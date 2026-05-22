@@ -1,0 +1,47 @@
+<script id="navbar-tooltips" type="text/javascript">
+  // Promote navbar icon links and the colour-scheme toggle to Tippy tooltips
+  // with the themed "mc" style (see .tippy-box[data-theme~="mc"] in the SCSS).
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window.tippy !== "function") return;
+
+    const config = {
+      theme: "mc",
+      placement: "bottom",
+      arrow: false,
+      delay: [100, 0],
+      offset: [0, 6],
+      allowHTML: false,
+      appendTo: function () { return document.body; },
+    };
+
+    function bind(el, content, overrides) {
+      if (!el || !content || el.dataset.tippyBound === "1") return;
+      el.removeAttribute("title");
+      window.tippy(el, Object.assign({ content: content }, config, overrides || {}));
+      el.dataset.tippyBound = "1";
+    }
+
+    // Brand/title links home: give it a "Home" tooltip (hover-only, so it is
+    // not pinned when clicked while already on the home page).
+    document.querySelectorAll(".navbar a.navbar-brand").forEach(function (brand) {
+      bind(brand, "Home", { trigger: "mouseenter", hideOnClick: true });
+    });
+
+    document.querySelectorAll(".navbar a.nav-link").forEach(function (link) {
+      const icon = link.querySelector("iconify-icon[aria-label], iconify-icon[title]");
+      if (!icon) return;
+      const label = icon.getAttribute("aria-label") || icon.getAttribute("title");
+      icon.removeAttribute("title");
+      bind(link, label);
+    });
+
+    // The toggle changes state in place: a focus trigger would pin the tooltip
+    // after a click. Bind it hover-only (its accessible name is the aria-label).
+    document.querySelectorAll("a.quarto-color-scheme-toggle").forEach(function (toggle) {
+      bind(toggle, toggle.getAttribute("title") || toggle.getAttribute("aria-label"), {
+        trigger: "mouseenter",
+        hideOnClick: true,
+      });
+    });
+  });
+</script>

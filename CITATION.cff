@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "TidyTuesday figures in Typst"
+abstract: "Weekly TidyTuesday datasets visualised in Typst with Gribouille."
+type: dataset
+authors:
+  - family-names: "Canouil"
+    given-names: "Mickaël"
+    orcid: "https://orcid.org/0000-0002-3396-4549"
+url: "https://m.canouil.dev/tidytuesday"
+repository-code: "https://github.com/mcanouil/tidytuesday"
+license: CC-BY-NC-SA-4.0

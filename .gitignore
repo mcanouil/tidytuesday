@@ -1,0 +1,7 @@
+/_site/
+/.quarto/
+.DS_Store
+tidytuesday/**/*.svg
+
+**/*.quarto_ipynb
+/.preview/

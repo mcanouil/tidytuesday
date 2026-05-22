@@ -1,0 +1,376 @@
+/*-- scss:defaults --*/
+
+// Custom complete theme (no built-in Bootswatch base).
+// This file is the default (light) theme; theme-dark.scss layers overrides on top.
+// Fonts are linked from the page head (see _quarto.yml include-in-header).
+
+// All base variables use !default so theme-dark.scss can override them
+// when layered on top (Quarto applies later layers with higher precedence).
+
+// Palette ---------------------------------------------------------------
+$ink:    #15233b !default;
+$paper:  #fbfaf7 !default;
+$teal:   #0f8b8d !default;
+$amber:  #e08e0b !default;
+$rose:   #c5455b !default;
+$mist:   #eef1f6 !default;
+
+$primary:   $teal !default;
+$secondary: $amber !default;
+$success:   #2f9e6f !default;
+$info:      #2a7f8a !default;
+$warning:   $amber !default;
+$danger:    $rose !default;
+
+$body-bg:    $paper !default;
+$body-color: $ink !default;
+$link-color: darken($teal, 4%) !default;
+$link-hover-color: darken($teal, 16%) !default;
+
+// Typography ------------------------------------------------------------
+$font-family-sans-serif: "Inter", system-ui, -apple-system, sans-serif !default;
+$headings-font-family: "Space Grotesk", #{$font-family-sans-serif} !default;
+$font-family-monospace: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace !default;
+$font-weight-base: 400 !default;
+$line-height-base: 1.65 !default;
+$headings-font-weight: 600 !default;
+$headings-letter-spacing: -0.015em !default;
+$h1-font-size: 2.6rem !default;
+
+// Shape -----------------------------------------------------------------
+$border-radius:    0.65rem !default;
+$border-radius-sm: 0.4rem !default;
+$border-radius-lg: 1.1rem !default;
+$border-color: rgba($ink, 0.12) !default;
+
+// Code ------------------------------------------------------------------
+$code-color: darken($teal, 10%) !default;
+$code-bg: rgba($teal, 0.08) !default;
+
+// Navbar / footer (Quarto) ---------------------------------------------
+$navbar-bg: $ink !default;
+$navbar-fg: rgba(#ffffff, 0.9) !default;
+$navbar-hl: $amber !default;
+$footer-bg: $ink !default;
+$footer-fg: rgba(#ffffff, 0.78) !default;
+
+// Bootstrap tooltip: dark surface, light text in both modes.
+// Bootstrap defaults the tooltip colour to body-bg, which collapses in dark.
+$tooltip-bg: $ink !default;
+$tooltip-color: $paper !default;
+$tooltip-opacity: 1 !default;
+
+// Tokens consumed by the rules layer below -----------------------------
+$surface:      #ffffff !default;
+$surface-2:    $mist !default;
+$hairline:     rgba($ink, 0.1) !default;
+$accent-grad:  linear-gradient(115deg, #{$teal} 0%, #{$amber} 100%) !default;
+$page-grad:    radial-gradient(1200px 600px at 100% -5%, rgba($teal, 0.08), transparent 60%),
+               radial-gradient(900px 500px at -10% 0%, rgba($amber, 0.07), transparent 55%) !default;
+$shadow-card:  0 1px 2px rgba($ink, 0.06), 0 12px 30px rgba($ink, 0.08) !default;
+$shadow-card-h: 0 6px 14px rgba($ink, 0.1), 0 22px 48px rgba($ink, 0.16) !default;
+
+
+/*-- scss:rules --*/
+
+// Helper: mix body background and foreground (adapts per light/dark mode).
+@function body-mix($weight) {
+  @return mix($body-bg, $body-color, $weight);
+}
+
+// Theme-toggle icons: shape from an SVG mask, colour from background-color,
+// so the glyph follows the surrounding text colour (currentColor).
+$_icon-sun: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
+$_icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097z"/></svg>');
+
+@mixin toggle-icon($icon) {
+  background-image: none;
+  background-color: currentColor;
+  -webkit-mask-image: $icon;
+  mask-image: $icon;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+// Page canvas -----------------------------------------------------------
+body {
+  background-image: $page-grad;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+// Navbar ----------------------------------------------------------------
+.navbar {
+  border-bottom: 1px solid $hairline;
+  backdrop-filter: saturate(140%) blur(6px);
+  box-shadow: 0 2px 18px rgba(#000000, 0.18);
+
+  .navbar-brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: $accent-grad;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .navbar-nav .nav-link {
+    position: relative;
+    font-weight: 500;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: 0.3rem;
+      height: 2px;
+      border-radius: 2px;
+      background: $accent-grad;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover::after,
+    &.active::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+// Headings with gradient accent ----------------------------------------
+.quarto-title .title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+  background: $accent-grad;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+main h2 {
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid transparent;
+  border-image: $accent-grad 1;
+}
+
+// Content links: animated underline ------------------------------------
+main a:not(.gallery-card):not(.btn) {
+  text-decoration: none;
+  background-image: $accent-grad;
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.22s ease;
+
+  &:hover {
+    background-size: 100% 2px;
+  }
+}
+
+// Gallery grid ----------------------------------------------------------
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.6rem;
+  margin-top: 2rem;
+}
+
+.gallery-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $hairline;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: $surface;
+  box-shadow: $shadow-card;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: $accent-grad;
+    z-index: 2;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-card-h;
+    color: inherit;
+
+    .gallery-thumb img {
+      transform: scale(1.04);
+    }
+  }
+}
+
+.gallery-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.1rem;
+  background: $surface-2;
+  overflow: hidden;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+  }
+}
+
+.gallery-meta {
+  padding: 1rem 1.15rem 1.25rem;
+}
+
+.gallery-date {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $primary;
+}
+
+.gallery-title {
+  font-family: "Space Grotesk", sans-serif;
+  margin: 0.3rem 0 0.5rem;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.gallery-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.82;
+}
+
+// Figures ---------------------------------------------------------------
+main figure img,
+main p img {
+  border-radius: $border-radius;
+}
+
+// Code ------------------------------------------------------------------
+// Quarto hardcodes the code-block background from the light theme, which
+// looks wrong in dark mode. Derive it from the body instead so it adapts.
+div.sourceCode {
+  background-color: body-mix(95%);
+  border: 1px solid body-mix(55%);
+  border-radius: $border-radius;
+}
+
+p code.sourceCode,
+li code.sourceCode,
+td code.sourceCode {
+  background-color: inherit;
+}
+
+// Theme toggle: sun in light mode, moon in dark mode -------------------
+.navbar .quarto-color-scheme-toggle {
+  &:not(.alternate) .bi::before {
+    @include toggle-icon($_icon-sun);
+  }
+
+  &.alternate .bi::before {
+    @include toggle-icon($_icon-moon);
+  }
+}
+
+// Tooltips --------------------------------------------------------------
+// Navbar tooltips use Tippy with the "mc" theme (see tooltips.html):
+// dark surface, light text, primary border, soft shadow, in both modes.
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tippy-box[data-theme~="mc"] {
+  background-color: $tooltip-bg;
+  color: $tooltip-color;
+  border: 1px solid $primary;
+  border-radius: $border-radius-sm;
+  box-shadow: 0 6px 20px rgba(#000000, 0.35);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.15rem 0.4rem;
+  animation: fade-in 0.15s ease;
+
+  .tippy-arrow {
+    color: $tooltip-bg;
+  }
+}
+
+// Skip link (revealed on keyboard focus) -------------------------------
+.skip-link:focus {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1080;
+  padding: 0.5rem 0.9rem;
+  border-radius: $border-radius-sm;
+  background: $primary;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(#000000, 0.35);
+}
+
+// GLightbox: enlarge SVG figures. GLightbox rebuilds a fresh <img> from the
+// anchor href; vw units are needed because .gslide-media has width: auto.
+.glightbox-container .gslide-image img[src$=".svg"] {
+  width: 75vw;
+  height: auto;
+  max-width: 75vw;
+  max-height: 90vh;
+  min-width: 0;
+  object-fit: contain;
+}
+
+// Listing sort / filter controls (adapt to light & dark) ---------------
+.quarto-listing-filter,
+.quarto-listing-sort {
+  .form-control,
+  .form-select {
+    background-color: $surface;
+    color: $body-color;
+    border-color: $hairline;
+
+    &::placeholder {
+      color: rgba($body-color, 0.55);
+    }
+
+    &:focus {
+      background-color: $surface;
+      color: $body-color;
+      border-color: $primary;
+      box-shadow: 0 0 0 0.2rem rgba($primary, 0.2);
+    }
+  }
+
+  .input-group-text {
+    background-color: $surface-2;
+    color: $body-color;
+    border-color: $hairline;
+  }
+}
+
+// Author degrees in the title block ------------------------------------
+.quarto-title-author-degree {
+  font-size: 0.65em;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: $primary;
+}
+
+// Footer ----------------------------------------------------------------
+.nav-footer {
+  border-top: 1px solid $hairline;
+}

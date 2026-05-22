@@ -1,0 +1,86 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - about.qmd
+    - "tidytuesday/20*/*/*/index.qmd"
+
+filters:
+  - typst-render
+  - code-window
+  - assets/filters/current-year.lua
+
+website:
+  title: "TidyTuesday"
+  description: "Mickaël Canouil's weekly TidyTuesday figures, drawn in Typst with Gribouille."
+  site-url: "https://m.canouil.dev/tidytuesday"
+  repo-url: "https://github.com/mcanouil/tidytuesday"
+  repo-actions: none
+  repo-link-target: _blank
+  repo-link-rel: noopener noreferrer
+  open-graph: true
+  twitter-card: true
+  bread-crumbs: true
+  page-navigation: true
+  back-to-top-navigation: true
+  page-footer:
+    left: |
+      Powered by [{{< iconify simple-icons:quarto title="Quarto Logo" label="Quarto Logo" >}} Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
+    center: |
+      &copy; []{#current-year} [Mickaël CANOUIL](https://mickael.canouil.fr){target="_blank" rel="noopener noreferrer"}. [{{< iconify octicon:heart-fill-16 title="Heart" label="Heart" >}} Sponsor](https://github.com/sponsors/mcanouil?o=esb){target="_blank" rel="noopener noreferrer"}.
+    right: |
+      License: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0){target="_blank" rel="noopener noreferrer"}.
+  navbar:
+    right:
+      - text: '{{< iconify octicon:info-16 title="About" label="About" >}}'
+        href: about.qmd
+        aria-label: "About"
+      - text: '{{< iconify octicon:mark-github-16 title="GitHub" label="GitHub" >}}'
+        href: "https://github.com/mcanouil/tidytuesday"
+        target: _blank
+        rel: noopener noreferrer
+        aria-label: "GitHub repository"
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - section: "TidyTuesday"
+        href: index.qmd
+        contents:
+          - auto: "tidytuesday/*/*/*/index.qmd"
+
+brand: assets/brand/_brand.yml
+
+lang: en-GB
+
+format:
+  html:
+    theme:
+      light: assets/scss/theme.scss
+      dark:
+        - assets/scss/theme.scss
+        - assets/scss/theme-dark.scss
+    toc: true
+    lightbox: auto
+    grid:
+      body-width: 1100px
+    template-partials:
+      - assets/partials/_title-meta-author.html
+    include-in-header:
+      - text: |
+          <link rel="preconnect" href="https://fonts.bunny.net">
+          <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700|space-grotesk:500,600,700|jetbrains-mono:400,500&display=swap">
+    include-before-body:
+      - assets/partials/skip-link.html
+    include-after-body:
+      - assets/partials/tooltips.html
+      - assets/partials/a11y-fixes.html
+      - assets/partials/title-block-header.html
+
+authors:
+  - name:
+      given: Mickaël
+      family: CANOUIL
+    degrees: "Ph.D."
+    url: https://mickael.canouil.fr

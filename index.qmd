@@ -1,0 +1,26 @@
+---
+title: "TidyTuesday Gallery"
+description: "Weekly data figures drawn in Typst with Gribouille."
+listing:
+  id: gallery
+  contents:
+    - "tidytuesday/20*/*/*/index.qmd"
+  template: assets/listings/gallery.ejs.md
+  sort: "date desc"
+  sort-ui: [date, title]
+  filter-ui: true
+  categories: true
+  page-size: 12
+  feed: true
+  fields: [title, date, description, categories, image]
+  field-types:
+    date: date
+page-layout: full
+sidebar: false
+---
+
+Each week takes a [TidyTuesday](https://github.com/rfordatascience/tidytuesday) dataset and turns it into a figure drawn entirely in [Typst](https://typst.app), mostly with [Gribouille](https://m.canouil.dev/gribouille).
+Pick a card to see the figure and its source.
+
+::: {#gallery}
+:::

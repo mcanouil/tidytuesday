@@ -1,0 +1,24 @@
+---
+title: "About"
+sidebar: false
+---
+
+[TidyTuesday](https://github.com/rfordatascience/tidytuesday) is a weekly social data project.
+A fresh dataset lands every week and the community explores it and shares the results.
+
+This site is my take on it, with two constraints:
+
+- Every figure is drawn in [Typst](https://typst.app), not R or Python.
+- Figures are built with [Gribouille](https://m.canouil.dev/gribouille), my grammar-of-graphics package for Typst.
+
+## How it is organised
+
+Each entry lives under a `tidytuesday/year/month/day` folder matching the dataset's date.
+A folder holds the downloaded data and a `_plot.typ` source; the `typst-render` extension compiles it to light and dark SVGs shown in the gallery and on the entry page.
+
+## Reproducing an entry
+
+```sh
+scripts/new-week.sh 2026-05-26   # scaffold the folder and fetch the data
+quarto preview                   # browse the gallery locally; figures compile on render
+```

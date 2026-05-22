@@ -1,0 +1,22 @@
+---
+title: "__TITLE__"
+engine: markdown
+date: "__DATE__"
+image: plot-light.svg
+categories:
+  - __YEAR__
+description: "A short description of the figure."
+---
+
+Write a sentence or two about what the figure shows.
+
+```{typst}
+//| label: fig-__SLUG__
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| echo: true
+//| fig-cap: "__TITLE__"
+//| fig-alt: "Figure built from the __TITLE__ dataset."
+```
+
+Data: [TidyTuesday __DATE__](https://github.com/rfordatascience/tidytuesday/tree/main/data/__YEAR__/__DATE__).

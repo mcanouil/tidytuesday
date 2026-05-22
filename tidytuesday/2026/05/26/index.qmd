@@ -1,0 +1,24 @@
+---
+title: "Renewable energy share over two decades"
+engine: markdown
+date: "2026-05-26"
+image: plot-light.svg
+categories:
+  - 2026
+description: "Renewable energy as a share of final consumption, 1990–2010, for five large economies."
+---
+
+The Sustainable Energy for All dataset tracks each country's energy mix from 1990 to 2010.
+Plotting renewable energy as a share of final consumption shows how differently five large economies started and moved.
+Brazil stays high on hydro and biomass, China's share falls as coal grows, and France and Germany climb slowly from a low base.
+
+```{typst}
+//| label: fig-2026-05-26
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| echo: true
+//| fig-cap: "Renewable energy as a share of total final energy consumption, 1990–2010."
+//| fig-alt: "Line chart of renewable energy share for Brazil, China, France, Germany, and the United States from 1990 to 2010."
+```
+
+Data: [TidyTuesday 2026-05-26](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-05-26).

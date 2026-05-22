@@ -1,0 +1,15 @@
+meta:
+  name: "TidyTuesday in Typst"
+  link:
+    home: "https://m.canouil.dev/tidytuesday"
+
+color:
+  palette:
+    ink: "#1b1f24"
+    paper: "#ffffff"
+    teal: "#2a7f8a"
+    amber: "#d98e04"
+  foreground: ink
+  background: paper
+  primary: teal
+  secondary: amber

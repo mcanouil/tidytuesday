@@ -1,0 +1,47 @@
+/*-- scss:defaults --*/
+
+// Dark overrides only; layered on top of theme.scss (default/light).
+// Typography and shape are inherited from the base theme.
+
+// Palette ---------------------------------------------------------------
+$night:   #0d1626;
+$slate:   #16223a;
+$fog:     #e7ecf4;
+$teal:    #34d3c2;
+$amber:   #f4b552;
+$rose:    #f0708a;
+
+$primary:   $teal;
+$secondary: $amber;
+$success:   #57c89a;
+$info:      #57b6c8;
+$warning:   $amber;
+$danger:    $rose;
+
+$body-bg:    $night;
+$body-color: $fog;
+$link-color: $teal;
+$link-hover-color: lighten($teal, 10%);
+
+$border-color: rgba($fog, 0.14);
+$code-color: lighten($teal, 6%);
+$code-bg: rgba($teal, 0.12);
+
+$navbar-bg: #0a111f;
+$navbar-fg: rgba($fog, 0.86);
+$navbar-hl: $amber;
+$footer-bg: #0a111f;
+$footer-fg: rgba($fog, 0.7);
+
+$tooltip-bg: #0a111f;
+$tooltip-color: $fog;
+
+// Tokens consumed by the shared rules layer ----------------------------
+$surface:      $slate;
+$surface-2:    lighten($slate, 4%);
+$hairline:     rgba($fog, 0.12);
+$accent-grad:  linear-gradient(115deg, #{$teal} 0%, #{$amber} 100%);
+$page-grad:    radial-gradient(1200px 600px at 100% -5%, rgba($teal, 0.12), transparent 60%),
+               radial-gradient(900px 500px at -10% 0%, rgba($amber, 0.1), transparent 55%);
+$shadow-card:  0 1px 2px rgba(#000000, 0.4), 0 12px 30px rgba(#000000, 0.5);
+$shadow-card-h: 0 6px 14px rgba(#000000, 0.5), 0 22px 48px rgba(#000000, 0.62);
