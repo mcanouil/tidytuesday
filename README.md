@@ -1,5 +1,7 @@
 # TidyTuesday in Typst
 
+![TidyTuesday in Typst — weekly figures with Gribouille.](assets/og-card.png)
+
 My weekly [TidyTuesday](https://github.com/rfordatascience/tidytuesday) figures, drawn entirely in [Typst](https://typst.app) with [Gribouille](https://m.canouil.dev/gribouille), a grammar-of-graphics package.
 
 Live gallery: <https://m.canouil.dev/tidytuesday>.
@@ -24,12 +26,23 @@ Shared assets live under `assets/`:
 assets/
 ├── brand/_brand.yml        # colour palette shared with figures
 ├── listings/gallery.ejs.md # custom gallery listing template (read as markdown)
+├── og-card.png             # social card (committed; built from typst/social-card.typ)
+├── typst/social-card.typ   # social card source (Typst + Gribouille)
 └── scss/
     ├── theme.scss          # custom complete theme (default / light)
     └── theme-dark.scss     # dark overrides, layered on top
 ```
 
 Fonts come from [Bunny Fonts](https://fonts.bunny.net) (GDPR-friendly), linked in the page head.
+
+## Social card
+
+`assets/og-card.png` is the site-wide Open Graph / Twitter image (entries override it with their own figure).
+It is built from Typst with the Quarto-bundled compiler and committed (CI runners lack the Inter font):
+
+```sh
+scripts/build-card.sh   # regenerate assets/og-card.png after editing the source
+```
 
 ## Add a week
 

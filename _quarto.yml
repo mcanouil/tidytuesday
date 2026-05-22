@@ -54,6 +54,9 @@ brand: assets/brand/_brand.yml
 
 lang: en-GB
 
+image: /assets/og-card.png
+image-alt: "TidyTuesday in Typst — weekly figures with Gribouille."
+
 format:
   html:
     theme:
