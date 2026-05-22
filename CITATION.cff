@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
-title: "TidyTuesday figures in Typst"
+title: "TidyTuesday in Typst"
 abstract: "Weekly TidyTuesday datasets visualised in Typst with Gribouille."
 type: dataset
 authors:
