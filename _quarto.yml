@@ -79,6 +79,7 @@ format:
     include-after-body:
       - assets/partials/tooltips.html
       - assets/partials/a11y-fixes.html
+      - assets/partials/ordinal-dates.html
       - assets/partials/title-block-header.html
 
 authors:

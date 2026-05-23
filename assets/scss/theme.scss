@@ -377,6 +377,15 @@ td code.sourceCode {
   }
 }
 
+// Ordinal date suffixes (st, nd, rd, th) wrapped by ordinal-dates.html.
+// Override <sup> default raise: stay on baseline, shrink, italicise.
+.ordinal-suffix {
+  font-size: 0.70em;
+  font-style: italic;
+  vertical-align: baseline;
+  line-height: inherit;
+}
+
 // Author degrees in the title block ------------------------------------
 .quarto-title-author-degree {
   font-size: 0.65em;
