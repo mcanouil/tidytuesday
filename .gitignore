@@ -1,5 +1,7 @@
 /_site/
 /.quarto/
-tidytuesday/**/*.svg
 **/*.quarto_ipynb
 /.luarc.json
+
+tidytuesday/**/*.svg
+tidytuesday/**/*.png
