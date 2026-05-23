@@ -21,12 +21,12 @@
   mapping: aes(x: "year", y: "renewable", colour: "country"),
   layers: (geom-line(),),
   labs: labs(
-    title: "Renewable share of final energy use, 1990–2010",
+    title: "Renewable share of final energy use, 1990-2010",
     x: "Year",
     y: "Renewable energy (% of final consumption)",
     colour: "Country",
   ),
   theme: theme-minimal(),
-  width: 18cm,
-  height: 11cm,
+  width: 12cm,
+  height: 6.3cm,
 )

@@ -13,6 +13,7 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: featured.png
 //| format: png
+//| dpi: 300
 ```
 
 The Sustainable Energy for All dataset tracks each country's energy mix from 1990 to 2010.
