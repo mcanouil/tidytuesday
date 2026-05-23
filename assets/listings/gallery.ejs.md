@@ -4,10 +4,10 @@
   <a class="gallery-card" href="<%- item.path %>" <%= metadataAttrs(item) %>>
     <% if (item.image) { %>
       <% const lightSrc = item.image; %>
-      <% const darkSrc = item.image.replace(/-light\.svg$/, "-dark.svg"); %>
+      <% const darkSrc = item.image.replace(/-light\./, "-dark."); %>
       <div class="gallery-thumb">
-        <img class="light-content" src="<%- lightSrc %>" alt="<%- item.title %>">
-        <img class="dark-content" src="<%- darkSrc %>" alt="<%- item.title %>">
+        <img class="light-content" src="<%- lightSrc %>" alt="<%- item.title %>" loading="lazy">
+        <img class="dark-content" src="<%- darkSrc %>" alt="<%- item.title %>" loading="lazy">
       </div>
     <% } %>
     <div class="gallery-meta">

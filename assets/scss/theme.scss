@@ -275,6 +275,18 @@ main p img {
   border-radius: $border-radius;
 }
 
+// Framed figure: centred soft card around Typst output images.
+img.figure-frame {
+  display: block;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding: 1rem;
+  background-color: $surface;
+  border: 1px solid $hairline;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-card;
+}
+
 // Code ------------------------------------------------------------------
 // Quarto hardcodes the code-block background from the light theme, which
 // looks wrong in dark mode. Derive it from the body instead so it adapts.
