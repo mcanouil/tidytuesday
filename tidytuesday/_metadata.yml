@@ -1,11 +1,13 @@
 extensions:
   typst-render:
     preamble: /assets/typst/_preamble.typ
+    classes: figure-frame
     background:
       light: "#fbfaf7"
       dark: "#0d1626"
     foreground:
       light: "#15233b"
       dark: "#e7ecf4"
+    output-directory: "./images"
 
 date-format: "dddd[, the] Do [of] MMMM, YYYY"
