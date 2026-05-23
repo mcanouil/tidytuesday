@@ -6,10 +6,16 @@ project:
     - about.qmd
     - "tidytuesday/20*/*/*/index.qmd"
 
-filters:
-  - typst-render
-  - code-window
-  - assets/filters/current-year.lua
+lang: en-GB
+image: /assets/og-card.png
+image-alt: "TidyTuesday in Typst — weekly figures with Gribouille."
+
+authors:
+  - name:
+      given: Mickaël
+      family: CANOUIL
+    degrees: "Ph.D."
+    url: https://mickael.canouil.fr
 
 website:
   title: "TidyTuesday"
@@ -52,11 +58,6 @@ website:
 
 brand: assets/brand/_brand.yml
 
-lang: en-GB
-
-image: /assets/og-card.png
-image-alt: "TidyTuesday in Typst — weekly figures with Gribouille."
-
 format:
   html:
     theme:
@@ -82,9 +83,7 @@ format:
       - assets/partials/ordinal-dates.html
       - assets/partials/title-block-header.html
 
-authors:
-  - name:
-      given: Mickaël
-      family: CANOUIL
-    degrees: "Ph.D."
-    url: https://mickael.canouil.fr
+filters:
+  - typst-render
+  - code-window
+  - assets/filters/current-year.lua
