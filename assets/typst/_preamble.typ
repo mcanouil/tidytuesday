@@ -1,4 +1,4 @@
-#import "@preview/gribouille:0.1.0": *
+#import "@local/gribouille:0.0.0": *
 
 // Prepended before every {typst} block by typst-render (see _quarto.yml).
 // Wraps the Gribouille theme functions so each plot picks up the

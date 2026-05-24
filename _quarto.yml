@@ -1,5 +1,6 @@
 project:
   type: website
+  pre-render: scripts/install-gribouille.sh
   output-dir: _site
   render:
     - index.qmd
