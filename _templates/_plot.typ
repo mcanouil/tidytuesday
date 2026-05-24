@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see _quarto.yml);
 // do not import it here or the theme-* wrappers get rebound.
+// #import "@preview/gribouille:0.1.0": *
+// #import "@local/gribouille:0.0.0": *
 
-// The typst-render extension compiles this file with the repository root as
-// the Typst root, so the data path is relative to the repository root.
 #let data = csv("__CSVPATH__", row-type: dictionary)
 
 // TODO: map real column names from the CSV above.

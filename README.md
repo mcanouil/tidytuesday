@@ -53,12 +53,13 @@ quarto preview                   # browse locally; figures compile on render
 ```
 
 `new-week.sh` needs [`gh`](https://cli.github.com), `jq`, and `curl`.
-Typst downloads Gribouille and its CeTZ backend on first render (network required once).
+The `pre-render` hook runs `scripts/install-gribouille.sh`, which installs the latest Gribouille development build into Typst's `local` package namespace, pinned to the constant version `0.0.0` so the import in `assets/typst/_preamble.typ` never changes (network required).
+It skips the download when `0.0.0` is already installed; set `GRIBOUILLE_FORCE_UPDATE=1` to refresh.
 
 ## Tooling
 
 - Typst `0.14.2`.
-- Gribouille `0.1.0` (CeTZ `0.5` backend).
+- Gribouille development build, pinned locally as `0.0.0` (CeTZ `0.5` backend); the social card stays on Gribouille `0.1.0`.
 - Quarto `1.9.37`.
 
 ## Publishing

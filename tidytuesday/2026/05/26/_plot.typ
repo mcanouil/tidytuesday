@@ -1,6 +1,7 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.1.0": *
+// #import "@local/gribouille:0.0.0": *
 
 #let num(s) = if s == "NA" or s == "" { 0.0 } else { float(s) }
 
