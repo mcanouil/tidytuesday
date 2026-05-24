@@ -1,10 +1,10 @@
 ---
 engine: markdown
-title: "Renewable energy share over two decades"
-description: "Renewable energy as a share of final consumption, 1990–2010, for five large economies."
+title: "What 'renewable energy' means depends on how rich a country is"
+description: "Two stacked-area panels split renewable energy by source for Vietnam and Germany, 1990 to 2010, showing traditional biomass falling as modern renewables rise."
 date: "2026-05-26"
 image: images/featured-light.png
-image-alt: "Line chart of renewable energy share for Brazil, China, France, Germany, and the United States from 1990 to 2010."
+image-alt: "Two stacked-area panels of renewable energy by source, 1990 to 2010. Vietnam's traditional biomass band shrinks and its renewable share falls from 76% to 35%, while Germany's modern bioenergy and wind and solar grow and its share rises from 2% to 11%."
 categories: [2026]
 ---
 
@@ -22,11 +22,18 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| fig-alt: "{{< meta image-alt >}}"
-//| fig-cap: "Renewable energy as a share of total final energy consumption, 1990–2010."
+//| fig-cap: "Renewable energy by source as a share of total final energy consumption, 1990 to 2010, for Vietnam and Germany."
 ```
 
 Data: [TidyTuesday 2026-05-26](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-05-26).
 
 The Sustainable Energy for All dataset tracks each country's energy mix from 1990 to 2010.
-Plotting renewable energy as a share of final consumption shows how differently five large economies started and moved.
-Brazil stays high on hydro and biomass, China's share falls as coal grows, and France and Germany climb slowly from a low base.
+A high renewable share is not always a sign of clean, modern energy.
+Across countries in 2010, the renewable share correlates 0.88 with the share coming from traditional biomass, that is wood, charcoal, and dung burned for cooking and heating.
+
+Vietnam shows what happens as a poor country grows richer.
+Its renewable share falls from 76% to 35%, not because it abandons clean energy, but because fossil fuels expand faster than traditional biomass can be replaced.
+
+Germany shows the opposite road.
+Starting from almost nothing, it builds modern bioenergy and then wind and solar, lifting its renewable share from 2% to 11%.
+The same headline number hides two very different stories.
