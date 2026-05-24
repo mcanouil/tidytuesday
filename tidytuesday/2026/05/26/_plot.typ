@@ -72,9 +72,6 @@
     scale-fill-discrete(limits: cats, palette: cat-colours.values()),
   ),
   labs: labs(title: country, x: none, y: "% of final energy"),
-  // Collapse the empty x-axis title row: an "" title still reserves its height,
-  // and the band is only skipped when the title element's size is 0pt (see
-  // gribouille render.typ gate `axis-title-x size > 0pt`). Years are self-evident.
   theme: theme-minimal(),
   guides: guides(fill: guide-none()),
   width: 6.6cm,
@@ -134,10 +131,6 @@
   ),
 )
 
-// typst-render injects `#set text(fill: foreground)` ahead of this file, so the
-// ambient text fill already carries the document ink. Read it back with `context
-// text.fill` where a concrete colour is needed; never reach into the extension's
-// internal `_typst_render_foreground` binding (that bridge lives in _preamble.typ).
 #let accent = rgb("#0f8b8d")
 
 #let panels = compose(
@@ -146,11 +139,13 @@
   layout: "grid",
   columns: 2,
   collect: none,
+  guides-placement: "bottom",
   gutter: 1.6cm,
 )
 
 // Manual, order-controlled legend (compose's hoisted legend clips its first
 // swatch). Drawn from the same dictionary, so it always matches the bands.
+// Workaround awaiting upstream fix.
 #let swatch(c) = box(
   baseline: 1pt,
   rect(width: 9pt, height: 9pt, radius: 1pt, fill: cat-colours.at(c)),
@@ -169,13 +164,13 @@
     Renewable share of final energy use, by source, 1990 to 2010
   ]
 
-  #v(6pt)
+  #v(0pt)
 
   // compose() lays the two panels in a grid; the linking annotation is placed
   // over the gutter between them, with arrows tracing each opposite trend.
   #box[
     #panels
-    #place(center + horizon, dx: 0pt, dy: -16pt)[
+    #place(center + horizon, dx: -7pt, dy: -16pt)[
       #set align(center)
       #set text(size: 7.5pt, style: "italic", fill: accent)
       As incomes rise, \ two roads diverge
@@ -188,7 +183,7 @@
     ]
   ]
 
-  #v(4pt)
+  #v(-25pt)
   #legend
 
   #v(5pt)
