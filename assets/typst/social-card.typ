@@ -125,7 +125,7 @@
 #place(top, rect(width: 100%, height: 8pt, fill: gradient.linear(teal, amber)))
 
 // Figure, right side, in a framed panel.
-#place(right + horizon, dx: -48pt, block(
+#place(right + horizon, dx: -80pt, block(
   fill: surface,
   radius: 16pt,
   inset: 16pt,
