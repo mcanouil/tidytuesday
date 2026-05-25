@@ -21,6 +21,8 @@ categories: [2026]
 ```{typst}
 //| label: fig-2026-05-26
 //| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| width: 18cm
