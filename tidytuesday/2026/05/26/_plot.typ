@@ -99,7 +99,10 @@
     x: 2009.6,
     y: 70,
     label: callout[
-      #text(fill: cat-colours.at("Traditional biomass"), weight: "semibold")[Traditional biomass] #emph[for cooking] \
+      #text(
+        fill: cat-colours.at("Traditional biomass"),
+        weight: "semibold"
+      )[Traditional biomass] #emph[for cooking] \
       #emph[fades as fossil fuels spread]
     ],
     size: 6.5pt,
@@ -114,7 +117,15 @@
     x: 1990.2,
     y: 9.6,
     label: callout[
-      #text(fill: cat-colours.at("Modern bioenergy"), weight: "semibold")[Modern bioenergy], #emph[then] #text(fill: cat-colours.at("Wind & solar"), weight: "semibold")[wind & solar], \
+      #text(
+        fill: cat-colours.at("Modern bioenergy"),
+        weight: "semibold"
+      )[Modern bioenergy],
+      #emph[then]
+      #text(
+        fill: cat-colours.at("Wind & solar"),
+        weight: "semibold"
+      )[wind & solar], \
       #emph[built from almost nothing]
     ],
     size: 6.5pt,
