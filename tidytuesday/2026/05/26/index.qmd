@@ -14,8 +14,8 @@ categories: [2026]
 //| output-filename: featured.png
 //| format: png
 //| dpi: 300
-//| width: 12cm
-//| height: 6.3cm
+//| width: 18cm
+//| height: 9.45cm
 ```
 
 ```{typst}
