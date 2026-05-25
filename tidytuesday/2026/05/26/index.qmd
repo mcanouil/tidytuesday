@@ -1,7 +1,7 @@
 ---
 engine: markdown
-title: "What 'renewable energy' means depends on how rich a country is"
-description: "Two stacked-area panels split renewable energy by source for Vietnam and Germany, 1990 to 2010, showing traditional biomass falling as modern renewables rise."
+title: "Sustainable Energy for All"
+description: "Country-level energy data from the UN Sustainable Energy for All initiative, covering electricity access, energy efficiency, and renewable share from 1990 to 2010."
 date: "2026-05-26"
 image: images/featured-light.png
 image-alt: "Two stacked-area panels of renewable energy by source, 1990 to 2010. Vietnam's traditional biomass band shrinks and its renewable share falls from 76% to 35%, while Germany's modern bioenergy and wind and solar grow and its share rises from 2% to 11%."
@@ -14,6 +14,8 @@ categories: [2026]
 //| output-filename: featured.png
 //| format: png
 //| dpi: 300
+//| width: 12cm
+//| height: 6.3cm
 ```
 
 ```{typst}
@@ -21,6 +23,8 @@ categories: [2026]
 //| echo: true
 //| file: _plot.typ
 //| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
 //| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "Renewable energy by source as a share of total final energy consumption, 1990 to 2010, for Vietnam and Germany."
 ```

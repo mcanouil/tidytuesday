@@ -2,6 +2,7 @@
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.1.0": *
 // #import "@local/gribouille:0.0.0": *
+// #set page(width: auto, height: auto, margin: 0cm)
 
 #let num(s) = if s == "NA" or s == "" { 0.0 } else { float(s) }
 
@@ -18,6 +19,25 @@
   "Wind & solar": rgb("#0072b2"),
 )
 #let cats = cat-colours.keys()
+
+#let accent = rgb("#0f8b8d")
+
+// Box-styled callout: a translucent paper background plus a hairline accent
+// border lifts the prose off the stacked bands so it stays legible. The paper
+// colour comes from the ambient `page.fill` (typst-render sets the page fill to
+// the document background), mirroring how ink is read from `text.fill`, so the
+// boxes track the light / dark site toggle.
+#let callout(body) = context {
+  // `page.fill` is `auto` when the document sets no page fill (standalone
+  // compile); typst-render sets it to the background, so fall back to white.
+  let bg = if page.fill in (auto, none) { white } else { page.fill }
+  box(
+    fill: bg.transparentize(12%),
+    inset: (x: 5pt, y: 3pt),
+    radius: 3pt,
+    stroke: 0.5pt + accent.transparentize(45%),
+  )[#body]
+}
 
 // One row per (year, category) carrying the stacked band bounds (ymin, ymax).
 // geom-area draws every band from y = 0, so stacked areas would paint over one
@@ -55,27 +75,16 @@
 #let vn = reshape("Vietnam")
 #let de = reshape("Germany")
 
-// One ribbon layer per category: gribouille's ribbon does not split on a group
-// aesthetic, so each band is its own filtered layer. The shared fill scale still
-// trains across all layers, keeping the colour mapping consistent.
-#let bands(rows) = cats.map(c => geom-ribbon(
-  data: rows.filter(r => r.category == c),
-  alpha: 0.92,
-))
-
 #let panel(rows, country, annotations) = plot(
   data: rows,
   mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
-  layers: bands(rows) + annotations,
+  layers: (geom-ribbon(alpha: 1),) + annotations,
   scales: (
     scale-x-continuous(breaks: (1990, 2000, 2010)),
     scale-fill-discrete(limits: cats, palette: cat-colours.values()),
   ),
-  labs: labs(title: country, x: none, y: "% of final energy"),
+  labs: labs(title: country, x: none, y: "% Final Energy", fill: none),
   theme: theme-minimal(),
-  guides: guides(fill: guide-none()),
-  width: 6.6cm,
-  height: 6cm,
   defer: true,
 )
 
@@ -83,112 +92,65 @@
 // "why" sitting in the empty corner of each panel. Text colour is left to the
 // theme ink so the callouts track the light / dark site toggle.
 #let vn-annot = (
-  annotate("text", x: 1990.2, y: 79, label: "76%", size: 9pt, anchor: "west"),
-  annotate("text", x: 2009.8, y: 39, label: "35%", size: 9pt, anchor: "east"),
+  annotate("label", x: 1990.2, y: 79, label: "76%", size: 9pt, anchor: "west"),
+  annotate("label", x: 2009.8, y: 42, label: "35%", size: 9pt, anchor: "east"),
   annotate(
-    "text",
+    "typst",
     x: 2009.6,
     y: 70,
-    label: "Traditional biomass for cooking",
-    size: 6.5pt,
-    anchor: "east",
-  ),
-  annotate(
-    "text",
-    x: 2009.6,
-    y: 65,
-    label: "fades as fossil fuels spread",
+    label: callout[
+      #text(fill: cat-colours.at("Traditional biomass"), weight: "semibold")[Traditional biomass] #emph[for cooking] \
+      #emph[fades as fossil fuels spread]
+    ],
     size: 6.5pt,
     anchor: "east",
   ),
 )
 #let de-annot = (
-  annotate("text", x: 1990.2, y: 1.2, label: "2%", size: 9pt, anchor: "west"),
-  annotate("text", x: 2009.8, y: 11.4, label: "11%", size: 9pt, anchor: "east"),
+  annotate("label", x: 1990.2, y: 2.5, label: "2%", size: 9pt, anchor: "west"),
+  annotate("label", x: 2009.8, y: 11.4, label: "11%", size: 9pt, anchor: "east"),
   annotate(
-    "text",
+    "typst",
     x: 1990.2,
     y: 9.6,
-    label: "Modern bioenergy, then",
-    size: 6.5pt,
-    anchor: "west",
-  ),
-  annotate(
-    "text",
-    x: 1990.2,
-    y: 8.9,
-    label: "wind & solar, built from",
-    size: 6.5pt,
-    anchor: "west",
-  ),
-  annotate(
-    "text",
-    x: 1990.2,
-    y: 8.2,
-    label: "almost nothing",
+    label: callout[
+      #text(fill: cat-colours.at("Modern bioenergy"), weight: "semibold")[Modern bioenergy], #emph[then] #text(fill: cat-colours.at("Wind & solar"), weight: "semibold")[wind & solar], \
+      #emph[built from almost nothing]
+    ],
     size: 6.5pt,
     anchor: "west",
   ),
 )
-
-#let accent = rgb("#0f8b8d")
 
 #let panels = compose(
   panel(vn, "Vietnam", vn-annot),
   panel(de, "Germany", de-annot),
   layout: "grid",
   columns: 2,
-  collect: none,
-  guides-placement: "bottom",
-  gutter: 1.6cm,
+  collect: ("fill",),
+  guides: guides(default: guide-legend(position: "bottom")),
+  gutter: 1cm,
+  labs: labs(
+    title: "What \"Renewable Energy\" Means Depends on How Rich a Country Is",
+    subtitle: "Renewable share of final energy use, by source, 1990 to 2010.",
+    caption: typst([
+      Source: Sustainable Energy for All (TidyTuesday 2026-05-26). \
+      Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
+    ])
+  ),
 )
 
-// Manual, order-controlled legend (compose's hoisted legend clips its first
-// swatch). Drawn from the same dictionary, so it always matches the bands.
-// Workaround awaiting upstream fix.
-#let swatch(c) = box(
-  baseline: 1pt,
-  rect(width: 9pt, height: 9pt, radius: 1pt, fill: cat-colours.at(c)),
-)
-#let legend = align(center)[
-  #set text(size: 8pt)
-  #cats.map(c => box[#swatch(c) #h(3pt) #c]).join(h(16pt))
-]
-
-#block(width: auto)[
-  #text(size: 13pt, weight: 700)[
-    What "renewable energy" means depends on how rich a country is
-  ]
-
-  #context text(size: 9pt, fill: text.fill.transparentize(20%))[
-    Renewable share of final energy use, by source, 1990 to 2010
-  ]
-
-  #v(0pt)
-
-  // compose() lays the two panels in a grid; the linking annotation is placed
-  // over the gutter between them, with arrows tracing each opposite trend.
-  #box[
-    #panels
-    #place(center + horizon, dx: -7pt, dy: -16pt)[
-      #set align(center)
-      #set text(size: 7.5pt, style: "italic", fill: accent)
-      As incomes rise, \ two roads diverge
-      #v(2pt)
-      #box(inset: (x: 2pt))[
-        #text(size: 13pt, fill: cat-colours.at("Traditional biomass"))[↓]
-        #h(4pt)
-        #text(size: 13pt, fill: cat-colours.at("Wind & solar"))[↑]
-      ]
+#box[
+  #panels
+  #place(top + center, dx: 0pt, dy: 2.8cm)[
+    #set align(center)
+    #set text(size: 8pt, style: "italic", fill: accent)
+    As incomes rise, \ two roads diverge
+    #v(2pt)
+    #box(inset: (x: 2pt))[
+      #text(size: 30pt, fill: cat-colours.at("Traditional biomass"))[↓]
+      #h(4pt)
+      #text(size: 30pt, fill: cat-colours.at("Wind & solar"))[↑]
     ]
-  ]
-
-  #v(-25pt)
-  #legend
-
-  #v(5pt)
-  #context text(size: 7pt, fill: text.fill.transparentize(35%))[
-    Source: Sustainable Energy for All (TidyTuesday 2026-05-26). Bands sum to each
-    country's total renewable share; panels use independent vertical scales.
   ]
 ]
