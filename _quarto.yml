@@ -43,6 +43,11 @@ website:
       - text: '{{< iconify octicon:info-16 title="About" label="About" >}}'
         href: about.qmd
         aria-label: "About"
+      - text: '{{< iconify octicon:rss-16 title="RSS" label="RSS" >}}'
+        href: index.xml
+        target: _blank
+        rel: noopener noreferrer
+        aria-label: "RSS feed"
       - text: '{{< iconify octicon:mark-github-16 title="GitHub" label="GitHub" >}}'
         href: "https://github.com/mcanouil/tidytuesday"
         target: _blank
