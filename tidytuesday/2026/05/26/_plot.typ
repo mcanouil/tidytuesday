@@ -2,7 +2,7 @@
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.1.0": *
 // #import "@local/gribouille:0.0.0": *
-// #set page(width: auto, height: auto, margin: 0cm)
+// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let num(s) = if s == "NA" or s == "" { 0.0 } else { float(s) }
 
@@ -19,6 +19,15 @@
   "Wind & solar": rgb("#0072b2"),
 )
 #let cats = cat-colours.keys()
+
+// One-line definition per category, aligned with `cats`. Each rolls up the
+// raw columns summed in `reshape`, so the legend names what every band is.
+#let cat-labels = (
+  [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
+  [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
+  [#strong[Hydropower] \ electricity from flowing water],
+  [#strong[Wind & solar] \ plus geothermal & marine],
+)
 
 #let accent = rgb("#0f8b8d")
 
@@ -81,7 +90,7 @@
   layers: (geom-ribbon(alpha: 1),) + annotations,
   scales: (
     scale-x-continuous(breaks: (1990, 2000, 2010)),
-    scale-fill-discrete(limits: cats, palette: cat-colours.values()),
+    scale-fill-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
   ),
   labs: labs(title: country, x: none, y: "% Final Energy", fill: none),
   theme: theme-minimal(),
@@ -153,15 +162,15 @@
 
 #box[
   #panels
-  #place(top + center, dx: 0pt, dy: 2.8cm)[
+  #place(top + center, dx: 0pt, dy: 2cm)[
     #set align(center)
     #set text(size: 8pt, style: "italic", fill: accent)
     As incomes rise, \ two roads diverge
     #v(2pt)
     #box(inset: (x: 2pt))[
-      #text(size: 30pt, fill: cat-colours.at("Traditional biomass"))[↓]
+      #text(size: 40pt, fill: cat-colours.at("Traditional biomass"))[↓]
       #h(4pt)
-      #text(size: 30pt, fill: cat-colours.at("Wind & solar"))[↑]
+      #text(size: 40pt, fill: cat-colours.at("Wind & solar"))[↑]
     ]
   ]
 ]
