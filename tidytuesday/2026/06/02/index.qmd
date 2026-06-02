@@ -15,7 +15,7 @@ categories: [2026]
 //| format: png
 //| dpi: 300
 //| width: 18cm
-//| height: 11cm
+//| height: 9.45cm
 ```
 
 ```{typst}
@@ -26,7 +26,7 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| width: 18cm
-//| height: 11cm
+//| height: 9.45cm
 //| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "(A): mean months of statutory leave reserved for each parent across 21 European countries, 1970 to 2024, with a band of plus or minus one standard error around each line. (B): a dumbbell chart of all 21 countries in 2024, each drawn as two dots joined by a bar whose length is the gap between mothers and the co-parent, sorted with the countries closest to parity on top."
 ```
