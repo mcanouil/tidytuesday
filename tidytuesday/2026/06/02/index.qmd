@@ -1,0 +1,52 @@
+---
+engine: markdown
+title: "Whose Leave Is It Anyway?"
+description: "European parenting leave policies from 1970 to 2024, showing how many months of statutory leave are reserved for mothers compared with the co-parent across 21 countries."
+date: "2026-06-02"
+image: images/featured-light.png
+image-alt: "Two panels. Panel (A) is a two-line chart of mean months of statutory leave reserved for each parent across 21 European countries from 1970 to 2024, each line wrapped in a shaded band of plus or minus one standard error: the blue mothers line rises from about 14 months to a peak above 21 around 2010 then eases to roughly 18, while the vermillion co-parent line sits near zero until 2000 and climbs to about 5 months by 2024, and the mothers band is consistently wider. Panel (B) is a dumbbell chart, a 2024 snapshot of all 21 countries, each shown as a blue mothers dot and a vermillion co-parent dot joined by a grey bar whose length is the gap; countries are sorted with the smallest gaps on top, where Spain, Slovakia and the United Kingdom reach parity, down to Ireland with the widest gap at the bottom."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 11cm
+```
+
+```{typst}
+//| label: fig-2026-06-02
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 11cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "(A): mean months of statutory leave reserved for each parent across 21 European countries, 1970 to 2024, with a band of plus or minus one standard error around each line. (B): a dumbbell chart of all 21 countries in 2024, each drawn as two dots joined by a bar whose length is the gap between mothers and the co-parent, sorted with the countries closest to parity on top."
+```
+
+Data: [TidyTuesday 2026-06-02](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-02).
+
+Europe has long earmarked far more statutory leave for mothers than for the co-parent.
+In 1970 the average country set aside about fourteen months for mothers and almost nothing for the co-parent.
+That asymmetry is the oldest and most stubborn feature of the data.
+
+The co-parent line stays close to the floor until the turn of the century.
+Only four countries reserved any leave for the co-parent in 1980, but nineteen did by 2024, as "use it or lose it" quotas spread across the continent.
+The line lifts off after 2000 and reaches roughly five months, about a third of what mothers receive, so the gap closes but only slowly.
+
+The shaded band around each line spans one standard error of the mean, so it widens when countries disagree.
+The mothers band is consistently the wider of the two, a reminder that "European maternity leave" hides very different national choices, and the mean is pulled upward by a few countries with unusually long leave.
+The point of the left panel is the shape of the two trends and the gap between them, not the precise height of either line.
+
+The right panel is a dumbbell chart that makes the national divergence concrete by ranking all twenty-one countries in 2024.
+Each country is a pair of dots, one for mothers and one for the co-parent, joined by a bar whose length is the gap between them.
+Spain, Slovakia and the United Kingdom have closed it completely, reserving the same amount for both parents, while at the other end Ireland reserves forty-two months for mothers and barely two for the co-parent.
+France sits in the lower half: sixteen months for mothers but only about four for the co-parent, despite matching Spain on maternity leave.
+That is the spread the European average smooths away.
