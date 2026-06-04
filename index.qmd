@@ -17,12 +17,6 @@ listing:
     date: date
 page-layout: full
 sidebar: false
-comments:
-  giscus:
-    repo: mcanouil/gribouille
-    repo-id: R_kgDOSGUuww
-    category: Show and tell
-    category-id: DIC_kwDOSGUuw84C7KIZ
 ---
 
 Each week takes a [TidyTuesday](https://github.com/rfordatascience/tidytuesday) dataset and turns it into a figure drawn entirely in [Typst](https://typst.app), mostly with [Gribouille](https://m.canouil.dev/gribouille).

@@ -11,3 +11,10 @@ extensions:
       light: "#15233b"
       dark: "#e7ecf4"
     output-directory: "./images"
+
+comments:
+  giscus:
+    repo: mcanouil/gribouille
+    repo-id: R_kgDOSGUuww
+    category: Show and tell
+    category-id: DIC_kwDOSGUuw84C7KIZ
