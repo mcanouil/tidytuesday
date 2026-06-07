@@ -1,22 +1,36 @@
 ---
-title: "__TITLE__"
 engine: markdown
-date: "__DATE__"
-image: plot-light.svg
-categories:
-  - __YEAR__
+title: "__TITLE__"
 description: "A short description of the figure."
+date: "__DATE__"
+image: images/featured-light.png
+image-alt: "A description of the featured image."
+categories: [__YEAR__]
 ---
 
-Write a sentence or two about what the figure shows.
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
 
 ```{typst}
 //| label: fig-__SLUG__
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
 //| file: _plot.typ
 //| output-filename: plot.svg
-//| echo: true
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "__TITLE__"
-//| fig-alt: "Figure built from the __TITLE__ dataset."
 ```
 
 Data: [TidyTuesday __DATE__](https://github.com/rfordatascience/tidytuesday/tree/main/data/__YEAR__/__DATE__).
+
+Write a sentence or two about what the figure shows.
