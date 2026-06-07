@@ -84,7 +84,8 @@
 #let vn = reshape("Vietnam")
 #let de = reshape("Germany")
 
-#let panel(rows, country, annotations) = plot(
+#let panel(rows, country, annotations) = defer(
+  plot,
   data: rows,
   mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
   layers: (geom-ribbon(alpha: 1),) + annotations,
@@ -94,7 +95,6 @@
   ),
   labs: labs(title: country, x: none, y: "% Final Energy", fill: none),
   theme: theme-minimal(),
-  defer: true,
 )
 
 // In-panel callouts: the total renewable share at each end, plus a one-line

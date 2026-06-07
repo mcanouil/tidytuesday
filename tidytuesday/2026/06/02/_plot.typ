@@ -89,7 +89,8 @@
   acc
 }
 
-#let main = plot(
+#let main = defer(
+  plot,
   data: obs,
   mapping: aes(x: "year", y: "months", colour: "series"),
   layers: (
@@ -165,7 +166,6 @@
   guides: guides(colour: guide-none(), fill: guide-none()),
   labs: labs(x: none, y: "Months of Leave"),
   theme: theme-minimal(),
-  defer: true,
 )
 
 // Secondary panel: a 2024 snapshot of all 21 countries as a dumbbell. A grey
@@ -173,7 +173,8 @@
 // length IS the gap; sorted with parity at the top. Different axes (months by
 // country) make this read as a different question from the time series, not a
 // lookalike. Colour still means series, tying it to the main panel.
-#let secondary = plot(
+#let secondary = defer(
+  plot,
   data: gap-dots,
   mapping: aes(x: "months", y: "country", fill: "series"),
   layers: (
@@ -197,7 +198,6 @@
     axis-text-y: element-text(font: "DejaVu Sans Mono", size: 7pt),
     tick-length-y: 0.08cm,
   ),
-  defer: true,
 )
 
 #compose(

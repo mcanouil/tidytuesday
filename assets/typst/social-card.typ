@@ -1,4 +1,4 @@
-#import "@preview/gribouille:0.1.0": *
+#import "@preview/gribouille:0.2.1": *
 
 // Site dark palette.
 #let bg = rgb("#0d1626")
