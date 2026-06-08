@@ -1,0 +1,49 @@
+---
+engine: markdown
+title: "Panned by Critics, Paid by Audiences"
+description: "Theatrical video-game film adaptations plotted by critics' score against worldwide box office, showing how many poorly reviewed films still earn big and how far opening-night audiences grade them above the critics."
+date: "2026-06-09"
+image: images/featured-light.png
+image-alt: "Scatter plot of theatrical video-game film adaptations with the Rotten Tomatoes critics' score on the x axis and worldwide box office on a logarithmic y axis from 100 thousand to 1 billion US dollars. A shaded band marks the zone left of the 60 percent 'fresh' line where films still gross past 100 million dollars, and many markers sit inside it. The Super Mario Bros. Movie tops the chart near 1.4 billion dollars at 59 percent, with Sonic the Hedgehog 3 the best reviewed at 86 percent and Detective Pikachu also labelled, and Postal by Uwe Boll at the bottom; these four labelled films are circled in teal. Marker size encodes the production budget, fill colour encodes box office divided by budget on a vermillion-to-teal scale pivoting at break-even, and marker shape splits films released before 2019 (circles) from those released 2019 onward (squares). An inset dumbbell in the top-left shows the mean critics' score at 33 far below the mean audience CinemaScore at 76."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-06-09
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Theatrical video-game film adaptations by critics' score and worldwide box office, with marker size for production budget, fill colour for box office divided by budget, and shape for release era. An inset contrasts the mean critics' score with the mean audience CinemaScore."
+```
+
+Data: [TidyTuesday 2026-06-09](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-09).
+
+Video-game film adaptations have a long reputation for being review-proof.
+The horizontal axis is the Rotten Tomatoes critics' score, the vertical axis is worldwide box office on a logarithmic scale, and the shaded band marks the films that critics called rotten yet that still grossed past one hundred million dollars.
+The band is crowded, which is the whole point: a low score has rarely stopped one of these films from making money.
+
+The biggest earners cluster towards the recent end of the story.
+The Super Mario Bros. Movie sits at the top with about 1.4 billion dollars on a fifty-nine per cent score, and Sonic the Hedgehog 3, the best reviewed of the set at eighty-six per cent, follows well behind it.
+Marker shape separates the films released before 2019 from those released since, and the post-Detective Pikachu boom is where the heaviest grossing titles now live.
+
+Colour reads profitability as worldwide box office divided by the production budget, pivoting at break-even, so vermillion markers lost money and teal markers cleared their budget several times over.
+Most of the cloud is comfortably in profit; the clearest losses belong to the cheap, savaged titles in the lower left, with Postal by Uwe Boll at the very bottom.
+
+The inset makes the critic-versus-audience split explicit.
+Averaged over every film scored by both, the mean critics' score sits around thirty-three while the mean opening-night CinemaScore, mapped onto the same nought-to-one-hundred ruler, sits around seventy-six.
+Critics and audiences are not watching these films the same way, and the box office sides with the audiences.
