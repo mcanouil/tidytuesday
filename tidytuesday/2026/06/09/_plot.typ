@@ -219,8 +219,8 @@
 
   guides: guides(
     shape: guide-none(),
-    fill: guide-legend(direction: "horizontal", align: center),
-    size: guide-legend(direction: "horizontal", align: center),
+    fill: guide-legend(direction: "horizontal"),
+    size: guide-legend(direction: "horizontal"),
   ),
   labs: labs(
     title: "Panned by Critics, Paid by Audiences",
