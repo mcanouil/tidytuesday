@@ -1,0 +1,42 @@
+---
+engine: markdown
+title: "Britain's Top Baby Names Are Losing Their Grip"
+description: "Baby names registered in England & Wales, Scotland and Northern Ireland, showing how the ten most popular names' share of births has roughly halved since the 1990s for both boys and girls."
+date: "2026-06-16"
+order: 20260616
+image: images/featured-light.png
+image-alt: "Three line-chart panels, one each for England & Wales, Scotland and Northern Ireland, showing the top-ten baby names' share of recorded births. In every panel a teal line for boys and an amber line for girls fall from roughly a quarter of births in the 1990s to about a tenth by 2024, and Scotland's panel reaches back to 1974 with the longest, steepest decline."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-06-16
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Top-ten baby names' share of recorded births in England & Wales, Scotland and Northern Ireland, by sex, from 1974 to 2025."
+```
+
+Data: [TidyTuesday 2026-06-16](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-16).
+
+In every UK nation the ten most popular names now claim a far smaller share of births than they did a generation ago.
+The share has roughly halved since the 1990s, sliding to around a tenth of all babies, and the fall holds for both boys and girls.
+Parents are drawing from an ever wider pool, so no single name dominates the way it once did.
+
+Scotland's record reaches back to 1974, far earlier than the 1996 and 1997 starts for England & Wales and Northern Ireland, and its decline is the longest and steepest on show.
+The three nations set out from different heights but end up close together, all converging on a more fragmented set of names.
