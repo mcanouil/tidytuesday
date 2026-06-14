@@ -3,6 +3,7 @@ engine: markdown
 title: "Sustainable Energy for All"
 description: "Country-level energy data from the UN Sustainable Energy for All initiative, covering electricity access, energy efficiency, and renewable share from 1990 to 2010."
 date: "2026-05-26"
+order: 20260526
 image: images/featured-light.png
 image-alt: "Two stacked-area panels of renewable energy by source, 1990 to 2010. Vietnam's traditional biomass band shrinks and its renewable share falls from 76% to 35%, while Germany's modern bioenergy and wind and solar grow and its share rises from 2% to 11%."
 categories: [2026]

@@ -3,6 +3,7 @@ engine: markdown
 title: "Panned by Critics, Paid by Audiences"
 description: "Theatrical video-game film adaptations plotted by critics' score against worldwide box office, showing how many poorly reviewed films still earn big and how far opening-night audiences grade them above the critics."
 date: "2026-06-09"
+order: 20260609
 image: images/featured-light.png
 image-alt: "Scatter plot of theatrical video-game film adaptations with the Rotten Tomatoes critics' score on the x axis and worldwide box office on a logarithmic y axis from 100 thousand to 1 billion US dollars. A shaded band marks the zone left of the 60 percent 'fresh' line where films still gross past 100 million dollars, and many markers sit inside it. The Super Mario Bros. Movie tops the chart near 1.4 billion dollars at 59 percent, with Sonic the Hedgehog 3 the best reviewed at 86 percent and Detective Pikachu also labelled, and Postal by Uwe Boll at the bottom; these four labelled films are circled in teal. Marker size encodes the production budget, fill colour encodes box office divided by budget on a vermillion-to-teal scale pivoting at break-even, and marker shape splits films released before 2019 (circles) from those released 2019 onward (squares). An inset dumbbell in the top-left shows the mean critics' score at 33 far below the mean audience CinemaScore at 76."
 categories: [2026]

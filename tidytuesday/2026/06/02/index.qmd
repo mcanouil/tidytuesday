@@ -3,6 +3,7 @@ engine: markdown
 title: "Whose Leave Is It Anyway?"
 description: "European parenting leave policies from 1970 to 2024, showing how many months of statutory leave are reserved for mothers compared with the co-parent across 21 countries."
 date: "2026-06-02"
+order: 20260602
 image: images/featured-light.png
 image-alt: "Two panels. Panel (A) is a two-line chart of mean months of statutory leave reserved for each parent across 21 European countries from 1970 to 2024, each line wrapped in a shaded band of plus or minus one standard error: the blue mothers line rises from about 14 months to a peak above 21 around 2010 then eases to roughly 18, while the vermillion co-parent line sits near zero until 2000 and climbs to about 5 months by 2024, and the mothers band is consistently wider. Panel (B) is a dumbbell chart, a 2024 snapshot of all 21 countries, each shown as a blue mothers dot and a vermillion co-parent dot joined by a grey bar whose length is the gap; countries are sorted with the smallest gaps on top, where Spain, Slovakia and the United Kingdom reach parity, down to Ireland with the widest gap at the bottom."
 categories: [2026]

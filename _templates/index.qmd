@@ -3,6 +3,7 @@ engine: markdown
 title: "__TITLE__"
 description: "A short description of the figure."
 date: "__DATE__"
+order: __ORDER__
 image: images/featured-light.png
 image-alt: "A description of the featured image."
 categories: [__YEAR__]

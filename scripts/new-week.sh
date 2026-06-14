@@ -56,6 +56,7 @@ done
 csv_path="${dir}/data/${csv_names[0]}"
 title="TidyTuesday ${date_arg}"
 slug="${date_arg}"
+order="${year}${month}${day}"
 
 sed \
 	-e "s|__CSVPATH__|${csv_path}|g" \
@@ -65,6 +66,7 @@ sed \
 sed \
 	-e "s|__DATE__|${date_arg}|g" \
 	-e "s|__YEAR__|${year}|g" \
+	-e "s|__ORDER__|${order}|g" \
 	-e "s|__TITLE__|${title}|g" \
 	-e "s|__SLUG__|${slug}|g" \
 	_templates/index.qmd >"${dir}/index.qmd"
