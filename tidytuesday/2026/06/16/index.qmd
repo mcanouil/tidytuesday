@@ -1,11 +1,11 @@
 ---
 engine: markdown
-title: "Britain's Top Baby Names Are Losing Their Grip"
-description: "Baby names registered in England & Wales, Scotland and Northern Ireland, showing how the ten most popular names' share of births has roughly halved since the 1990s for both boys and girls."
+title: "Britain's Gender-Neutral Baby Names"
+description: "Baby names registered in England & Wales, Scotland and Northern Ireland, counting the names used for both boys and girls in the same year, aggregated across all three UK nations for their shared years (1997–2024). An area chart shows the share of all distinct names that are gender-neutral per year, with the approximate count in parentheses on the y-axis and the most-registered gender-neutral name labelled per five-year window."
 date: "2026-06-16"
 order: 20260616
 image: images/featured-light.png
-image-alt: "Three line-chart panels, one each for England & Wales, Scotland and Northern Ireland, showing the top-ten baby names' share of recorded births. In every panel a teal line for boys and an amber line for girls fall from roughly a quarter of births in the 1990s to about a tenth by 2024, and Scotland's panel reaches back to 1974 with the longest, steepest decline."
+image-alt: "An area chart with a teal shaded region showing the share of baby names registered for both boys and girls across all three UK nations combined from 1997 to 2024. The shaded area fluctuates between about 3.5 percent and 5 percent across the period. Six text labels appear above the line at five-year intervals marking the most-registered gender-neutral name in each window: Jordan near 1998, Cameron near 2002, Charlie near 2007 and 2012, Noah near 2017 and 2022. The y-axis labels pair the percentage with an approximate count of names in parentheses."
 categories: [2026]
 ---
 
@@ -29,14 +29,18 @@ categories: [2026]
 //| width: 18cm
 //| height: 9.45cm
 //| fig-alt: "{{< meta image-alt >}}"
-//| fig-cap: "Top-ten baby names' share of recorded births in England & Wales, Scotland and Northern Ireland, by sex, from 1974 to 2025."
+//| fig-cap: "Share of all distinct baby names registered for both boys and girls across all three UK nations combined (minimum 3 births each sex per year), from 1997 to 2024. Y-axis labels include the approximate count of gender-neutral names in parentheses. Labels mark the most-registered gender-neutral name in each window: Jordan (1997–1999), Cameron (2000–2004), Charlie (2005–2014), and Noah (2015–2024)."
 ```
 
 Data: [TidyTuesday 2026-06-16](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-16).
 
-In every UK nation the ten most popular names now claim a far smaller share of births than they did a generation ago.
-The share has roughly halved since the 1990s, sliding to around a tenth of all babies, and the fall holds for both boys and girls.
-Parents are drawing from an ever wider pool, so no single name dominates the way it once did.
+Combining births registered across all three UK nations, roughly 4–5 per cent of all distinct names in use each year are registered for both boys and girls — around 400 to 600 names depending on the year.
+A name counts here only when at least three babies of each sex were registered with it in the combined UK total for that year, filtering out statistical noise and names suppressed for small counts.
+The shaded area shows each year; the y-axis label pairs the percentage with the approximate count in parentheses so both scales are readable without a dual axis.
 
-Scotland's record reaches back to 1974, far earlier than the 1996 and 1997 starts for England & Wales and Northern Ireland, and its decline is the longest and steepest on show.
-The three nations set out from different heights but end up close together, all converging on a more fragmented set of names.
+Each label marks the single most-registered gender-neutral name in its window.
+Jordan led in the late 1990s, Cameron took over briefly in the early 2000s, and Charlie then dominated for a full decade.
+Noah claimed the top spot from 2015 onwards and held it through 2024.
+The leaders change across periods, but the overall share stays in a similar range, suggesting that the pool of gender-neutral names is relatively stable rather than systematically expanding.
+
+This stable pool sits alongside the declining concentration visible in the top-ten names' share of births: naming is becoming more diverse, but whether gender-neutral naming specifically is growing is less clear from this data alone.
