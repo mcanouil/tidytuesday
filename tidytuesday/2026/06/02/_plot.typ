@@ -163,7 +163,7 @@
       palette: series-colours.values(),
     ),
   ),
-  guides: guides(colour: guide-none(), fill: guide-none()),
+  guides: guides(colour: none, fill: none),
   labs: labs(x: none, y: "Months of Leave"),
   theme: theme-minimal(),
 )
@@ -192,7 +192,7 @@
     scale-y-discrete(limits: country-order),
     scale-fill-discrete(limits: series, palette: series-colours.values()),
   ),
-  guides: guides(fill: guide-none()),
+  guides: guides(fill: none),
   labs: labs(x: "Months of Leave", y: none),
   theme: theme-minimal(
     axis-text-y: element-text(font: "DejaVu Sans Mono", size: 7pt),

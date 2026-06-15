@@ -101,7 +101,7 @@
     axis-line: element-line(stroke: 0.5pt),
     tick-length: 0.05cm,
   ),
-  guides: guides(colour: guide-none(), fill: guide-none(), shape: guide-none()),
+  guides: guides(colour: none, fill: none, shape: none),
   width: 14cm,
   height: 10.5cm,
 )

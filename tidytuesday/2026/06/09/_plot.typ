@@ -218,7 +218,7 @@
   ),
 
   guides: guides(
-    shape: guide-none(),
+    shape: none,
     fill: guide-legend(direction: "horizontal"),
     size: guide-legend(direction: "horizontal"),
   ),
