@@ -1,7 +1,7 @@
 ---
 engine: markdown
 title: "Britain's Gender-Neutral Baby Names"
-description: "Baby names registered in England & Wales, Scotland and Northern Ireland, counting the names used for both boys and girls in the same year, aggregated across all three UK nations for their shared years (1997–2024). An area chart shows the share of all distinct names that are gender-neutral per year, with the approximate count in parentheses on the y-axis and the most-registered gender-neutral name labelled per five-year window."
+description: "Baby names registered in England & Wales, Scotland and Northern Ireland, counting the names used for both boys and girls in the same year, aggregated across all three UK nations for their shared years (1997–2024)."
 date: "2026-06-16"
 order: 20260616
 image: images/featured-light.png
