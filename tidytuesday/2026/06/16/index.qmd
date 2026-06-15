@@ -1,0 +1,46 @@
+---
+engine: markdown
+title: "Britain's Gender-Neutral Baby Names"
+description: "Baby names registered in England & Wales, Scotland and Northern Ireland, counting the names used for both boys and girls in the same year, aggregated across all three UK nations for their shared years (1997–2024). An area chart shows the share of all distinct names that are gender-neutral per year, with the approximate count in parentheses on the y-axis and the most-registered gender-neutral name labelled per five-year window."
+date: "2026-06-16"
+order: 20260616
+image: images/featured-light.png
+image-alt: "An area chart with a teal shaded region showing the share of baby names registered for both boys and girls across all three UK nations combined from 1997 to 2024. The shaded area fluctuates between about 3.5 percent and 5 percent across the period. Six text labels appear above the line at five-year intervals marking the most-registered gender-neutral name in each window: Jordan near 1998, Cameron near 2002, Charlie near 2007 and 2012, Noah near 2017 and 2022. The y-axis labels pair the percentage with an approximate count of names in parentheses."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-06-16
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Share of all distinct baby names registered for both boys and girls across all three UK nations combined (minimum 3 births each sex per year), from 1997 to 2024. Y-axis labels include the approximate count of gender-neutral names in parentheses. Labels mark the most-registered gender-neutral name in each window: Jordan (1997–1999), Cameron (2000–2004), Charlie (2005–2014), and Noah (2015–2024)."
+```
+
+Data: [TidyTuesday 2026-06-16](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-16).
+
+Combining births registered across all three UK nations, roughly 4–5 per cent of all distinct names in use each year are registered for both boys and girls — around 400 to 600 names depending on the year.
+A name counts here only when at least three babies of each sex were registered with it in the combined UK total for that year, filtering out statistical noise and names suppressed for small counts.
+The shaded area shows each year; the y-axis label pairs the percentage with the approximate count in parentheses so both scales are readable without a dual axis.
+
+Each label marks the single most-registered gender-neutral name in its window.
+Jordan led in the late 1990s, Cameron took over briefly in the early 2000s, and Charlie then dominated for a full decade.
+Noah claimed the top spot from 2015 onwards and held it through 2024.
+The leaders change across periods, but the overall share stays in a similar range, suggesting that the pool of gender-neutral names is relatively stable rather than systematically expanding.
+
+This stable pool sits alongside the declining concentration visible in the top-ten names' share of births: naming is becoming more diverse, but whether gender-neutral naming specifically is growing is less clear from this data alone.
