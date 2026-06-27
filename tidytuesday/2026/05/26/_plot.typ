@@ -93,7 +93,7 @@
     scale-x-continuous(breaks: (1990, 2000, 2010)),
     scale-fill-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
   ),
-  labs: labs(title: country, x: none, y: "% Final Energy", fill: none),
+  labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
   theme: theme-minimal(),
 )
 
@@ -150,7 +150,7 @@
   collect: ("fill",),
   guides: guides(default: guide-legend(position: "bottom")),
   gutter: 1cm,
-  labs: labs(
+  labels: labels(
     title: "What \"Renewable Energy\" Means Depends on How Rich a Country Is",
     subtitle: "Renewable share of final energy use, by source, 1990 to 2010.",
     caption: typst([

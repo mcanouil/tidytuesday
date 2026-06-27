@@ -124,12 +124,11 @@
         y: "months",
         fill: "series",
         label: after-stat((row, ctx) => str(calc.round(row.y)) + " months"),
+        nudge-y: 1,
       ),
       stat: stat-summary(fun: "mean", axis: "y"),
       size: 9pt,
       colour: white,
-      dx: 0,
-      dy: 1,
       segment: true,
       inherit-aes: false,
     ),
@@ -164,7 +163,7 @@
     ),
   ),
   guides: guides(colour: none, fill: none),
-  labs: labs(x: none, y: "Months of Leave"),
+  labels: labels(x: none, y: "Months of Leave"),
   theme: theme-minimal(),
 )
 
@@ -193,7 +192,7 @@
     scale-fill-discrete(limits: series, palette: series-colours.values()),
   ),
   guides: guides(fill: none),
-  labs: labs(x: "Months of Leave", y: none),
+  labels: labels(x: "Months of Leave", y: none),
   theme: theme-minimal(
     axis-text-y: element-text(font: "DejaVu Sans Mono", size: 7pt),
     tick-length-y: 0.08cm,
@@ -209,7 +208,7 @@
   tag-prefix: "(",
   tag-suffix: ")",
   align-panels: true,
-  labs: labs(
+  labels: labels(
     title: "Europe Still Reserves Far More Leave for Mothers Than for the Co-Parent",
     subtitle: [*(A)* the gap between #text(fill: series-colours.at("Mothers"), weight: "bold")[mothers] and the #text(fill: series-colours.at("Co-parents"), weight: "bold")[co-parent] has narrowed since 2000 yet mothers still get far more; \ *(B)* in 2024 it ranges from parity (Spain, Slovakia, UK) to roughly 40 months (Ireland).],
     caption: typst([

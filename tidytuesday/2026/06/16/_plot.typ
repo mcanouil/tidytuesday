@@ -131,14 +131,13 @@
     geom-line(colour: teal, stroke: 0.8pt),
     geom-label(
       data: label_rows,
-      mapping: aes(label: "label"),
+      mapping: aes(label: "label", nudge-y: 0.7cm),
       size: 7pt,
       fill: teal,
       colour: white,
       stroke: 0.3pt,
       inset: 3pt,
       radius: 1pt,
-      dy: 0.7cm,
     ),
   ),
   scales: (
@@ -153,7 +152,7 @@
       },
     )
   ),
-  labs: labs(
+  labels: labels(
     title: "Britain's Gender-Neutral Baby Names",
     subtitle: [
       Names registered for both #strong[boys] and #strong[girls] across

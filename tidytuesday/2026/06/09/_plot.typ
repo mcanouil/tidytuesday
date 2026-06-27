@@ -176,9 +176,8 @@
       data: d => d
         .filter(r => r.title in label-text)
         .map(r => (..r, lab: pill(label-text.at(r.title)))),
-      mapping: aes(x: "rt", y: "box", label: "lab"),
+      mapping: aes(x: "rt", y: "box", label: "lab", nudge-y: 0.35),
       anchor: "south",
-      dy: 0.35,
       inherit-aes: false,
     ),
     // Inset dumbbell parked in the sparse top-left corner above the cloud.
@@ -222,7 +221,7 @@
     fill: guide-legend(direction: "horizontal"),
     size: guide-legend(direction: "horizontal"),
   ),
-  labs: labs(
+  labels: labels(
     title: "Panned by Critics, Paid by Audiences",
     subtitle: [
       A poor critics' score has rarely stopped a theatrical video-game adaptation
