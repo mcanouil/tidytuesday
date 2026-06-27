@@ -1,0 +1,38 @@
+---
+engine: markdown
+title: "Leo XIII Outpaced Every Modern Pope"
+description: "A lollipop chart ranking modern popes by encyclical output, showing Leo XIII's 86 dwarfing every successor."
+date: "2026-06-23"
+order: 20260623
+image: images/featured-light.png
+image-alt: "A horizontal lollipop chart ranking eleven modern popes by the number of encyclicals they published, ordered from Leo XIII at the top down to Leo XIV, each pope labelled with their reign years and the count at the end of its stem. Leo XIII leads with 86 in a warm accent colour, more than double the next, Pius XII with 39. The remaining popes are in muted grey: Pius XI 23, Pius X 16, John Paul II 14, Benedict XV 12, John XXIII 8, Paul VI 7, Francis 4, Benedict XVI 3, and Leo XIV with 1. A translucent funnel links the Leo XIII point to an inset column chart in the bottom-right showing his encyclicals per year across his 25-year reign, holding roughly steady between two and eight."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-06-23
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Leo XIII Outpaced Every Modern Pope"
+```
+
+Data: [TidyTuesday 2026-06-23](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-23).
+
+Leo XIII (1878--1903) towers above every other modern pope: 86 encyclicals against Pius XII's 39, the next highest.
+His output is the more striking for being sustained across a 25-year reign rather than concentrated in a few years.

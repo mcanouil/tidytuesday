@@ -54,7 +54,9 @@ for name in "${csv_names[@]}"; do
 done
 
 csv_path="${dir}/data/${csv_names[0]}"
-title="TidyTuesday ${date_arg}"
+# Deliberate TODO placeholder so the generic title is never shipped unedited;
+# replace it with the figure's actual headline finding before publishing.
+title="TODO: figure title (TidyTuesday ${date_arg})"
 slug="${date_arg}"
 order="${year}${month}${day}"
 

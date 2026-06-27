@@ -1,7 +1,7 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
-// #import "@preview/gribouille:0.1.0": *
 // #import "@local/gribouille:0.0.0": *
+// #import "@preview/gribouille:0.4.1": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let num(s) = if s == "NA" or s == "" { 0.0 } else { float(s) }
@@ -90,11 +90,12 @@
   mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
   layers: (geom-ribbon(alpha: 1),) + annotations,
   scales: (
-    scale-x-continuous(breaks: (1990, 2000, 2010)),
+    scale-x-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
+    scale-y-continuous(expand: (0%, auto)),
     scale-fill-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
   ),
   labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
-  theme: theme-minimal(),
+  theme: theme-minimal(tick-length: 0.1cm),
 )
 
 // In-panel callouts: the total renewable share at each end, plus a one-line
