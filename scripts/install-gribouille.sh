@@ -28,7 +28,7 @@ esac
 
 dest="${base}/gribouille/${version}"
 
-if [[ "${GRIBOUILLE_FORCE_UPDATE:-0}" != "1" && -d "${dest}" ]]; then
+if [[ "${GRIBOUILLE_FORCE_UPDATE:-0}" != "1" && -d "${dest}" && -f "_variables.yml" ]]; then
 	echo "Gribouille ${version} already installed; skipping (set GRIBOUILLE_FORCE_UPDATE=1 to refresh)."
 	exit 0
 fi
@@ -42,6 +42,13 @@ mkdir -p "${tmp}/extract"
 tar -xzf "${tmp}/gribouille.tar.gz" --strip-components=1 -C "${tmp}/extract"
 
 build="$(sed -n 's|^# dev build: \(.*\)|\1|p' "${tmp}/extract/typst.toml" | head -1)"
+
+if [[ -n "${build}" ]] && [[ "${build}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)($|[[:space:]]) ]]; then
+	gribouille_version="v${BASH_REMATCH[1]} (build \`${build}\`)"
+else
+	gribouille_version="main (build \`${build:-unknown}\`)"
+fi
+printf 'gribouille-version: "%s"\n' "${gribouille_version}" > "_variables.yml"
 
 sed -i.bak -E "s|^version *= *\"[^\"]*\"|version = \"${version}\"|" "${tmp}/extract/typst.toml"
 rm -f "${tmp}/extract/typst.toml.bak"

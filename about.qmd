@@ -9,7 +9,7 @@ A fresh dataset lands every week and the community explores it and shares the re
 This site is my take on it, with two constraints:
 
 - Every figure is drawn in [Typst](https://typst.app), not R or Python.
-- Figures are built with [Gribouille](https://m.canouil.dev/gribouille), my grammar-of-graphics package for Typst.
+- Figures are built with [Gribouille](https://m.canouil.dev/gribouille) ({{< var gribouille-version >}}), my grammar-of-graphics package for Typst.
 
 ## How it is organised
 

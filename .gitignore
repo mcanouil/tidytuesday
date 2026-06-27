@@ -3,5 +3,7 @@
 **/*.quarto_ipynb
 /.luarc.json
 
+/_variables.yml
+
 tidytuesday/**/*.svg
 tidytuesday/**/*.png
