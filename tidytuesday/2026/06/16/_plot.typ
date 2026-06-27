@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@local/gribouille:0.0.0": *
-// #import "@preview/gribouille:0.4.1": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+#import "@preview/gribouille:0.4.1": *
+#set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // Treat every missing sentinel as `none` so a single guard filters them out.
 #let num(s) = if s in ("NA", "N/A", "") { none } else { float(s) }
@@ -141,7 +141,7 @@
     ),
   ),
   scales: (
-    scale-x-continuous(breaks: (2000, 2005, 2010, 2015, 2020)),
+    scale-x-continuous(breaks: (2000, 2005, 2010, 2015, 2020), expand: (0%, 0%)),
     scale-y-continuous(
       name: "Share of All Distinct Names",
       limits: (0, max_pct + 0.5),
