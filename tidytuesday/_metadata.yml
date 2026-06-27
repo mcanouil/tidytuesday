@@ -11,6 +11,7 @@ extensions:
       light: "#15233b"
       dark: "#e7ecf4"
     output-directory: "./images"
+    margin: 0cm
 
 comments:
   giscus:
