@@ -112,9 +112,6 @@
   layers: (
     // Funnel connector: drawn first so the stems, point, count labels, and the
     // opaque inset box all sit on top, the box hiding the triangle's base edge.
-    // `clip: false` (merged onto the layer dict, since geom-polygon has no clip
-    // param) opts the layer out of the discrete out-of-range drop pre-pass, so
-    // its fractional numeric y values survive instead of being filtered out.
     geom-polygon(
       data: (
         (x: 33.85, y: 8.53),
@@ -125,7 +122,7 @@
       fill: accent,
       stroke: none,
       inherit-aes: false,
-    ) + (clip: false),
+    ),
     // Lollipop stem: length encodes the count on a common zero-based axis. The
     // group aesthetic tints the record holder accent and everyone else muted.
     geom-segment(
