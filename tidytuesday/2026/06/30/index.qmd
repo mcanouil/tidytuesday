@@ -1,0 +1,40 @@
+---
+engine: markdown
+title: "The Older the Wreck, the Deeper It Stays Lost"
+description: "An underwater cross-section of Irish shipwrecks by decade, showing that the older the loss, the less likely it has ever been located."
+date: "2026-06-30"
+order: 20260630
+image: images/featured-light.png
+image-alt: "A diverging bar chart styled as an underwater cross-section of Irish shipwrecks by decade from 1750 to 2010. A pale surface at the top deepens through blue into the dark deep at the bottom. A waterline at zero splits each decade into wrecks that have been located, rising above it in bright teal, and wrecks with no recorded position, sinking below it in steel blue. Before 1840 almost every column plunges into the deep, peaking in the 1850s with 1,382 lost, 96 percent never located. From the 1910s the found share climbs sharply: the vermillion-outlined World War One column is the turning point, with about half of that decade's wrecks found (630). After 1950 the small columns sit almost entirely above the waterline, nearly every wreck charted. A small sinking-ship motif rests in the deep bottom-right corner."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-06-30
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "The Older the Wreck, the Deeper It Stays Lost"
+```
+
+Data: [TidyTuesday 2026-06-30](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-30).
+
+Ship-wreck icon by [Delapouite](https://game-icons.net), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+Of 17,981 recorded Irish shipwrecks, only one in five has ever been given coordinates, and that found share climbs steadily with time: from almost none before 1840, through the World War One turning point, to nearly all after 1950.
+The older losses, led by the famine-era 1850s, sink unlocated into the deep, though the pattern also reflects steel hulls and modern sonar, not recency alone.
