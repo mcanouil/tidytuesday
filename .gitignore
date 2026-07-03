@@ -5,5 +5,5 @@
 
 /_variables.yml
 
-tidytuesday/**/*.svg
-tidytuesday/**/*.png
+tidytuesday/**/images/*.svg
+tidytuesday/**/images/*.png

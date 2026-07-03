@@ -116,7 +116,7 @@
     annotate("typst", x: 1978, y: 470, label: box(width: 3cm)[#set align(center); #note(fill: rgb("#0d3450"), size: 7.5pt)[Since 1950, nearly every wreck is charted]], anchor: "south", clip: false),
     // A wreck settling on the seabed, in the deep bottom-right corner (its faint
     // steel tint is set in wreck.svg).
-    annotate("typst", x: 2024, y: -1520, label: image("wreck.svg", width: 2.7cm), anchor: "south-east", clip: false),
+    annotate("typst", x: 2024, y: -1520, label: image("assets/wreck.svg", width: 2.7cm), anchor: "south-east", clip: false),
   ),
   scales: (
     scale-x-continuous(
