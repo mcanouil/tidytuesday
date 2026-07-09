@@ -89,10 +89,10 @@
   data: rows,
   mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
   layers: (geom-ribbon(alpha: 1),) + annotations,
-  scales: (
-    scale-x-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
-    scale-y-continuous(expand: (0%, auto)),
-    scale-fill-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
+  scales: scales(
+    x: scale-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
+    y: scale-continuous(expand: (0%, auto)),
+    fill: scale-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
   ),
   labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
   theme: theme-minimal(tick-length: 0.1cm),

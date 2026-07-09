@@ -83,9 +83,9 @@
       data: leo-by-year,
       mapping: aes(x: "yr", y: "n"),
       layers: (geom-col(fill: accent, width: 0.7),),
-      scales: (
-        scale-x-continuous(breaks: (1, 5, 10, 15, 20, 25), expand: (0%, 0%)),
-        scale-y-continuous(breaks: (0, 4, 8)),
+      scales: scales(
+        x: scale-continuous(breaks: (1, 5, 10, 15, 20, 25), expand: (0%, 0%)),
+        y: scale-continuous(breaks: (0, 4, 8)),
       ),
       labels: labels(
         title: "Sustained: Encyclicals per Year of His 25-Year Reign",
@@ -151,8 +151,8 @@
     // x-axis labels below.
     annotate("typst", x: 58, y: "Leo XIV", nudge-y: -0.2cm, label: inset, anchor: "south", clip: false),
   ),
-  scales: (
-    scale-x-continuous(
+  scales: scales(
+    x: scale-continuous(
       name: "Encyclicals Published",
       limits: (0, auto),
       breaks: (0, 20, 40, 60, 80),
@@ -162,7 +162,7 @@
     ),
     // Two-line ticks: pope name, then their reign span smaller beneath. The
     // record holder's name carries the accent so the y-axis ties to its stem.
-    scale-y-discrete(
+    y: scale-discrete(
       limits: pope-order,
       labels: pope-order.map(p => {
         let m = pope-meta.at(p)
@@ -177,8 +177,8 @@
       }),
     ),
     // Group palette: muted for every pope, accent reserved for the record holder.
-    scale-colour-discrete(limits: ("Other", leo-name), palette: (muted, accent)),
-    scale-fill-discrete(limits: ("Other", leo-name), palette: (muted, accent)),
+    colour: scale-discrete(limits: ("Other", leo-name), palette: (muted, accent)),
+    fill: scale-discrete(limits: ("Other", leo-name), palette: (muted, accent)),
   ),
   // The group split is direct-labelled by colour and the y-axis, so the legend
   // would be redundant.

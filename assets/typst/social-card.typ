@@ -1,4 +1,4 @@
-#import "@preview/gribouille:0.2.1": *
+#import "@local/gribouille:0.0.0": *
 
 // Site dark palette.
 #let bg = rgb("#0d1626")
@@ -80,13 +80,13 @@
       ),
     ),
   ),
-  scales: (
-    scale-x-continuous(),
-    scale-y-continuous(labels: format-comma()),
-    scale-colour-discrete(limits: species-colours.keys(), palette: species-colours.values()),
-    scale-fill-discrete(limits: species-colours.keys(), palette: species-colours.values()),
+  scales: scales(
+    x: scale-continuous(),
+    y: scale-continuous(labels: format-comma()),
+    colour: scale-discrete(limits: species-colours.keys(), palette: species-colours.values()),
+    fill: scale-discrete(limits: species-colours.keys(), palette: species-colours.values()),
   ),
-  labs: labs(
+  labels: labels(
     title: typst("Penguins *Dataset*"),
     subtitle: "Palmer Archipelago (Antarctica) penguins.",
     colour: "Species",

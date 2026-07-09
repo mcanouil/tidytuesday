@@ -183,13 +183,13 @@
     // Inset dumbbell parked in the sparse top-left corner above the cloud.
     annotate("typst", x: 25, y: 1.75e6, label: inset, anchor: "north-west"),
   ),
-  scales: (
-    scale-x-continuous(
+  scales: scales(
+    x: scale-continuous(
       name: "Rotten Tomatoes Critics' Score (%)",
       limits: (0, 100),
       breaks: (0, 20, 40, 60, 80, 100),
     ),
-    scale-y-continuous(
+    y: scale-continuous(
       name: "Worldwide Box Office (US$)",
       transform: "log10",
       // limits: (8e4, 3e9),
@@ -197,20 +197,20 @@
       labels: ("$100K", "$1M", "$10M", "$100M", "$1B"),
       // expand: (5%, 25%),
     ),
-    scale-fill-gradient2(
+    fill: scale-gradient2(
       name: "Box Office / Budget Ratio",
       low: loss, mid: rgb("#cfcfcf"), high: profit,
       midpoint: 0,
       breaks: (-6, -4, -2, 0, 2, 4),
       labels: ([$1/64$×], [$1/16$×], [$1/4$×], [$1$×], [$4$×], [$16$×]),
     ),
-    scale-size-continuous(
+    size: scale-continuous(
       name: "Production Budget",
       range: (3pt, 10pt),
       breaks: (50e6, 100e6, 200e6),
       labels: ("$50M", "$100M", "$200M"),
     ),
-    scale-shape(
+    shape: scale-discrete(
       name: "Release Era",
       limits: ("Before 2019", "2019 onward"),
     ),

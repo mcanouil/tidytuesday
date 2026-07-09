@@ -118,14 +118,14 @@
     // steel tint is set in wreck.svg).
     annotate("typst", x: 2024, y: -1520, label: image("assets/wreck.svg", width: 2.7cm), anchor: "south-east", clip: false),
   ),
-  scales: (
-    scale-x-continuous(
+  scales: scales(
+    x: scale-continuous(
       name: "Decade of Loss",
       breaks: (1750, 1800, 1850, 1900, 1950, 2000),
       limits: (1743, 2018),
       expand: (0%, 0%),
     ),
-    scale-y-continuous(
+    y: scale-continuous(
       name: "Wrecks per Decade · Found Above, Lost Below",
       breaks: (-1000, -500, 0, 500),
       labels: ("1,000", "500", "0", "500"),
@@ -149,7 +149,7 @@
   theme: theme-minimal(
     plot-title: element-text(font: chart-font, size: 15pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8.5pt),
-    caption: element-text(font: body-font, size: 6.5pt),
+    plot-caption: element-text(font: body-font, size: 6.5pt),
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text: element-text(font: body-font, size: 7.5pt),
     panel-background: element-rect(fill: water),

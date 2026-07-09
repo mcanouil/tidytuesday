@@ -140,9 +140,9 @@
       radius: 1pt,
     ),
   ),
-  scales: (
-    scale-x-continuous(breaks: (2000, 2005, 2010, 2015, 2020), expand: (0%, 0%)),
-    scale-y-continuous(
+  scales: scales(
+    x: scale-continuous(breaks: (2000, 2005, 2010, 2015, 2020), expand: (0%, 0%)),
+    y: scale-continuous(
       name: "Share of All Distinct Names",
       limits: (0, max_pct + 0.5),
       // Labels show percentage and approximate count in parentheses.
@@ -150,7 +150,7 @@
         let n = int(calc.round(p / 100 * mean_total))
         str(calc.round(p, digits: 1)) + "% (" + str(n) + ")"
       },
-    )
+    ),
   ),
   labels: labels(
     title: "Britain's Gender-Neutral Baby Names",

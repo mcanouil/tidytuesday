@@ -147,17 +147,17 @@
       anchor: "west",
     ),
   ),
-  scales: (
-    scale-x-continuous(
+  scales: scales(
+    x: scale-continuous(
       breaks: (1970, 1980, 1990, 2000, 2010, 2024),
       expand: (1%, 10%),
     ),
-    scale-y-continuous(limits: (0, 24)),
-    scale-colour-discrete(
+    y: scale-continuous(limits: (0, 24)),
+    colour: scale-discrete(
       limits: series,
       palette: series-colours.values(),
     ),
-    scale-fill-discrete(
+    fill: scale-discrete(
       limits: series,
       palette: series-colours.values(),
     ),
@@ -186,10 +186,10 @@
     ),
     geom-point(size: 3.4pt, alpha: 0.5),
   ),
-  scales: (
-    scale-x-continuous(limits: (0, 44), breaks: (0, 12, 24, 36)),
-    scale-y-discrete(limits: country-order),
-    scale-fill-discrete(limits: series, palette: series-colours.values()),
+  scales: scales(
+    x: scale-continuous(limits: (0, 44), breaks: (0, 12, 24, 36)),
+    y: scale-discrete(limits: country-order),
+    fill: scale-discrete(limits: series, palette: series-colours.values()),
   ),
   guides: guides(fill: none),
   labels: labels(x: "Months of Leave", y: none),
