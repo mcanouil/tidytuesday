@@ -1,0 +1,39 @@
+---
+engine: markdown
+title: "The Heavier the Division, the More Fights End in a Knockout"
+description: "A horizontal breakdown of how UFC fights end across the eight men's weight divisions, showing the knockout share climbing steadily from flyweight to heavyweight."
+date: "2026-07-07"
+order: 20260707
+image: images/featured-light.png
+image-alt: "A horizontal stacked bar chart of 5,991 men's UFC fights across eight weight divisions, ordered lightest at the top to heaviest at the bottom, each labelled with its weight limit from 125 to 265 pounds. Every bar runs from 0 to 100 percent and is split into three segments: a vermillion knockout share anchored at the left, a blue submission share in the middle, and a quiet warm-grey decision share on the right. The vermillion knockout wedge widens steadily down the divisions, from 25 percent among flyweights to 52 percent among heavyweights, the only bar to cross a dashed line at the halfway mark. The decision share falls the same way, from 55 percent down to 36 percent, while the blue submission share stays near one in five throughout. A vermillion ring traces the heavyweight knockout wedge, with a callout noting that over half of heavyweight bouts end in a knockout, and a counterpoint by the flyweight bar notes that lighter divisions go the distance."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-07-07
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "The Heavier the Division, the More Fights End in a Knockout"
+```
+
+Data: [TidyTuesday 2026-07-07](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-07-07).
+
+Across 5,991 men's UFC fights from 2010 to 2026, how a fight ends tracks how heavy the fighters are.
+The knockout share climbs from a quarter of flyweight bouts to more than half of all heavyweight bouts, while the share that reaches the judges falls just as steadily.
+Submissions barely move, holding near one fight in five across every division, so the heavier the fight, the less likely it is to leave the outcome to the scorecards.
