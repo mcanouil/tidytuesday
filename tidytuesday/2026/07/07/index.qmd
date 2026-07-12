@@ -1,11 +1,11 @@
 ---
 engine: markdown
 title: "The Heavier the Division, the More Fights End in a Knockout"
-description: "A horizontal breakdown of how UFC fights end across the eight men's weight divisions, showing the knockout share climbing steadily from flyweight to heavyweight."
+description: "A horizontal breakdown of how UFC fights end across the twelve men's and women's weight divisions, showing the knockout share climbing steadily with the weight limit in both."
 date: "2026-07-07"
 order: 20260707
 image: images/featured-light.png
-image-alt: "A horizontal stacked bar chart of 5,991 men's UFC fights across eight weight divisions, ordered lightest at the top to heaviest at the bottom, each labelled with its weight limit from 125 to 265 pounds. Every bar runs from 0 to 100 percent and is split into three segments: a vermillion knockout share anchored at the left, a blue submission share in the middle, and a quiet warm-grey decision share on the right. The vermillion knockout wedge widens steadily down the divisions, from 25 percent among flyweights to 52 percent among heavyweights, the only bar to cross a dashed line at the halfway mark. The decision share falls the same way, from 55 percent down to 36 percent, while the blue submission share stays near one in five throughout. A vermillion ring traces the heavyweight knockout wedge, with a callout noting that over half of heavyweight bouts end in a knockout, and a counterpoint by the flyweight bar notes that lighter divisions go the distance."
+image-alt: "A horizontal stacked bar chart of 8,258 UFC fights across twelve weight divisions, split into a men's group of eight bars on top and a women's group of four below, each ordered lightest to heaviest and labelled with its gender and weight limit. Every bar runs from 0 to 100 percent and is split into three segments: a vermillion knockout share anchored at the left, a blue submission share in the middle, and a quiet warm-grey decision share on the right. The vermillion knockout wedge widens with the weight limit in both groups, from 23 percent among men's flyweights to 52 percent among men's heavyweights, and from 13 percent among women's strawweights to 24 percent among women's featherweights. Men's heavyweight is the only bar to cross a dashed line at the halfway mark. The decision share falls the same way in each group while the blue submission share stays near one in five throughout. A vermillion ring traces the men's heavyweight knockout wedge, with a callout noting that over half of men's heavyweight bouts end in a knockout."
 categories: [2026]
 ---
 
@@ -34,6 +34,6 @@ categories: [2026]
 
 Data: [TidyTuesday 2026-07-07](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-07-07).
 
-Across 5,991 men's UFC fights from 2010 to 2026, how a fight ends tracks how heavy the fighters are.
-The knockout share climbs from a quarter of flyweight bouts to more than half of all heavyweight bouts, while the share that reaches the judges falls just as steadily.
+Across 8,258 UFC fights from 1997 to 2026, how a fight ends tracks how heavy the fighters are, in both the men's and the women's divisions.
+The knockout share climbs from under a quarter of men's flyweight bouts to more than half of all men's heavyweight bouts, and it rises the same way through the women's divisions, while the share that reaches the judges falls just as steadily.
 Submissions barely move, holding near one fight in five across every division, so the heavier the fight, the less likely it is to leave the outcome to the scorecards.
