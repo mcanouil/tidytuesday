@@ -5,6 +5,7 @@ project:
   render:
     - index.qmd
     - about.qmd
+    - 404.qmd
     - "tidytuesday/20*/*/*/index.qmd"
 
 lang: en-GB
@@ -48,10 +49,8 @@ website:
         target: _blank
         rel: noopener noreferrer
         aria-label: "RSS feed"
-      - text: '{{< iconify octicon:mark-github-16 title="GitHub" label="GitHub" >}}'
-        href: "https://github.com/mcanouil/tidytuesday"
-        target: _blank
-        rel: noopener noreferrer
+      - text: GitHub
+        href: "#gitlink-widget"
         aria-label: "GitHub repository"
   sidebar:
     style: docked
@@ -93,3 +92,12 @@ filters:
   - typst-render
   - code-window
   - assets/filters/current-year.lua
+  - path: gitlink
+    at: post-quarto
+
+extensions:
+  gitlink:
+    enabled: false
+    widget:
+      enabled: true
+      style-navbar-tools: true
