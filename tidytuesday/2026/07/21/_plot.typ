@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.4.1": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+#import "@local/gribouille:0.0.0": *
+#set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per account submitted to the near-death experience archive. Both the
 // Greyson score and the eight theme flags are derived from the narrative text
@@ -171,7 +171,7 @@
     // reads without a legend.
     annotate(
       "typst", x: n-rows + 0.5, y: threshold - 0.5,
-      label: note(fill: above-col, size: 7.5pt, weight: "bold")[threshold #threshold],
+      label: note(fill: above-col, size: 7.5pt, weight: "bold")[Threshold #threshold],
       anchor: "south-west", clip: false,
     ),
     annotate(
@@ -182,7 +182,7 @@
     // One callout out in the long empty tail, where the scores the scale was
     // built for would sit if the archive ever reached them.
     annotate(
-      "typst", x: n-rows + 0.2, y: 11,
+      "typst", x: n-rows - 0, y: 11,
       label: box(width: 8.4cm)[
         #note(fill: above-col, size: 9pt, weight: "bold")[
           #n-above of #n-scored scored accounts (#pct-above) reach #threshold.
@@ -222,11 +222,13 @@
     y: "Greyson NDE Scale Score",
     subtitle: [
       The Greyson NDE Scale counts an account as a near-death experience at
-      #threshold points out of #scale-max. Across #n-scored scored accounts, all
+      #text(fill: above-col, weight: "bold")[#threshold points] out of #scale-max. \
+      Across #n-scored scored accounts, all
       but #text(fill: above-col, weight: "bold")[#n-above of them] fall
       #text(fill: below-col.darken(15%), weight: "bold")[below that line], and
       no theme shifts the middle: every row's median sits between
-      #median-lo and #median-hi. Even #col-name(stretch.col, size: 8.5pt), whose
+      #median-lo and #median-hi. 
+      Even #col-name(stretch.col, size: 8.5pt), whose
       tail clears the threshold most often, does so in only #stretch-pct of the
       accounts that carry it.
     ],
