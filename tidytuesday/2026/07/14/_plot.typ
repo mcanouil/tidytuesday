@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.4.1": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+#import "@local/gribouille:0.0.0": *
+#set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per museum specimen, covering the whole penguin family rather than
 // the three species of palmerpenguins. Every number in the chart is derived
@@ -162,7 +162,7 @@
     // the number it stands for without landing on any data.
     annotate(
       "typst", x: fam-x.hi, y: fam-y.hi + 1.4,
-      label: box(width: 6cm)[
+      label: box(width: 5.4cm)[
         #set align(right)
         #note(fill: box-col, size: 7.5pt, weight: "bold")[
           The dashed box holds every beak the three famous species have between
@@ -188,7 +188,7 @@
     shape: famous-scale(famous-shapes),
   ),
   // The key sits inside the panel, in the empty band under the three clouds.
-  guides: guides(default: guide-legend(position: bottom + right, key-size: 0.22cm)),
+  guides: guides(default: guide-legend(position: (x: 82%, y: 78%), key-size: 0.22cm)),
   labels: labels(
     title: "The Famous Three Penguins Sit in One Corner of the Beak",
     // The legend names the species; a title over it would only repeat the word.
