@@ -15,26 +15,22 @@
 // Records carrying no month have no place on a calendar dial, so they are
 // dropped; the caption states how many.
 #let month-of(v) = if v == none or v == "" or v == "NA" { none } else { int(v) }
-
-// Group a whole number with thousands separators, e.g. 35052 -> "35,052".
-#let thousands(n) = {
-  let out = ()
-  for (i, c) in str(calc.abs(n)).clusters().rev().enumerate() {
-    if i > 0 and calc.rem(i, 3) == 0 { out.push(",") }
-    out.push(c)
-  }
-  out.rev().join()
-}
+#let comma = format-comma()
+#let pct = format-percent()
 
 #let month-names = (
   "Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.",
   "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec.",
 )
 
-// One pass over the records, tallying each organism's month counts.
+// One pass over the forty thousand records: each organism's month counts, and
+// the share that are casual sightings rather than specimens, which is what
+// makes the seasonal shape an observation pattern as much as a biological one.
 #let tally = (:)
 #let n-dropped = 0
+#let n-human = 0
 #for r in raw {
+  if r.record_type == "HUMAN_OBSERVATION" { n-human += 1 }
   let m = month-of(r.month)
   if m == none {
     n-dropped += 1
@@ -47,27 +43,26 @@
 
 #let n-records = raw.len()
 #let n-used = n-records - n-dropped
-// Most records are casual sightings rather than specimens, which is what makes
-// the seasonal shape an observation pattern as much as a biological one.
-#let n-human = raw.filter(r => r.record_type == "HUMAN_OBSERVATION").len()
-#let pct-human = calc.round(100 * n-human / n-records)
+#let pct-human = pct(n-human / n-records)
 
 // One dial per organism, each scaled to its own records so a species with four
 // hundred sightings and one with forty thousand can be read side by side.
 // Ordered by how sharply the year concentrates, sharpest first, so the reader
 // meets the strongest seasonal signal at the left.
 #let dials = tally.pairs().map(((name, counts)) => {
-    let total = counts.sum()
-    let shares = counts.map(c => 100 * c / total)
-    let peak-i = shares.position(s => s == calc.max(..shares))
-    (
-      organism: name,
-      total: total,
-      shares: shares,
-      peak-month: month-names.at(peak-i),
-      peak-share: calc.round(shares.at(peak-i)),
-    )
-}).sorted(key: d => d.peak-share).rev()
+  let total = counts.sum()
+  let shares = counts.map(c => c / total)
+  let peak = calc.max(..shares)
+  let peak-i = shares.position(s => s == peak)
+  (
+    organism: name,
+    total: total,
+    shares: shares.map(s => 100 * s),
+    peak: peak,
+    peak-month: month-names.at(peak-i),
+    peak-share: pct(peak),
+  )
+}).sorted(key: d => d.peak).rev()
 
 #let sharpest = dials.first()
 #let broadest = dials.last()
@@ -85,36 +80,30 @@
 #let ring-list = rings.slice(0, -1).map(str).join(", ") + " and " + str(rings.last())
 #let ring-max = 45
 
-// The strip carries the panel's own headline, since a facet label is plain text
-// and this is the one place a per-panel number can sit without colliding with a
-// wedge or a month tick. Faceting on this column instead of the raw name keeps
-// the fill scale keyed to the organism.
-#let panel-of(d) = d.organism + " · " + str(d.peak-share) + "% " + d.peak-month
-
 // The long table the dials are drawn from: one wedge per organism per month.
+//
+// The strip carries each panel's own headline, since a facet label is plain
+// text and this is the one place a per-panel number can sit without colliding
+// with a wedge or a month tick. Faceting on that string instead of the raw name
+// keeps the fill scale keyed to the organism.
 #let wedges = ()
 #for d in dials {
+  let panel = d.organism + " · " + d.peak-share + " " + d.peak-month
   for (i, share) in d.shares.enumerate() {
     wedges.push((
       organism: d.organism,
-      panel: panel-of(d),
+      panel: panel,
       month: month-names.at(i),
       share: share,
     ))
   }
 }
 
-// One hue per organism, each chosen for the thing it names: a rose for the
-// orchid, an ochre for the finch's belly, an ocean blue for the ray, and a
-// luminous green for the glowworm. Each sits alone in its own dial behind a
-// named strip, so identity never rests on colour.
-//
-// Rose and green are the awkward pair, since a deuteranope reads them as the
-// same hue; what separates them is the gap in lightness, which is why the rose
-// is held down and the green lifted. All four then clear the colour-vision and
-// contrast checks against the pale page and the dark one alike, so the figure
-// needs no light/dark branch and nothing outside this file has to tell it which
-// page it is on.
+// One hue per organism, named for the thing it describes. Rose and green read
+// as the same hue to a deuteranope, so the rose is held down and the green
+// lifted: the lightness gap is what separates them. All four clear the
+// colour-vision and contrast checks on the pale page and the dark one alike, so
+// the figure needs no light/dark branch.
 #let organism-colours = (
   "Orchid": rgb("#b03e5c"),
   "Gouldian finch": rgb("#c47a12"),
@@ -133,12 +122,6 @@
 #let body-font = "Lato"
 #let chart-font = "Archivo"
 
-// Only the four cardinal months are labelled: twelve labels on four dials this
-// size collide, and the quarter marks are enough to orient the reader. The rest
-// of the months keep their tick and lose their text.
-#let shown-months = ("Jan.", "Apr.", "Jul.", "Oct.")
-#let month-label(m) = if m in shown-months { m } else { "" }
-
 #plot(
   data: wedges,
   mapping: aes(x: "month", y: "share", fill: "organism"),
@@ -148,18 +131,14 @@
     geom-col(width: 1, colour: wedge-edge, stroke: 0.5pt),
   ),
   scales: scales(
+    // Only the quarter months are labelled: twelve labels on four dials this
+    // size collide, and the rest keep their tick and lose their text.
     x: scale-discrete(
       limits: month-names,
-      labels: month-names.map(month-label),
+      labels: month-names.map(m => if m in ("Jan.", "Apr.", "Jul.", "Oct.") { m } else { "" }),
       expand: false,
     ),
-    // The rings are drawn but not numbered: a figure this size has nowhere to
-    // put a radial number that is not already covered by a wedge.
-    y: scale-continuous(
-      breaks: rings,
-      labels: rings.map(_ => ""),
-      limits: (0, ring-max),
-    ),
+    y: scale-continuous(breaks: rings, limits: (0, ring-max)),
     fill: scale-discrete(
       limits: dial-order,
       palette: dial-order.map(n => organism-colours.at(n)),
@@ -167,7 +146,10 @@
   ),
   coord: coord-radial(theta: "x"),
   facet: facet-wrap("panel", nrow: 1),
-  guides: guides(default: none),
+  // The rings stay, their numbers go: a figure this size has nowhere to put a
+  // radial number that a wedge does not already cover. `default` never reaches
+  // the radial axis, so `r` has to say so itself.
+  guides: guides(default: none, r: none),
   labels: labels(
     title: "Four Australian Species, Four Different Months",
     // Neither axis carries a title: the rings and the dials are explained in
@@ -178,16 +160,16 @@
       Each dial is one species' year, every wedge a month's share of that
       species' own records. The
       #text(fill: organism-colours.at(sharpest.organism), weight: "bold")[#sharpest.organism]
-      is the sharpest, with #sharpest.peak-share% of its records falling in
+      is the sharpest, with #sharpest.peak-share of its records falling in
       #sharpest.peak-month alone, while the
       #text(fill: organism-colours.at(broadest.organism), weight: "bold")[#broadest.organism]
-      spreads across half the year and peaks at only #broadest.peak-share%.
+      spreads across half the year and peaks at only #broadest.peak-share.
       Months run clockwise from January, so the southern winter sits at the
       bottom of every dial.
     ],
     caption: typst([
-      #thousands(n-used) of #thousands(n-records) records carry a month; #n-dropped have no date and are dropped. Rings mark #ring-list%, and each dial is scaled to its own species (#thousands(smallest-total) to #thousands(largest-total) records). \
-      #pct-human% of the records are casual human sightings, so a peak marks when people were out looking as much as when the species was there, and weekends are over-represented in every dial. \
+      #comma(n-used) of #comma(n-records) records carry a month; #n-dropped have no date and are dropped. Rings mark #ring-list%, and each dial is scaled to its own species (#comma(smallest-total) to #comma(largest-total) records). \
+      #pct-human of the records are casual human sightings, so a peak marks when people were out looking as much as when the species was there, and weekends are over-represented in every dial. \
       Source: Australian biodiversity occurrences (TidyTuesday 2026-07-28). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ]),
   ),
@@ -208,9 +190,6 @@
       outset: margin(top: 0.4cm, right: 0.4cm, bottom: 0.4cm, left: 0.4cm),
     )
   ),
-  // Short of the figure's own width on purpose. A radial panel hangs its theta
-  // labels outside the circle, and on a single row the first and last dials
-  // hang theirs off the ends of the figure; this leaves them somewhere to sit.
   width: auto,
   height: auto,
 )

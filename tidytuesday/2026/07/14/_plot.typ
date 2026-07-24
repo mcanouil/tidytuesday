@@ -65,9 +65,10 @@
 
 // The family extremes the chart calls out by name, found by measurement rather
 // than by row position, so they stay correct if the data changes.
-#let longest = birds.sorted(key: b => b.x).last()
+#let by-length = birds.sorted(key: b => b.x)
+#let longest = by-length.last()
+#let shortest = by-length.first()
 #let deepest = birds.sorted(key: b => b.y).last()
-#let shortest = birds.sorted(key: b => b.x).first()
 
 // One palette, one source of truth. The three famous species each take a hue;
 // everything else in the family is a deliberate neutral, a backdrop rather than
@@ -90,45 +91,32 @@
 #let body-font = "Alegreya Sans"
 #let chart-font = "Alegreya"
 
-#let famous-order = palmer
 #let famous-colours = (adelie-col, chinstrap-col, gentoo-col)
 #let famous-shapes = ("circle", "triangle", "square")
-// Typst glyphs matching famous-shapes, so the key in the panel shows the same
-// mark the reader has to find among the points.
-#let famous-glyphs = ("\u{25CF}", "\u{25B2}", "\u{25A0}")
-#let famous-scale(values) = scale-discrete(limits: famous-order, palette: values)
 
-// `fill: none` means "say nothing about the colour", so the text inherits the
-// page ink typst-render sets and stays legible whichever way the site is
-// toggled, rather than pinning a colour that would vanish on the other page.
-// Passing a colour is reserved for text that names a coloured mark; secondary
-// text steps down in size rather than in colour, for the same reason.
-#let inked(fill, ..fields) = {
-  let args = fields.named()
-  if fill != none { args.insert("fill", fill) }
-  args
-}
-
+// No fill means "say nothing about the colour", so the text inherits the page
+// ink and stays legible whichever way the site is toggled. A colour is passed
+// only for text naming a coloured mark; secondary text steps down in size.
+//
 // Species names are binomials, so they are set in italic wherever they appear.
-#let sp(name, fill: none, size: 8pt, weight: "regular") = text(
-  ..inked(fill, font: chart-font, style: "italic", size: size, weight: weight),
-)[#name]
-#let note(body, fill: none, size: 7pt, weight: "regular") = text(
-  ..inked(fill, font: body-font, size: size, weight: weight),
-)[#body]
+#let sp(name, fill: none, size: 8pt, weight: "regular") = {
+  set text(fill: fill) if fill != none
+  text(font: chart-font, style: "italic", size: size, weight: weight)[#name]
+}
+#let note(body, fill: none, size: 7pt, weight: "regular") = {
+  set text(fill: fill) if fill != none
+  text(font: body-font, size: size, weight: weight)[#body]
+}
 
 // The three clouds overlap almost completely, so a label per cloud would sit on
-// top of its neighbours. The key goes in the empty band below them instead,
-// carrying the same mark and the same hue as the points it names.
-#let key-row(i) = {
-  let name = famous-order.at(i)
-  let n = famous.filter(b => b.species == name).len()
-  box(inset: (bottom: 1.2pt))[
-    #text(fill: famous-colours.at(i), size: 8pt)[#famous-glyphs.at(i)]
-    #h(2pt) #sp(name, size: 8.5pt, weight: "bold", fill: famous-colours.at(i))
-    #note(size: 6.5pt)[ n = #n]
-  ]
-}
+// top of its neighbours; the legend goes in the empty band below them instead.
+// Both scales carry the same labels so the fill and shape guides merge into one
+// key, which then draws the real marker rather than a lookalike glyph.
+#let famous-labels = palmer.map(name => sp(name, size: 8.5pt, weight: "bold")
+  + note(size: 6.5pt)[ n = #famous.filter(b => b.species == name).len()])
+#let famous-scale(values) = scale-discrete(
+  limits: palmer, palette: values, labels: famous-labels,
+)
 
 // A named specimen at one edge of the family, with the measurement that puts it
 // there, so the reader can see what the famous three leave out at either end.
@@ -143,12 +131,11 @@
     geom-mark(
       method: "hull", expand: 6pt,
       fill: other-col, colour: other-col, alpha: 0.1, stroke: 0.5pt,
-      inherit-aes: false, data: birds, mapping: aes(x: "x", y: "y"),
     ),
     // The fifteen species nobody plots: small, translucent and held to a
     // neutral, so they read as context rather than as a fourth category.
     geom-point(
-      data: others, mapping: aes(x: "x", y: "y"), inherit-aes: false,
+      data: others,
       size: 2.2pt, fill: other-col, colour: mark-edge, stroke: 0.4pt, alpha: 0.85,
     ),
     // The box the whole figure is about: the range the three famous species
@@ -163,14 +150,8 @@
     ),
     // The famous three, each with its own hue and its own shape.
     geom-point(
-      data: famous, mapping: aes(x: "x", y: "y", fill: "species", shape: "species"),
-      inherit-aes: false, size: 3.6pt, colour: mark-edge, stroke: 0.6pt,
-    ),
-    // The key, in the empty band under the famous three and inside the panel.
-    annotate(
-      "typst", x: 73, y: 16.2,
-      label: box[#stack(dir: ttb, ..range(3).map(key-row))],
-      anchor: "north-west", clip: false,
+      data: famous, mapping: aes(fill: "species", shape: "species"),
+      size: 3.6pt, colour: mark-edge, stroke: 0.6pt,
     ),
     // The family extremes, each anchored away from its own point so the label
     // never covers the specimen it names.
@@ -206,9 +187,13 @@
     fill: famous-scale(famous-colours),
     shape: famous-scale(famous-shapes),
   ),
-  guides: guides(default: none),
+  // The key sits inside the panel, in the empty band under the three clouds.
+  guides: guides(default: guide-legend(position: bottom + right, key-size: 0.22cm)),
   labels: labels(
     title: "The Famous Three Penguins Sit in One Corner of the Beak",
+    // The legend names the species; a title over it would only repeat the word.
+    fill: none,
+    shape: none,
     subtitle: [
       Measure all #n-species species instead of the usual three, and the
       palmerpenguins trio,
