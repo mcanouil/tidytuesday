@@ -27,15 +27,9 @@
 }
 
 #let month-names = (
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.",
+  "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec.",
 )
-
-// Southern-hemisphere seasons, so a northern reader does not misread July as
-// midsummer. Named once here and used for the season ring and the caption.
-#let season-of(m) = if m in (12, 1, 2) { "summer" } else if m in (3, 4, 5) {
-  "autumn"
-} else if m in (6, 7, 8) { "winter" } else { "spring" }
 
 // One pass over the records, tallying each organism's month counts.
 #let tally = (:)
@@ -72,7 +66,6 @@
       shares: shares,
       peak-month: month-names.at(peak-i),
       peak-share: calc.round(shares.at(peak-i)),
-      peak-season: season-of(peak-i + 1),
     )
 }).sorted(key: d => d.peak-share).rev()
 
@@ -87,9 +80,10 @@
 
 // The rings the radial gridlines fall on. Named once here, drawn unlabelled on
 // the dials and spelled out in the caption instead, so no number has to sit on
-// top of a wedge.
+// top of a wedge. The outer bound sits just past the tallest wedge.
 #let rings = (10, 20, 30, 40)
 #let ring-list = rings.slice(0, -1).map(str).join(", ") + " and " + str(rings.last())
+#let ring-max = 45
 
 // The strip carries the panel's own headline, since a facet label is plain text
 // and this is the one place a per-panel number can sit without colliding with a
@@ -139,81 +133,32 @@
 #let body-font = "Lato"
 #let chart-font = "Archivo"
 
-// `fill: none` means "say nothing about the colour", so the text inherits the
-// page ink typst-render sets and stays legible whichever way the site is
-// toggled, rather than pinning a colour that would vanish on the other page.
-// Passing a colour is reserved for text that names a coloured mark; secondary
-// text steps down in size rather than in colour, for the same reason.
-#let inked(fill, ..fields) = {
-  let args = fields.named()
-  if fill != none { args.insert("fill", fill) }
-  args
-}
-#let note(body, fill: none, size: 7pt, weight: "regular") = text(
-  ..inked(fill, font: body-font, size: size, weight: weight),
-)[#body]
-
 // Only the four cardinal months are labelled: twelve labels on four dials this
-// size collide, and the quarter marks are enough to orient the reader.
-//
-// They are drawn as a layer rather than as theta ticks, because a radial panel
-// puts its tick labels outside the circle and the circle already fills the
-// panel, so the built-in ones run off the ends of the figure. Carrying them as
-// data instead puts them on the radial scale, which is why that scale is given
-// an explicit outer bound with room past the last ring: the labels ride in the
-// band between the two, clear of every ring. An explicit `limits:` pins the
-// view outright, so the room has to be in the limit rather than in `expand:`.
-// Each row names its panel, so every dial gets its own set.
-// Both radii hang off the last ring, so moving the rings moves the layout with
-// them. The gaps are the smallest that clear the label text at either side:
-// every unit spent here shrinks the wedges, and the tallest wedge sitting under
-// a labelled month is well short of the tallest wedge overall.
-#let shown-months = ("Jan", "Apr", "Jul", "Oct")
-#let label-radius = rings.last() + 7 // outside the last ring
-#let view-max = label-radius + 5 // the dial's edge, clear of the labels
-
-#let month-labels = ()
-#for d in dials {
-  for m in shown-months {
-    month-labels.push((
-      panel: panel-of(d),
-      month: m,
-      radius: label-radius,
-      label: note(size: 6.5pt)[#m],
-    ))
-  }
-}
+// size collide, and the quarter marks are enough to orient the reader. The rest
+// of the months keep their tick and lose their text.
+#let shown-months = ("Jan.", "Apr.", "Jul.", "Oct.")
+#let month-label(m) = if m in shown-months { m } else { "" }
 
 #plot(
   data: wedges,
   mapping: aes(x: "month", y: "share", fill: "organism"),
   layers: (
-    // The rings, drawn as layers rather than as panel grid. A radial panel
-    // takes one stroke for the whole grid and spends it on rings and spokes
-    // alike, and a spoke runs the full radius straight through the month label
-    // sitting on it. Blanking the grid and drawing only the rings keeps the
-    // scale and loses the collision.
-    ..rings.map(r => geom-hline(
-      yintercept: r, stroke: 0.5pt, colour: grid-col, inherit-aes: false,
-    )),
     // A full-width wedge per month, so each dial reads as a year rather than as
     // twelve separate bars.
     geom-col(width: 1, colour: wedge-edge, stroke: 0.5pt),
-    // The quarter months, in the band between the last ring and the dial edge.
-    geom-typst(
-      data: month-labels,
-      mapping: aes(x: "month", y: "radius", label: "label"),
-      inherit-aes: false,
-    ),
   ),
   scales: scales(
-    x: scale-discrete(limits: month-names, labels: month-names.map(_ => "")),
+    x: scale-discrete(
+      limits: month-names,
+      labels: month-names.map(month-label),
+      expand: false,
+    ),
     // The rings are drawn but not numbered: a figure this size has nowhere to
     // put a radial number that is not already covered by a wedge.
     y: scale-continuous(
       breaks: rings,
       labels: rings.map(_ => ""),
-      limits: (0, view-max),
+      limits: (0, ring-max),
     ),
     fill: scale-discrete(
       limits: dial-order,
@@ -254,11 +199,18 @@
     axis-text: element-text(font: body-font, size: 7pt),
     strip-background: element-blank(),
     strip-text: element-text(font: chart-font, size: 8.5pt, weight: "bold"),
-    // The rings are drawn as layers instead (see above), so the panel grid is
-    // off entirely.
-    panel-grid: element-blank(),
-    panel-spacing: 0.2cm,
+    // Rings and spokes both come from this one stroke, and both stop at the
+    // circle, inside the month labels.
+    panel-grid: element-line(colour: grid-col),
+    panel-spacing: 0.5cm,
+    panel-background: element-rect(
+      fill: rgb("#f7f0e7"),
+      outset: margin(top: 0.4cm, right: 0.4cm, bottom: 0.4cm, left: 0.4cm),
+    )
   ),
+  // Short of the figure's own width on purpose. A radial panel hangs its theta
+  // labels outside the circle, and on a single row the first and last dials
+  // hang theirs off the ends of the figure; this leaves them somewhere to sit.
   width: auto,
   height: auto,
 )
