@@ -1,0 +1,40 @@
+---
+engine: markdown
+title: "Almost No Account Reaches the Greyson Threshold"
+description: "A beeswarm of 587 scored near-death experience accounts across the eight themes the archive codes for, showing that only 9% reach the score at which the Greyson NDE Scale counts an account as a near-death experience."
+date: "2026-07-21"
+order: 20260721
+image: images/featured-light.png
+image-alt: "A horizontal beeswarm chart with eight rows, one for each theme the near-death experience archive codes for, ordered from the commonest at the top to the rarest at the bottom: ai_clinical with 526 accounts, ai_obe with 336, ai_unity with 96, ai_esp with 90, ai_hellish with 46, ai_world_future with 27, ai_past_lives with 20, and ai_aliens with 5. Each row label gives the column name in a monospaced face, then a plain-English gloss, the number of accounts and how many reach 7. The horizontal axis is the Greyson NDE Scale score, running the full length of the scale from 0 to 32. One dot marks each account, swarmed vertically within its row. In every row the dots pile into narrow columns between 0 and 4 and then thin out fast, so the right two-thirds of the panel is almost empty. A short dark rule marks each row's median; all eight sit between 2 and 3. A dashed crimson line just below 7 marks the threshold at which the scale counts an account as a near-death experience, and the few dots beyond it are drawn in crimson at full strength while the rest are held back in warm grey. A callout in the empty right-hand space states that 53 of 587 scored accounts, 9 percent, reach 7, that the scale runs to 32, and that the whole archive stops at 27."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-07-21
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Almost No Account Reaches the Greyson Threshold"
+```
+
+Data: [TidyTuesday 2026-07-21](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-07-21).
+
+The Greyson NDE Scale scores an account out of 32 and treats 7 as the point at which it counts as a near-death experience, so plotting the archive against that threshold asks a plain question of it.
+The answer is that 53 of the 587 scored accounts reach 7, about one in eleven, and the whole archive stops at 27 without ever approaching the top of the scale.
+Splitting the accounts by the eight themes coded for them changes almost nothing: every row's median falls between 2 and 3, and even `ai_unity`, whose tail clears the threshold most often, does so in only 17% of the accounts that carry it.
+Both the score and the theme flags here are derived from the narrative text rather than from an interview, so the figure says more about how the archive was coded than about what the experiences were.

@@ -1,0 +1,40 @@
+---
+engine: markdown
+title: "Four Australian Species, Four Different Months"
+description: "Four radial dials of the Australian year, one per species, showing that orchid, glowworm, manta ray and Gouldian finch records each pile into a different part of the calendar."
+date: "2026-07-28"
+order: 20260728
+image: images/featured-light.png
+image-alt: "Four radial dials in a row, one per species, each showing that species' year. Months run clockwise from January at the top, so the southern winter sits at the bottom, and every wedge is that month's share of the species' own records. Each dial is labelled with its species and its peak: orchid at 43 percent in September, glowworm at 30 percent in December, manta ray at 29 percent in July, and Gouldian finch at 16 percent in July. The orchid dial is dominated by one deep rose wedge reaching past the fourth ring on the left of the circle, with August and October beside it and almost nothing from December to April. The glowworm dial in green leans to the upper left, into the southern summer of November and December. The manta ray dial in ocean blue points straight down into June, July and August. The Gouldian finch dial in ochre is the most even, a small fan spread across the dry season from April to September and never rising far. Rings mark 10, 20, 30 and 40 percent."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-07-28
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Four Australian Species, Four Different Months"
+```
+
+Data: [TidyTuesday 2026-07-28](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-07-28).
+
+Four species share this week's occurrence records, and drawn as a calendar each one turns out to own a different part of the Australian year.
+Orchid records are the most concentrated of the four: 43% of them fall in September alone, and four months of the southern summer barely register.
+The manta ray points at the winter, with 29% of its records in July, the glowworm at the summer, with 30% in December, and the Gouldian finch spreads thinly across the whole dry season without ever passing 16% in any month.
+These are sighting records rather than surveys, though, and 93% of them are casual human observations, so each dial is partly a record of when people were out looking; weekends are over-represented in every one of them.

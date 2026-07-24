@@ -1,0 +1,39 @@
+---
+engine: markdown
+title: "The Famous Three Penguins Sit in One Corner of the Beak"
+description: "Beak length against beak depth for 92 specimens across all 18 penguin species, showing that the three species of palmerpenguins hold about 8% of the beak shapes the family covers."
+date: "2026-07-14"
+order: 20260714
+image: images/featured-light.png
+image-alt: "A scatter plot of beak length along the culmen against beak depth for 92 penguin specimens covering 18 species in 6 genera. A pale grey envelope traces the outline of the whole family, and 75 small grey points inside it are the 15 species outside palmerpenguins. The 17 specimens of the palmerpenguins three are drawn larger, each species with its own colour and its own shape: coral circles for Adélie, teal triangles for chinstrap, and blue squares for gentoo. All three cluster tightly between about 53 and 69 millimetres of beak length and 15 to 22 millimetres of depth, and a dashed brown rectangle encloses exactly that range. The rectangle covers a small part of the panel: the family as a whole spans 43.5 to 110 millimetres in length and 11.9 to 31 millimetres in depth. A key inside the empty band below the rectangle names the three species with their marks and sample sizes. Three specimens at the edges of the family are labelled by name: E. minor at 43.5 millimetres long in the bottom left, E. schlegeli at 31 millimetres deep at the top, and A. patagonicus at 110 millimetres long on the far right. A callout in the upper right states that the dashed box covers 24 percent of the family's range in length and 34 percent of it in depth, roughly 8 percent of the area the other fifteen species fill."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-07-14
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "The Famous Three Penguins Sit in One Corner of the Beak"
+```
+
+Data: [TidyTuesday 2026-07-14](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-07-14).
+
+Beak length against beak depth is the scatter plot the palmerpenguins dataset is known for, and this week's data lets it be drawn for all 18 species instead of the usual three.
+Set against the whole family, the famous trio turns out to sit in one corner of it: their beaks span 53.4 to 69.1 mm in length and 15.3 to 21.8 mm in depth, about a quarter of the family's range in one direction and a third of it in the other, so roughly 8% of the area the other fifteen species fill.
+What sits outside that box is most of what a penguin beak can be, from the 43.5 mm bill of the little penguin to the 110 mm of the king penguin, and the 31 mm depth of the royal penguin.
