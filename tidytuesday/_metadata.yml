@@ -3,6 +3,7 @@ date-format: "dddd[, the] Do [of] MMMM, YYYY"
 extensions:
   typst-render:
     preamble: /assets/typst/_preamble.typ
+    font-path: /assets/fonts
     classes: figure-frame
     background:
       light: "#fbfaf7"
