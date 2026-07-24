@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
 // #import "@preview/gribouille:0.4.1": *
-#import "@local/gribouille:0.0.0": *
-#set page(width: 18cm, height: 9.45cm, margin: 0cm)
+// #import "@local/gribouille:0.0.0": *
+// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per museum specimen, covering the whole penguin family rather than
 // the three species of palmerpenguins. Every number in the chart is derived
