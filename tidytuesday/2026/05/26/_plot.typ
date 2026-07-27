@@ -95,7 +95,7 @@
     fill: scale-discrete(limits: cats, palette: cat-colours.values(), labels: cat-labels),
   ),
   labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
-  theme: theme-minimal(tick-length: 0.1cm),
+  theme: theme-minimal(axis-ticks: element-tick(length: 0.1cm)),
 )
 
 // In-panel callouts: the total renewable share at each end, plus a one-line

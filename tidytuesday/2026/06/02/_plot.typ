@@ -195,7 +195,7 @@
   labels: labels(x: "Months of Leave", y: none),
   theme: theme-minimal(
     axis-text-y: element-text(font: "DejaVu Sans Mono", size: 7pt),
-    tick-length-y: 0.08cm,
+    axis-ticks-y: element-tick(length: 0.08cm),
   ),
 )
 

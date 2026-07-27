@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
-// #import "@local/gribouille:0.0.0": *
+#import "@local/gribouille:0.0.0": *
 // #import "@preview/gribouille:0.4.1": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+#set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let raw = csv("data/papal_encyclicals.csv", row-type: dictionary)
 
@@ -114,8 +114,8 @@
     // opaque inset box all sit on top, the box hiding the triangle's base edge.
     geom-polygon(
       data: (
-        (x: 33.85, y: 8.53),
-        (x: 82.5, y: 0.74),
+        (x: 34.15, y: 8.374),
+        (x: 82.4, y: 0.8),
         (x: leo-count + 0.25, y: leo-level),
       ),
       mapping: aes(x: "x", y: "y"),
@@ -200,9 +200,7 @@
   ),
   theme: theme-minimal(
     axis-text-y: element-text(size: 8pt),
-    tick-length: 0.12cm,
-    axis-ticks-y: element-line(),
-    axis-ticks-x: element-blank(),
+    axis-ticks-y: element-tick(length: 0.12cm),
   ),
   width: auto,
   height: auto,

@@ -99,7 +99,7 @@
     ink: ink,
     paper: surface,
     axis-line: element-line(stroke: 0.5pt),
-    tick-length: 0.05cm,
+    axis-ticks: element-tick(length: 0.05cm),
   ),
   guides: guides(colour: none, fill: none, shape: none),
   width: 14cm,
