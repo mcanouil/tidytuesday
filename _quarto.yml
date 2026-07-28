@@ -1,6 +1,8 @@
 project:
   type: website
-  pre-render: scripts/install-gribouille.sh
+  pre-render:
+    - scripts/install-gribouille.sh
+    - scripts/check-fonts.sh
   output-dir: _site
   render:
     - index.qmd
