@@ -1,8 +1,8 @@
 // Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
 // do not import it here or the theme-* wrappers get rebound.
-// #import "@local/gribouille:0.0.0": *
+#import "@local/gribouille:0.0.0": *
 // #import "@preview/gribouille:0.4.1": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+#set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let num(s) = if s == "NA" or s == "" { 0.0 } else { float(s) }
 
@@ -163,15 +163,15 @@
 
 #box[
   #panels
-  #place(top + center, dx: 0pt, dy: 2cm)[
+  #place(top + center, dx: 10pt, dy: 2cm)[
     #set align(center)
     #set text(size: 8pt, style: "italic", fill: accent)
     As incomes rise, \ two roads diverge
     #v(2pt)
     #box(inset: (x: 2pt))[
-      #text(size: 40pt, fill: cat-colours.at("Traditional biomass"))[↓]
-      #h(4pt)
-      #text(size: 40pt, fill: cat-colours.at("Wind & solar"))[↑]
+      #text(size: 30pt, fill: cat-colours.at("Traditional biomass"))[↓]
+      #h(-5pt)
+      #text(size: 30pt, fill: cat-colours.at("Wind & solar"))[↑]
     ]
   ]
 ]
