@@ -33,7 +33,7 @@
 #let accent = rgb("#d55e00") // the WWI pivot ring and bars (graphical mark, 3:1)
 #let accent-ink = rgb("#9c3f00") // a darker orange for the pivot callout text, legible on pale surface water
 #let body-font = "PT Serif"
-#let chart-font = "Big Caslon"
+#let chart-font = "Libre Caslon Text"
 
 // The story runs on dated wrecks; undated records carry no year to place on the
 // timeline. A wreck is "found" when it has coordinates in the inventory.

@@ -11,6 +11,10 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 
 | Family | Files | Upstream | Used by |
 | --- | --- | --- | --- |
+| PT Serif | `PT_Serif-Web-Regular.ttf`, `PT_Serif-Web-Bold.ttf` | [`ofl/ptserif`](https://github.com/google/fonts/tree/main/ofl/ptserif) | 2026-06-30 |
+| Libre Caslon Text | `LibreCaslonText[wght].ttf` | [`ofl/librecaslontext`](https://github.com/google/fonts/tree/main/ofl/librecaslontext) | 2026-06-30 |
+| Fira Sans | `FiraSans-Regular.ttf`, `FiraSans-Bold.ttf` | [`ofl/firasans`](https://github.com/google/fonts/tree/main/ofl/firasans) | 2026-07-07 |
+| Oswald | `Oswald[wght].ttf` | [`ofl/oswald`](https://github.com/google/fonts/tree/main/ofl/oswald) | 2026-07-07 |
 | Alegreya | `Alegreya[wght].ttf`, `Alegreya-Italic[wght].ttf` | [`ofl/alegreya`](https://github.com/google/fonts/tree/main/ofl/alegreya) | 2026-07-14 |
 | Alegreya Sans | `AlegreyaSans-Regular.ttf`, `AlegreyaSans-Bold.ttf` | [`ofl/alegreyasans`](https://github.com/google/fonts/tree/main/ofl/alegreyasans) | 2026-07-14 |
 | Public Sans | `PublicSans[wght].ttf` | [`ofl/publicsans`](https://github.com/google/fonts/tree/main/ofl/publicsans) | 2026-07-21 |
@@ -21,6 +25,9 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 Files in square brackets are variable fonts.
 Typst 0.15 reads their weight axis, so one file covers every weight a figure asks for.
 Where a family ships only static instances upstream, the individual weights the figures use are vendored instead.
+
+The 2026-06-30 figure originally named `Big Caslon`, which is Apple's and cannot be redistributed.
+It uses `Libre Caslon Text` instead: the same Caslon lineage, with a real bold cut for the title rather than a synthesised one.
 
 ## Adding a family
 
@@ -35,5 +42,5 @@ Only add fonts that a figure actually uses, and only under a licence that permit
 
 3. Add a row to the table above.
 
-Earlier weeks name faces that are not vendored yet (`Oswald`, `Fira Sans`, `PT Serif`, `Big Caslon`), so their published figures still fall back.
-The first three are redistributable and could be added here; `Big Caslon` is Apple's and cannot be.
+`scripts/check-fonts.sh` enforces this: it runs from Quarto's `pre-render` hook and fails the render when a figure names a family that is neither vendored here nor embedded in the Typst binary.
+Without it the gap is invisible on macOS, where system fonts satisfy the lookup and only the CI runner falls back.

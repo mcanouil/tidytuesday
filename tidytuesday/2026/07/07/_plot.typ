@@ -107,7 +107,7 @@
 #let dec-col = rgb("#a9a198") // decision: no finish, left to the scorecards
 #let seg-edge = rgb("#3333334d") // thin edge so segments split on light or dark paper
 #let body-font = "Fira Sans"
-#let chart-font = "Oswald" // condensed scoreboard face, downloaded to ~/Library/Fonts
+#let chart-font = "Oswald" // condensed scoreboard face
 #let ring-col = rgb("#7a3300") // burnt vermillion: reads on the pale and the dark paper
 #let ink = rgb("#1c1c1c") // near-black text ink, so nothing on the page is pure #000
 #let paper-white = rgb("#faf6f0") // warm off-white for the KO label, never pure #fff
