@@ -1,6 +1,6 @@
-// Gribouille comes from the typst-render preamble; do not re-import (rebinds the
-// theme-* wrappers).
-// #import "@preview/gribouille:0.2.0": *
+// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
+// importing it again here is redundant.
+// #import "@preview/gribouille:0.6.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
