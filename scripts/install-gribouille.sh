@@ -7,9 +7,10 @@
 # is rewritten on install and the import stays `@local/gribouille:0.0.0`.
 #
 # Wired into Quarto's `pre-render` hook (see _quarto.yml), so it runs before
-# every `quarto preview` and `quarto render` (locally and in CI). The social
-# card (assets/typst/social-card.typ) intentionally stays on the @preview
-# release, so it is not touched here.
+# every `quarto preview` and `quarto render` (locally and in CI). Only the
+# typst-render preamble has its import rewritten, since that is the single
+# place every {typst} block gets Gribouille from; assets/typst/social-card.typ
+# is compiled on its own and already imports @local.
 #
 # Skips the download when 0.0.0 is already installed; set GRIBOUILLE_FORCE_UPDATE=1
 # to fetch the latest build. CI runners start clean, so they always fetch it.
