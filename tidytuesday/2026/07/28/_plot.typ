@@ -157,15 +157,11 @@
     x: none,
     y: none,
     subtitle: [
-      Each dial is one species' year, every wedge a month's share of that
-      species' own records. The
-      #text(fill: organism-colours.at(sharpest.organism), weight: "bold")[#sharpest.organism]
-      is the sharpest, with #sharpest.peak-share of its records falling in
-      #sharpest.peak-month alone, while the
-      #text(fill: organism-colours.at(broadest.organism), weight: "bold")[#broadest.organism]
+      Each dial is one species' year, every wedge a month's share of that species' own records.
+      The #text(fill: organism-colours.at(sharpest.organism), weight: "bold")[#sharpest.organism] is the sharpest, with #sharpest.peak-share of its records falling in
+      #text(style: "italic")[#sharpest.peak-month] alone, while the #text(fill: organism-colours.at(broadest.organism), weight: "bold")[#broadest.organism]
       spreads across half the year and peaks at only #broadest.peak-share.
-      Months run clockwise from January, so the southern winter sits at the
-      bottom of every dial.
+      Months run clockwise from January, so the southern winter sits at the bottom of every dial.
     ],
     caption: typst([
       #comma(n-used) of #comma(n-records) records carry a month; #n-dropped have no date and are dropped. Rings mark #ring-list%, and each dial is scaled to its own species (#comma(smallest-total) to #comma(largest-total) records). \
