@@ -239,12 +239,10 @@
   ),
   scales: scales(
     x: scale-continuous(
-      name: "Average month the year's wool arrives",
       breaks: range(3, 9),
       labels: range(3, 9).map(p => month-names.at(calc.rem(p + 7, 12))),
     ),
     y: scale-continuous(
-      name: "Share of the year's kilos landing in China",
       breaks: (0, 20, 40, 60, 80),
       labels: v => str(v) + "%",
       expand: (18%, 10%),
@@ -252,7 +250,6 @@
     size: scale-area(range: (2.5pt, 9pt)),
     colour: scale-gradient(low: hop-early, high: hop-late),
     fill: scale-discrete(
-      name: "Tonnes in the year",
       limits: tonne-labels,
       palette: tonne-colours,
     ),
@@ -277,6 +274,9 @@
       out to #latest.label, when the average consignment did not land until #month-names.at(calc.rem(int(latest.arrival) + 7, 12)), #calc.round(latest.arrival - first-year.arrival, digits: 1) months later in the year than in #first-year.label, and back again.
       Watch the circles shrink as it goes: #peak.label sent #pct(peak.share / 100) east, but of #comma(calc.round(peak.tonnes)) tonnes against #comma(calc.round(heaviest.tonnes)) in #heaviest.label.
     ],
+    x: "Average month the year's wool arrives",
+    y: "Share of the year's kilos landing in China",
+    fill: "Tonnes in the year",
     // Each line has to fit on one rendered line at 6.5 pt across 18 cm, so
     // roughly 150 characters; a wrapped caption runs off the bottom of the page.
     caption: typst([
@@ -290,7 +290,7 @@
     plot-title: element-text(font: chart-font, size: 17pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8.5pt),
     plot-caption: element-text(font: body-font, size: 6.5pt),
-    axis-title: element-text(font: body-font, size: 8.5pt),
+    axis-title: element-text(font: body-font, size: 8pt),
     axis-text: element-text(font: body-font, size: 7pt),
     legend-title: element-text(font: body-font, size: 7.5pt, weight: "bold"),
     legend-text: element-text(font: body-font, size: 7pt),
