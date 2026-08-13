@@ -1,0 +1,53 @@
+---
+engine: markdown
+title: "Sixty-Two Galaxies Hide in the Diagram Everyone Draws"
+description: "Four hundred and eight nearby galactic nuclei on the emission-line diagram every paper reaches for, where the transition objects sit inside the LINER cloud instead of beside it, and on the one ratio that pulls the two apart."
+date: "2026-08-11"
+order: 20260811
+image: images/featured-light.png
+image-alt: "Two panels side by side, sharing one title, describing the same 408 nearby galaxies from the Palomar spectroscopic survey. Each galaxy belongs to one of four nuclear classes, drawn in a fixed colour and shape throughout: H II in green circles, 202 of them; Transition in amber triangles, 62; LINER in blue squares, 92; and Seyfert in rose diamonds, 52. The large left panel is a scatter plot, the classic emission-line diagnostic diagram. Its horizontal axis is the logarithm of the [N II] 6583 to H-alpha ratio, running from about minus 1.5 to plus 0.7, and its vertical axis is the logarithm of the [O III] 5007 to H-beta ratio, running from about minus 1.2 to plus 1.3. The green H II circles form a dense cloud on the left, centred near minus 0.5 horizontally and spread from minus 1.2 to plus 0.7 vertically. The rose Seyfert diamonds sit along the top right, mostly above plus 0.4 vertically. The blue LINER squares and the amber Transition triangles occupy the same region in the centre and right, between roughly minus 0.2 and plus 0.5 horizontally and minus 0.5 and plus 0.5 vertically, thoroughly mixed rather than separated: the amber triangles lie inside the blue cloud. A grey dashed vertical line at zero marks the best single cut on this axis, labelled best cut here, 69.5 percent right, and 37 of the 62 amber triangles fall on the wrong side of it. A key in the empty bottom left corner names the four classes. The small right panel shows four filled density curves, one per class, stacked top to bottom in the same order as the key, against the logarithm of the [O I] 6300 to H-alpha ratio, running from about minus 3 to plus 0.3. The green H II curve is broad and sits furthest left, peaking near minus 1.7. The amber Transition curve is narrow and tall, peaking near minus 1.0. The blue LINER curve is broad and sits to the right, peaking near minus 0.5. The rose Seyfert curve is broad and roughly bimodal, spanning minus 1.4 to plus 0.1. A grey dashed vertical line at minus 0.78 falls in the gap between the amber and blue curves, where they barely overlap, and is labelled 98.1 percent right. The contrast between the panels is the point: the same two classes that overlap completely on the left are almost cleanly separated on the right."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-08-11
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Sixty-Two Galaxies Hide in the Diagram Everyone Draws"
+```
+
+Data: [TidyTuesday 2026-08-11](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-08-11).
+
+A galaxy's nucleus is classified by the ratios between a handful of emission lines, and the diagram those ratios are read off is one of the most reproduced figures in astronomy.
+It plots [O III] against [N II], both divided by a hydrogen line to cancel out reddening, and it sorts nuclei into star-forming H II regions, Seyferts, LINERs, and the transition objects that are supposed to be some of each.
+That is the left panel, and the thing worth noticing is how badly it does the last of those four jobs.
+The transition objects do not sit between the star-forming galaxies and the LINERs on this diagram; they sit inside the LINERs.
+No vertical cut anywhere along the axis gets more than 69.5% of the two classes right, and the best one still hands 37 of the 62 transition objects to the wrong side.
+
+Swap one ratio and the picture changes completely.
+Against [O I] rather than [N II], the same two classes barely overlap: a single cut at −0.78 separates 151 of the 154, because every LINER in the survey sits above −0.77 and only three transition objects reach that high.
+Two ratios of the same four elements, measured on the same spectra of the same galaxies, and one of them carries almost all of the information the other is missing.
+The lesson is not that the famous diagram is wrong, but that it is one projection of a classification that was never two-dimensional.
+
+Two cautions, and the first is the larger.
+Ho, Filippenko and Sargent defined transition objects partly on [O I]/Hα in the first place, so the right panel is marking its own homework and the 98.1% is a measure of how consistently they applied their own rule, not an independent discovery.
+What survives that objection is the left panel: whatever the transition objects are, the diagram everyone draws cannot see them.
+The second is that 25 of the 408 classifications are flagged very uncertain, 14 of them LINERs, which is the class the argument leans on hardest.
+A further 71 galaxies carry no class at all, one is pure absorption, and six are missing a ratio; none of the 78 are drawn.
+Note also that the four columns named `log_oiii_hb`, `log_oi_ha`, `log_nii_ha` and `log_sii_ha` hold the plain ratio rather than its logarithm, so the figure takes the logarithm itself.
