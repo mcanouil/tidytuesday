@@ -1,0 +1,57 @@
+---
+engine: markdown
+title: "The Chair Is a Smaller Club Than the Pen"
+description: "Four hundred and eighty-four country hits, the 517 writers and 172 producers credited on them, and the finding that ten producers reach half the chart while ten writers reach a third, even though a song carries twice as many writers as producers."
+date: "2026-08-25"
+order: 20260825
+image: images/featured-light.png
+image-alt: "Two panels side by side under one title, describing 484 songs that entered the country top 30 between 2013 and 2019. The large left panel is a pair of rising step curves on a logarithmic horizontal axis that runs from 1 to 500 people, ranked by how many hits they are credited on, with the share of the 484 hits those people touch on the vertical axis from 0 to 100 percent. The blue producers curve sits above the amber writers curve across the whole range. At one name the blue curve is already at 12 percent and the amber at 9 percent. A grey dashed vertical rule stands at 10 names, where a double-headed arrow spans the gap between the two curves. A boxed note in the empty top left corner reads that at the top 10 names, producers cover 49.4 percent of the chart and writers 33.3 percent, 16.1 percent apart on the same club size. The blue curve reaches 86.4 percent by 50 names and flattens near 100 percent at about 170 names, where it ends; the amber curve reaches 67.4 percent at 50 names and needs the full 517 to reach 100 percent. Each curve is named at its own end, in a small box in its own colour: producers above, writers below. The small right panel is a scatter plot of the 128 people credited on five or more hits, with hits written on the horizontal axis from 0 to about 45 and hits produced on the vertical axis from 0 to about 60, the axis titles coloured amber and blue to match the curves. A grey dashed diagonal marks where the two counts are equal. Most points cluster in the bottom left corner under 15 of each. Five are labelled, each name set towards the middle of the panel with a short arrow back to its own point: Dann Huff high on the vertical axis at 59 produced and none written, Scott Hendricks at 33 produced and none written, Ross Copperman at 32 written and 26 produced and Shane McAnally at 36 written and 21 produced, both near the diagonal on the right, and Ashley Gorley far right along the bottom at 44 written and 1 produced. The scatter is the point: the two clubs are not separate clubs."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-08-25
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "The Chair Is a Smaller Club Than the Pen"
+```
+
+Data: [TidyTuesday 2026-08-25](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-08-25).
+
+Country songwriting has a reputation for being a closed shop, and the week's data comes with two tables of the busiest writers to prove it.
+It is true as far as it goes: 517 people wrote these 484 hits, and the ten most-credited of them are on a third of the chart.
+The producers are the stronger story, and nobody counted them.
+One hundred and seventy-two people produced the same 484 songs, and ten of them are on half the chart.
+By 50 names the producers cover 86.4% of the hits and the writers 67.4%.
+
+The comparison runs against the odds, which is what makes it worth drawing.
+These songs carry 1,495 writing credits and 749 production credits, so the average hit has three writers and one and a half producers.
+More names on a song means more chances for a small club to appear on it, so the writers' curve should be the one that climbs fast.
+It is the flatter of the two at every club size, and the gap is widest exactly where the industry's own top-ten lists sit.
+
+The right panel is why the two clubs cannot be discussed separately.
+Sixty of the 128 people with five credits or more hold some of each, and the ones at the top of the chart sit in very different places.
+Ashley Gorley wrote 44 of these hits and produced one.
+Dann Huff produced 59 and wrote none.
+Ross Copperman and Shane McAnally sit near the diagonal with 32 written against 26 produced and 36 written against 21 produced, and they are the ones the phrase "closed shop" is really about: not a writer or a producer, but both at once, on a tenth of the chart each.
+
+Three cautions.
+A curve here counts a song as covered as soon as one of its credited names is reached, so it measures reach rather than authorship, and a person with a tenth of a song counts the same as a person who wrote it alone.
+Ties are real at exactly the boundary the figure names: the tenth and eleventh writers are both credited on 14 hits, so "the top ten" is an arbitrary cut through a tie, broken alphabetically here.
+Two of the 484 songs carry no producer at all, which is why that curve stops just short of 100%.

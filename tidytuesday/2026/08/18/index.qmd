@@ -1,0 +1,52 @@
+---
+engine: markdown
+title: "Two Countries, One Average, Different Fates"
+description: "Forty nationalities on the IELTS band scale, where the spread narrows as the mean rises, and two countries that share an average of 6.63 and send very different shares of their candidates over the band universities ask for."
+date: "2026-08-18"
+order: 20260818
+image: images/featured-light.png
+image-alt: "Two panels side by side under one title, describing the overall IELTS Academic band of 40 nationalities in 2024 to 2025. The large left panel is a heatmap: 40 columns, one per nationality, ordered left to right by mean band, and 12 rows, one per reported band, from the open bucket below 4 at the bottom to 9 at the top. Each tile is filled in one green hue, pale for a small share of that nationality's candidates and dark for a large one, and the ramp tops out at 20 percent. Two of the 40 names along the bottom are coloured: Hong Kong in amber and Ghana in blue, the colours the right panel gives them. The dark mass runs as a diagonal band from the bottom left to the top right: Oman, the UAE, Kuwait and Japan on the far left carry their weight around bands 5 and 5.5, the middle of the panel carries its weight around 6 and 6.5, and France, Russia, Italy, Malaysia, Spain and Germany on the far right carry theirs around 7.5 and 8. The band grows narrower from left to right as well as higher, so the right-hand columns show two or three dark tiles where the left-hand columns show four or five paler ones. A grey dashed rule runs across the panel between the 6 and 6.5 rows, which the subtitle names as band 6.5, the usual university requirement. One key stands upright at the right edge of the figure, shared by both panels: a green ramp from 0 to 20 percent, titled share of candidates. The small right panel shows the same band scale on its vertical axis and the share of candidates on its horizontal axis, from 0 to 30 percent, for two nationalities that share a mean band of 6.63: Hong Kong as an amber line with circular markers and Ghana as a blue line with square markers, both named in their own colours in the subtitle above. Each marker is filled from the same green ramp as the tiles, so it darkens with the share it stands for, while its ring keeps the colour of its nationality. The Ghana curve is tall and narrow, peaking near 27 percent at band 7, and it falls almost to zero below band 5. The Hong Kong curve is lower and broader, peaking near 17 percent around bands 6 and 6.5, and it keeps a visible tail down to band 4. The same dashed rule sits between 6 and 6.5. An arrow points into the lower tail with the note that 7.1 percent of Hong Kong sit below 5.5, against 2.5 percent of Ghana. The contrast between the two panels is the point: one average, two very different shapes around it."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-08-18
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Two Countries, One Average, Different Fates"
+```
+
+Data: [TidyTuesday 2026-08-18](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-08-18).
+
+The IELTS Academic paper is reported as a distribution, one share per band, and almost every use of it is a single number: a university asks for 6.5, an employer asks for 7, and the mean band of a country is quoted as though it settled the matter.
+The left panel keeps the whole distribution and orders the 40 nationalities by that mean, and two things move together.
+The mass climbs, which is what the ordering is for, and it also tightens: the correlation between a nationality's mean band and the spread around it is −0.42.
+The United Arab Emirates, at 5.52, spreads its candidates across five bands that each hold at least a tenth, and needs four of them to cover half.
+Germany, the highest of the 40 at 7.57, covers half its candidates in two, and puts more than a third on one band alone.
+
+The right panel is what that costs a reader who stops at the mean.
+Hong Kong and Ghana share a mean band of 6.63, to two decimals, out of 40 nationalities.
+Ghana sends 70.8% of its candidates over 6.5 and Hong Kong 62.2%, a gap of more than eight points hidden inside an identical average.
+Ghana covers half its candidates in two bands and Hong Kong needs four, and the tail is where the two really part: 7.1% of Hong Kong candidates come out below 5.5, against 2.5% of Ghana's.
+Two countries, one average, and a different answer to the only question the number is usually asked to settle.
+
+Three cautions.
+The shares are of each nationality's own candidates and the data carries no candidate counts, so a country that sends a few hundred people counts as much here as one that sends hundreds of thousands, and nothing in the figure is a population estimate.
+Bands below 4 arrive as one open bucket with no score of its own; it is drawn and averaged at 3.5, so every mean quoted here leans on that choice, though the bucket is small enough in most columns that the ordering barely moves without it.
+The heaviest tiles are also cut off: the fill ramp tops out at 20% and 46 of the 480 tiles carry more than that, the heaviest being Germany at 34.7%, which keeps the middle of the range readable at the cost of flattening the top.

@@ -1,28 +1,26 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
+// #import "@preview/gribouille:0.7.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
-// One row per museum specimen, covering the whole penguin family rather than
-// the three species of palmerpenguins. Every number in the chart is derived
-// from this table, so the figure is reproducible end to end: no hand-typed
-// counts and no pre-summarised file.
+// One row per museum specimen, covering the whole penguin family rather than the
+// three species of palmerpenguins. Every number in the chart comes from this
+// table.
 // Source: data/many_penguins.csv (TidyTuesday 2026-07-14).
 #let raw = csv("data/many_penguins.csv", row-type: dictionary)
 
-// The CSV writes absent measurements as the literal string "NA"; parse those to
-// none so a bird missing one measurement is dropped from this panel only.
+// The CSV writes an absent measurement as "NA". Parsing it to `none` drops that
+// bird from this panel alone.
 #let num(v) = if v == none or v == "" or v == "NA" { none } else { float(v) }
 #let round1(x) = calc.round(x, digits: 1)
 
-// The three species of the palmerpenguins dataset, the ones nearly every
-// teaching example plots. Here they are exactly the genus Pygoscelis.
+// The three species of the palmerpenguins dataset, which are the genus
+// Pygoscelis.
 #let palmer = ("P. adeliae", "P. antarcticus", "P. papua")
 
-// Beak length against beak depth: the classic palmerpenguins axes, extended
-// from three species to all eighteen. A bird missing either measurement carries
-// no position on the panel, so it is dropped.
+// Beak length against beak depth: the palmerpenguins axes, extended from three
+// species to all eighteen. A bird missing either measurement is dropped.
 #let birds = ()
 #for r in raw {
   let x = num(r.at("beak.length_culmen"))
@@ -39,13 +37,12 @@
 #let others = birds.filter(b => b.species not in palmer)
 #let n-famous = famous.len()
 #let n-others = n-species - palmer.len()
-// The title and the subtitle both call the palmerpenguins set "three", the one
-// count that is spelled out rather than computed, so it is guarded here.
+// The title and the subtitle call the palmerpenguins set "three", the one count
+// spelled out rather than computed, so it is guarded here.
 #assert(palmer.len() == 3, message: "the palmerpenguins set is no longer three species")
 
-// The two bounding boxes the chart compares: the three famous species against
-// the whole family. Their ratio is the headline number, computed rather than
-// asserted, so it stays correct if the data changes.
+// The two bounding boxes the chart compares: the three famous species against the
+// whole family. Their ratio is the headline number, computed here.
 #let span(rows, key) = {
   let v = rows.map(r => r.at(key))
   (lo: calc.min(..v), hi: calc.max(..v))
@@ -63,40 +60,39 @@
 #let mult-x = calc.round(fam-x.hi / pal-x.hi, digits: 1)
 #let mult-y = calc.round(fam-y.hi / pal-y.hi, digits: 1)
 
-// The family extremes the chart calls out by name, found by measurement rather
-// than by row position, so they stay correct if the data changes.
+// The family extremes the chart names, found by measurement rather than by row
+// position.
 #let by-length = birds.sorted(key: b => b.x)
 #let longest = by-length.last()
 #let shortest = by-length.first()
 #let deepest = birds.sorted(key: b => b.y).last()
 
-// One palette, one source of truth. The three famous species each take a hue;
-// everything else in the family is a deliberate neutral, a backdrop rather than
-// a category. Shape repeats the same split, so identity never rests on colour.
+// One palette, one source of truth. Each famous species takes a hue, and the rest
+// of the family is a neutral backdrop rather than a category. Shape repeats the
+// split, so identity never rests on colour.
 //
-// Every hue here clears the colour-vision and contrast checks against the pale
-// page and the dark one alike, so the figure needs no light/dark branch and
-// nothing outside this file has to tell it which page it is on.
+// Every hue clears the colour-vision and contrast checks on both surfaces, so the
+// figure needs no light or dark branch.
 #let adelie-col = rgb("#e4572e") // warm coral
 #let chinstrap-col = rgb("#17a398") // teal
 #let gentoo-col = rgb("#4176d8") // deep blue
 #let other-col = rgb("#8a8f96") // the other species, held back
 #let box-col = rgb("#a86a44") // warm brown, for the box tracing the famous three
-// A dark seam rather than a white one: at this opacity it separates overlapping
-// marks on the pale page without cutting a bright hole in the dark one.
+// A dark seam rather than a white one: it separates overlapping marks on the pale
+// page without cutting a bright hole in the dark one.
 #let mark-edge = rgb("#33333366")
 
-// A scholarly serif for a museum specimen table, with its sans companion for
-// the running text. Both are vendored in assets/fonts, so CI renders them too.
+// A serif for the museum specimen table, with its sans companion for the running
+// text. Both are vendored in assets/fonts, so CI renders them too.
 #let body-font = "Alegreya Sans"
 #let chart-font = "Alegreya"
 
 #let famous-colours = (adelie-col, chinstrap-col, gentoo-col)
 #let famous-shapes = ("circle", "triangle", "square")
 
-// No fill means "say nothing about the colour", so the text inherits the page
-// ink and stays legible whichever way the site is toggled. A colour is passed
-// only for text naming a coloured mark; secondary text steps down in size.
+// No fill means "say nothing about the colour", so the text takes the page ink
+// whichever way the site is toggled. A colour is passed only for text naming a
+// coloured mark.
 //
 // Species names are binomials, so they are set in italic wherever they appear.
 #let sp(name, fill: none, size: 8pt, weight: "regular") = {
@@ -109,9 +105,8 @@
 }
 
 // The three clouds overlap almost completely, so a label per cloud would sit on
-// top of its neighbours; the legend goes in the empty band below them instead.
-// Both scales carry the same labels so the fill and shape guides merge into one
-// key, which then draws the real marker rather than a lookalike glyph.
+// its neighbours. The legend goes in the empty band below them. Both scales
+// carry the same labels, so the fill and shape guides merge into one key.
 #let famous-labels = palmer.map(name => sp(name, size: 8.5pt, weight: "bold")
   + note(size: 6.5pt)[ n = #famous.filter(b => b.species == name).len()])
 #let famous-scale(values) = scale-discrete(
@@ -119,29 +114,28 @@
 )
 
 // A named specimen at one edge of the family, with the measurement that puts it
-// there, so the reader can see what the famous three leave out at either end.
+// there.
 #let edge(b, value) = sp(b.species, size: 7.5pt) + note(size: 6.5pt)[ · #value]
 
 #plot(
   data: birds,
   mapping: aes(x: "x", y: "y"),
   layers: (
-    // The whole family as one faint envelope, so the reader sees the shape of
-    // the space before reading the points inside it.
+    // The whole family as one faint envelope, read before the points inside it.
     geom-mark(
       method: "hull", expand: 6pt,
       fill: other-col, colour: other-col, alpha: 0.1, stroke: 0.5pt,
     ),
-    // The fifteen species nobody plots: small, translucent and held to a
-    // neutral, so they read as context rather than as a fourth category.
+    // The fifteen species nobody plots: small, translucent and neutral, so they
+    // read as context rather than as a fourth category.
     geom-point(
       data: others,
       size: 2.2pt, fill: other-col, colour: mark-edge, stroke: 0.4pt, alpha: 0.85,
     ),
-    // The box the whole figure is about: the range the three famous species
-    // cover, drawn over the family it is a small corner of. The dash rides on
-    // the Typst stroke rather than on `linetype:`, which geom-rect has no
-    // parameter for and which annotate would swallow as an aesthetic.
+    // The box the figure is about: the range the three famous species cover,
+    // drawn over the family it is a corner of. The dash rides on the Typst
+    // stroke, because geom-rect has no `linetype:` and annotate would take it
+    // as an aesthetic.
     annotate(
       "rect",
       xmin: pal-x.lo, xmax: pal-x.hi, ymin: pal-y.lo, ymax: pal-y.hi,
@@ -153,13 +147,12 @@
       data: famous, mapping: aes(fill: "species", shape: "species"),
       size: 3.6pt, colour: mark-edge, stroke: 0.6pt,
     ),
-    // The family extremes, each anchored away from its own point so the label
-    // never covers the specimen it names.
+    // The family extremes, each anchored away from its own point.
     annotate("typst", x: deepest.x, y: deepest.y + 0.5, label: edge(deepest, [#round1(deepest.y) mm deep]), anchor: "south", clip: false),
     annotate("typst", x: longest.x, y: longest.y - 1.1, label: edge(longest, [#round1(longest.x) mm long]), anchor: "north-east", clip: false),
     annotate("typst", x: shortest.x, y: shortest.y - 0.4, label: edge(shortest, [#round1(shortest.x) mm long]), anchor: "north-west", clip: false),
-    // One callout in the empty upper-right quadrant, tying the dashed box to
-    // the number it stands for without landing on any data.
+    // One callout in the empty upper-right quadrant, tying the dashed box to its
+    // number without landing on any data.
     annotate(
       "typst", x: fam-x.hi, y: fam-y.hi + 1.4,
       label: box(width: 5.4cm)[
@@ -191,7 +184,7 @@
   guides: guides(default: guide-legend(position: (x: 82%, y: 78%), key-size: 0.22cm)),
   labels: labels(
     title: "The Famous Three Penguins Sit in One Corner of the Beak",
-    // The legend names the species; a title over it would only repeat the word.
+    // The legend names the species, so a title over it would repeat the word.
     fill: none,
     shape: none,
     subtitle: [

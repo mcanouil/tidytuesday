@@ -1,56 +1,45 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
+// #import "@preview/gribouille:0.7.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
-// One row per galaxy: the Palomar spectroscopic survey of nearby bright
-// galaxies, with the emission-line ratios each nucleus was classified from and
-// the class Ho, Filippenko and Sargent settled on.
+// One row per galaxy: the Palomar survey of nearby bright galaxies, with the
+// emission-line ratios and the class Ho, Filippenko and Sargent gave it.
 //
 // The four ratio columns are misnamed. `log_oiii_hb` and its siblings hold the
 // plain ratio, not its logarithm: IC 10 carries 4.35, and its `oiii_5007` over
-// `h_beta` in the emission-line table is 0.35 / 0.08. So every axis here takes
-// the logarithm itself, and reading the columns as their names claim would put
-// the whole figure on the wrong scale. No value in any of the four is zero or
-// negative, so the logarithm is safe on every row.
+// `h_beta` is 0.35 / 0.08. Every axis here takes the logarithm itself. No value
+// is zero or negative, so the logarithm is safe on every row.
 //
-// The week's second table, data/palomar_emission_lines.csv, is the line
-// strengths those ratios are built from; it is left alone because the ratios
-// are what the classification is made of and the survey table already carries
-// them.
+// The week's other table holds the line strengths the ratios are built from. It
+// is left alone, because the survey table already carries the ratios.
 // Source: data/palomar_survey.csv (TidyTuesday 2026-08-11).
 #let raw = csv("data/palomar_survey.csv", row-type: dictionary)
 
 #let pct1 = format-percent(digits: 1)
 #let dp2 = format-number(digits: 2)
 
-// `NA` is pervasive across every ratio column and across the class itself, so
-// missingness is turned into `none` once and filtered on once.
+// `NA` runs through every ratio column and the class, so missingness becomes
+// `none` once and is filtered once.
 #let num(v) = if v == none or v == "" or v == "NA" { none } else { float(v) }
 
-// The four classes the survey's nuclei are sorted into, ordered by how much of
-// the ionisation is stellar rather than accretion-driven. One further galaxy is
-// classed as pure absorption and 71 carry no class at all; both are dropped,
-// and the caption says so.
+// The four classes, ordered by how much of the ionisation is stellar rather than
+// accretion-driven. One galaxy is pure absorption and 71 carry no class. Both
+// are dropped, and the caption says so.
 #let class-order = ("H II", "Transition", "LINER", "Seyfert")
 
-// The pair the figure is about takes the two best-separated hues: amber against
-// blue is the strongest pairing available here, at a worst-case colour-vision
-// distance of 23.4 across deuteranopia, protanopia and tritanopia. That leaves
-// green against blue as the weakest pair at 5.6 under tritanopia, and it falls
-// on H II against LINER, which are the two classes furthest apart in the data
-// and further separated by shape and by where they sit on the panel. All four
-// clear the colour-vision and contrast checks on the pale page and the dark one
-// alike, so the figure needs no light/dark branch.
+// Amber against blue is the strongest pair here, at a worst-case colour-vision
+// distance of 23.4, and it goes to the two classes the figure is about. The
+// weakest pair is green against blue at 5.6 under tritanopia, on the two classes
+// furthest apart in the data. All four clear the checks on both surfaces.
 #let class-colours = (
   "H II": rgb("#3aa270"),
   "Transition": rgb("#c47a12"),
   "LINER": rgb("#2f7fc4"),
   "Seyfert": rgb("#b03e5c"),
 )
-// Colour is doubled by shape on the scatter, so no reader has to tell two
-// classes apart by hue alone.
+// Shape repeats what colour says, so no class rests on hue alone.
 #let class-shapes = (
   "H II": "circle",
   "Transition": "triangle",
@@ -58,9 +47,8 @@
   "Seyfert": "diamond",
 )
 
-// One pass over the 486 rows. A galaxy is drawn only if it carries a class and
-// all three ratios the figure uses, so both panels describe exactly the same
-// set of galaxies and the counts in the subtitle mean the same thing on each.
+// One pass over the 486 rows. A galaxy is drawn only with a class and all three
+// ratios, so both panels describe the same set.
 #let galaxies = ()
 #let n-unclassified = 0
 #let n-absorption = 0
@@ -91,15 +79,11 @@
   ))
 }
 
-#let class-counts = class-order.map(c => (
-  class: c,
-  n: galaxies.filter(g => g.class == c).len(),
-))
+#let class-counts = count(galaxies, "class")
 #let count-of(c) = class-counts.find(k => k.class == c).n
 
-// The title spells out sixty-two, the one number in this figure that is not
-// computed into the words around it, so a change upstream fails the render
-// rather than quietly contradicting the headline.
+// The title spells out sixty-two, the one number not computed into the words
+// around it, so a change upstream fails the render.
 #assert(
   count-of("Transition") == 62,
   message: "the data no longer holds sixty-two drawable transition objects",
@@ -109,17 +93,16 @@
   message: "a galaxy carries a class outside the four the figure draws",
 )
 
-// How well one vertical cut on a single ratio tells a LINER from a transition
-// object: the whole point of the figure, so it is measured rather than asserted.
+// How well one cut on a single ratio tells a LINER from a transition object. It
+// is measured, not asserted.
 //
-// A sweep over the sorted values rather than a pair of nested loops: every
-// candidate cut is the midpoint between two neighbours, and the running counts
-// give its accuracy in one pass. Galaxies at or above the cut are called LINER.
+// A sweep over the sorted values: every candidate cut is the midpoint between two
+// neighbours, and the running counts give its accuracy in one pass. Galaxies at
+// or above the cut are called LINER.
 #let best-cut(sample, key) = {
   let sorted = sample.sorted(key: g => (key)(g))
   let n-liner = sorted.filter(g => g.class == "LINER").len()
-  // The cut below everything calls every galaxy a LINER, and is the baseline
-  // any real cut has to beat.
+  // The cut below everything calls every galaxy a LINER. It is the baseline.
   let best = (cut: (key)(sorted.first()), correct: n-liner)
   let below-liner = 0
   let below-other = 0
@@ -139,22 +122,18 @@
 #let nii-cut = best-cut(pair, g => g.nii)
 #let oi-cut = best-cut(pair, g => g.oi)
 
-// The figure only says something if the two diagnostics really do disagree.
 #assert(
   oi-cut.accuracy > nii-cut.accuracy + 0.2,
   message: "the two diagnostics no longer disagree enough to be worth a figure",
 )
 
-// How many transition objects the [N II] cut hands to the LINER side: the
-// sentence the left panel exists to make.
+// How many transition objects the [N II] cut hands to the LINER side.
 #let strays = pair.filter(g => g.class == "Transition" and g.nii >= nii-cut.cut).len()
 
 #let n-very-uncertain = galaxies.filter(g => g.confidence == "very uncertain").len()
 
-// The rules, the notes beside them and the page the key sits on all come from
-// the theme the typst-render inputs resolved, so they follow the site's light
-// and dark toggle without a branch; the alpha is what holds the rules behind
-// the marks.
+// Ink, paper and rules come from the theme that typst-render resolved, so they
+// follow the light and dark toggle. The alpha holds the rules behind the marks.
 #let ink = theme-minimal().at("ink", default: black)
 #let paper-colour = theme-minimal().at("paper", default: white)
 #let rule-colour = ink.transparentize(30%)
@@ -173,8 +152,7 @@
   axis-ticks: element-tick(length: 0.05cm),
 )
 
-// The note that sits beside each rule, in the theme's own ink so it tracks the
-// page rather than fighting it.
+// The note beside each rule, in the theme's own ink.
 #let note(body) = text(font: body-font, size: 6.5pt, fill: note-colour)[#body]
 
 #let class-scale = scale-discrete(
@@ -186,13 +164,12 @@
   values: class-order.map(c => class-shapes.at(c)),
 )
 
-// Boxed so a class never breaks across a line: "H II" arriving as "H" at the end
-// of one line and "II" at the start of the next reads as two different things.
+// Boxed so a class never breaks across a line: "H II" split over two lines reads
+// as two different things.
 #let coloured(name) = box(text(fill: class-colours.at(name), weight: "bold")[#name])
 
-// The panel on the left: the diagram every paper draws, with the cut that does
-// best on it. The key sits in the bottom left, the one corner of this panel no
-// galaxy reaches.
+// Left panel: the diagram every paper draws, with the cut that does best on it.
+// The key sits in the bottom left, the one corner no galaxy reaches.
 #let bpt-panel = defer(
   plot,
   data: galaxies,
@@ -217,11 +194,9 @@
     shape: shape-scale,
   ),
   // One key for three aesthetics: colour, fill and shape describe the same four
-  // classes, so they are given the same guide and merge into a single set of
-  // swatches that look like the marks on the panel rather than three stacks of
-  // them. It has no title because the subtitle already names what the colours
-  // are, and it sits on the theme's own page colour so the grid does not show
-  // through it.
+  // classes, so one guide merges them into a single set of swatches. It carries
+  // no title, since the subtitle names the colours, and it sits on the page
+  // colour so the grid does not show through.
   guides: guides(default: guide-legend(position: bottom + left, key-size: 0.3cm)),
   labels: labels(
     x: typst[log #box[[N II] $lambda 6583$] / H$alpha$],
@@ -235,11 +210,9 @@
   height: 6.2cm,
 )
 
-// The panel on the right: the same galaxies, the same classes, one ratio
-// swapped. Densities rather than a second scatter, because four hundred points
-// at a third of the width is a smudge and the thing worth seeing is where each
-// class sits and how far it overlaps the next. Reversed so the classes read top
-// to bottom in the order of the key on the left.
+// Right panel: the same galaxies, one ratio swapped. Densities rather than a
+// second scatter, because four hundred points at a third of the width is a
+// smudge. Reversed, so the classes read in the order of the key.
 #let oi-panel = defer(
   plot,
   data: galaxies,

@@ -1,6 +1,6 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
+// #import "@preview/gribouille:0.7.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
@@ -16,8 +16,8 @@
 // Keep only years where all three nations publish data (E&W ends at 2024).
 #let start_year = 1997
 #let end_year = 2024
-// A name counts as gender-neutral when the combined UK total for each sex
-// reaches at least this many births; filters ONS-suppressed entries and noise.
+// A name counts as gender-neutral when the UK total for each sex reaches this
+// many births. The floor removes ONS-suppressed entries and noise.
 #let min_n = 3
 
 // Pass 1: sum births across nations per (year, name, sex) for shared years only.
@@ -66,8 +66,8 @@
 }
 #let mean_total = total_sum / n_yrs
 
-// Pass 4: find top gender-neutral name (by combined births) per 5-year interval.
-// Intervals are half-open [start, end); labels placed at midpoint year.
+// Pass 4: the commonest gender-neutral name per 5-year interval, by combined
+// births. Intervals are half-open, and labels sit at the midpoint year.
 #let intervals = (
   (start: 1997, end: 2000, mid: 1998),
   (start: 2000, end: 2005, mid: 2002),
@@ -110,7 +110,6 @@
   label_rows.push((year: iv.mid + 0.5, pct: pct, label: best_name))
 }
 
-// Build one row per year, sorted chronologically.
 #let rows = ()
 #let max_pct = 0.0
 #for (yr, v) in per_year {
@@ -120,7 +119,6 @@
 }
 #let rows = rows.sorted(key: r => r.year)
 
-// Okabe-Ito teal for the single series.
 #let teal = rgb("#009e73")
 
 #plot(
@@ -145,7 +143,7 @@
     y: scale-continuous(
       name: "Share of All Distinct Names",
       limits: (0, max_pct + 0.5),
-      // Labels show percentage and approximate count in parentheses.
+      // Each label carries the percentage and the count.
       labels: p => {
         let n = int(calc.round(p / 100 * mean_total))
         str(calc.round(p, digits: 1)) + "% (" + str(n) + ")"

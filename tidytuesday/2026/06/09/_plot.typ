@@ -1,6 +1,6 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
+// #import "@preview/gribouille:0.7.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
@@ -9,8 +9,8 @@
 
 #let raw = csv("data/game_films.csv", row-type: dictionary)
 
-// CinemaScore is an opening-night audience grade; map the letters onto a 0-100
-// scale so it can be read against the critic percentage on the same ruler.
+// CinemaScore is an opening-night audience grade. The letters map onto a 0-100
+// scale, so it reads against the critic percentage on the same ruler.
 #let cinemascore = (
   "A+": 100, "A": 95, "A-": 90,
   "B+": 85, "B": 80, "B-": 75,
@@ -19,17 +19,16 @@
   "F": 0,
 )
 
-// Okabe-Ito accents (colourblind-safe). Vermillion = lost money, teal = profit;
-// the diverging fill pivots at break-even (box office = budget). Accent matches
-// the site theme so the inset border tracks the light / dark toggle.
+// Okabe-Ito accents. Vermillion is money lost and teal is profit, and the fill
+// pivots at break-even, where box office equals budget. The accent matches the
+// site theme, so the inset border follows the light and dark toggle.
 #let loss = rgb("#d55e00")
 #let profit = rgb("#009e73")
 #let accent = rgb("#0f8b8d")
 
-// Main frame: keep one currency ($) so the y axis reads in dollars, and only
-// rows carrying budget + critic score so every channel (x, y, size, fill) is
-// honest. All such rows happen to be theatrical releases; the split that earns
-// the shape channel is therefore time, not category.
+// Main frame: one currency, so the y axis reads in dollars, and only rows that
+// carry a budget and a critic score, so every channel is honest. All of those
+// rows are theatrical releases, so shape carries time rather than category.
 #let films = (
   raw
     .filter(r => (
@@ -49,8 +48,8 @@
         rt: num(r.rotten_tomatoes),
         box: box,
         budget: bud,
-        // log10 of the profit multiple so the fill spreads evenly across orders
-        // of magnitude and pivots at 0 = break-even (box office = budget).
+        // The log10 of the profit multiple, so the fill spreads across orders of
+        // magnitude and pivots at 0, where box office equals budget.
         logmult: calc.log(box / bud, base: 2),
         era: era,
       )
@@ -58,16 +57,16 @@
 )
 
 // Inset frame: every film scored by both critics and an opening audience. The
-// two means carry the whole sub-story, so the inset only needs those numbers.
+// two means carry the sub-story on their own.
 #let scored = raw.filter(r => (
   num(r.rotten_tomatoes) != none and r.cinema_score in cinemascore
 ))
 #let critic-mean = scored.map(r => num(r.rotten_tomatoes)).sum() / scored.len()
 #let audience-mean = scored.map(r => cinemascore.at(r.cinema_score)).sum() / scored.len()
 
-// Hand-drawn dumbbell on a 0-100 track: the gap between the critic dot and the
-// audience dot IS the disagreement. Built from std Typst primitives (no nested
-// canvas) and reads `page.fill` so the card tracks the light / dark site toggle.
+// A dumbbell on a 0-100 track: the gap between the critic dot and the audience
+// dot is the disagreement. Built from plain Typst primitives, with no nested
+// canvas, and it reads `page.fill` to follow the light and dark toggle.
 #let inset = context {
   let bg = if page.fill in (auto, none) { white } else { page.fill }
   let w = 4.6cm
@@ -112,8 +111,8 @@
   ]
 }
 
-// Label with a translucent paper background so the text stays legible over the
-// marker cloud; the background reads `page.fill` to track the light / dark site.
+// A label on a translucent paper background, so the text holds over the marker
+// cloud. The background reads `page.fill` to follow the toggle.
 #let pill(body) = context {
   let bg = if page.fill in (auto, none) { white } else { page.fill }
   box(
@@ -123,8 +122,8 @@
   )[#text(size: 7.5pt)[#body]]
 }
 
-// Real dataset title -> the pill content to draw for it. Keys select which films
-// are emphasised; coordinates come from the inherited frame, never hardcoded.
+// A dataset title against the pill to draw for it. The keys pick the films to
+// emphasise, and the coordinates come from the inherited frame.
 #let label-text = (
   "The Super Mario Bros. Movie": align(center)[*The \ Super Mario Bros. \ Movie*],
   "Pokémon Detective Pikachu": align(center)[*Detective \ Pikachu*],
@@ -142,9 +141,9 @@
     shape: "era",
   ),
   layers: (
-    // Shade the "panned but paid" zone: rotten with critics (left of 60) yet
-    // grossing past $100M. Painted first so points sit on top of it. A direct
-    // geom-rect with a fixed fill keeps it off the continuous fill scale.
+    // The "panned but paid" zone: rotten with critics, left of 60, yet past
+    // $100M. Painted first, so the points sit on it. A fixed fill on geom-rect
+    // keeps it off the continuous fill scale.
     geom-rect(
       data: ((xmin: 0, xmax: 60, ymin: 1e8, ymax: 3e9),),
       mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
@@ -162,16 +161,16 @@
       linetype: "dashed",
     ),
     geom-point(alpha: 0.95, stroke: 0.4pt, colour: luma(45%)),
-    // Accent outline on the labelled films so the eye finds them in the cloud;
-    // inherits the plot mapping, so the ring matches each film's shape and size.
+    // An accent outline on the labelled films, so they stand out of the cloud.
+    // It inherits the plot mapping, so the ring matches each shape and size.
     geom-point(
       data: d => d.filter(r => r.title in label-text),
       fill: none,
       colour: accent,
       stroke: 1.2pt,
     ),
-    // Direct labels instead of a per-film legend; the data function filters the
-    // inherited frame and attaches each film's pill, so coordinates come from films.
+    // Direct labels rather than a per-film legend. The data function filters the
+    // inherited frame and attaches each pill, so the coordinates come from it.
     geom-typst(
       data: d => d
         .filter(r => r.title in label-text)
@@ -180,7 +179,7 @@
       anchor: "south",
       inherit-aes: false,
     ),
-    // Inset dumbbell parked in the sparse top-left corner above the cloud.
+    // The inset dumbbell sits in the sparse top-left corner, above the cloud.
     annotate("typst", x: 25, y: 1.75e6, label: inset, anchor: "north-west"),
   ),
   scales: scales(
@@ -192,10 +191,8 @@
     y: scale-continuous(
       name: "Worldwide Box Office (US$)",
       transform: "log10",
-      // limits: (8e4, 3e9),
       breaks: (1e5, 1e6, 1e7, 1e8, 1e9),
       labels: ("$100K", "$1M", "$10M", "$100M", "$1B"),
-      // expand: (5%, 25%),
     ),
     fill: scale-gradient2(
       name: "Box Office / Budget Ratio",

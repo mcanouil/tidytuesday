@@ -1,28 +1,28 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
+// #import "@preview/gribouille:0.7.0": *
 // #import "@local/gribouille:0.0.0": *
 // #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
-// EPLP missing sentinels all mean "no leave", so map them to 0; this keeps every
-// year balanced at 21 countries for an honest mean.
+// Every EPLP missing sentinel means "no leave", so all of them map to 0. That
+// keeps each year at 21 countries and the mean honest.
 #let num(s) = if s in ("NA", "Not applicable", "-98", "-99", "") { 0.0 } else {
   float(s)
 }
 
 #let raw = csv("data/eplp.csv", row-type: dictionary)
 
-// Each series bound to one Okabe-Ito hue (colourblind-safe), reused by strokes,
-// labels, and boxes; insertion order fixes the scale order. Both series share one
-// months axis so the gap between the lines is the story (Wilke).
+// Each series takes one Okabe-Ito hue, reused by the strokes, the labels and the
+// boxes. Insertion order fixes the scale order. Both series share one months
+// axis, so the gap between the lines is the story.
 #let series-colours = (
   "Mothers": rgb("#0072b2"),
   "Co-parents": rgb("#d55e00"),
 )
 #let series = series-colours.keys()
 
-// Boxed callout that lifts prose off the lines. Background reads the ambient
-// `page.fill`, so the box tracks the light / dark site toggle.
+// A boxed callout, to lift the prose off the lines. The background reads
+// `page.fill`, so the box follows the light and dark toggle.
 #let accent = rgb("#0f8b8d")
 #let callout(body) = context {
   let bg = if page.fill in (auto, none) { white } else { page.fill }
@@ -38,8 +38,8 @@
 #let mat-cols = ("mat_m_ld_bb", "mat_m_ld_ab", "mat_v_ld_bb", "mat_v_ld_ab")
 #let mother-leave(r) = mat-cols.fold(0.0, (a, c) => a + num(r.at(c)))
 
-// Long format, one row per country x year x series; the layers mean these via
-// stat-summary.
+// Long format, one row per country, year and series. The layers take the mean
+// through stat-summary.
 #let obs = {
   let acc = ()
   for r in raw {
@@ -59,9 +59,9 @@
   UK: "United Kingdom",
 )
 
-// Secondary panel data: where each country stands in 2024. One row per country
-// with its mother and co-parent months and the gap between them, sorted so the
-// closest-to-parity sits at the top of the dumbbell.
+// Where each country stands in 2024: one row per country with its mother months,
+// its co-parent months and the gap. Sorted so the closest to parity sits at the
+// top of the dumbbell.
 #let gap-2024 = (
   raw
     .filter(r => float(r.year) == 2024)
@@ -74,12 +74,12 @@
     .sorted(key: row => row.at("spread"))
 )
 
-// y order for the discrete country axis. gap-2024 is sorted parity-first; the
-// discrete y axis draws its first level at the bottom, so reverse to put parity
-// (smallest gap) at the top of the dumbbell.
+// The order for the discrete country axis. `gap-2024` is sorted parity first,
+// and the axis draws its first level at the bottom, so it is reversed here.
 #let country-order = gap-2024.map(row => row.country).rev()
 
-// The two dots per country, long format, coloured by series like the main panel.
+// The two dots per country, in long format, coloured by series as on the main
+// panel.
 #let gap-dots = {
   let acc = ()
   for row in gap-2024 {
@@ -94,17 +94,17 @@
   data: obs,
   mapping: aes(x: "year", y: "months", colour: "series"),
   layers: (
-    // +/-1 SE band per series via stat-summary(mean-se); drawn first so it sits
-    // under the line. fill: "series" tints it in each line's hue.
+    // A one standard-error band per series, from stat-summary(mean-se), drawn
+    // first so it sits under the line. `fill: "series"` gives it the line hue.
     geom-ribbon(
       mapping: aes(fill: "series"),
       stat: stat-summary(fun: "mean-se", axis: "y"),
       alpha: 0.2,
     ),
-    // Per-year mean line: stat-summary buckets each series by year, fun: "mean".
+    // The per-year mean line. stat-summary buckets each series by year.
     geom-line(stroke: 1.6pt, stat: stat-summary(fun: "mean", axis: "y")),
-    // Direct labels instead of a legend: bold series name at a hand-placed point,
-    // coloured by series via the shared scale.
+    // Direct labels rather than a legend: the series name at a hand-placed point,
+    // coloured through the shared scale.
     geom-typst(
       data: (
         (year: 1983, months: 19.4, series: "Mothers", label: "*Mothers*"),
@@ -114,9 +114,9 @@
       anchor: "west",
       inherit-aes: false,
     ),
-    // End-value labels: `data` filters the inherited frame to the final year, then
-    // stat-summary means it like the line; the box sits at that mean and after-stat
-    // binds its text to the same value, so the number can never drift from the line.
+    // End-value labels. `data` filters the inherited frame to the final year and
+    // stat-summary takes its mean, as the line does. `after-stat` binds the text
+    // to that same value, so the number cannot drift from the line.
     geom-label(
       data: d => d.filter(o => o.year == 2024),
       mapping: aes(
@@ -167,11 +167,10 @@
   theme: theme-minimal(),
 )
 
-// Secondary panel: a 2024 snapshot of all 21 countries as a dumbbell. A grey
-// segment per country spans its mother dot to its co-parent dot, so the bar
-// length IS the gap; sorted with parity at the top. Different axes (months by
-// country) make this read as a different question from the time series, not a
-// lookalike. Colour still means series, tying it to the main panel.
+// Second panel: a 2024 snapshot of all 21 countries as a dumbbell. A grey segment
+// runs from the mother dot to the co-parent dot, so its length is the gap, and
+// parity sits at the top. Months by country is a different question from the time
+// series, and colour still means series, which ties the two panels together.
 #let secondary = defer(
   plot,
   data: gap-dots,
