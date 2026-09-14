@@ -1,0 +1,65 @@
+---
+engine: markdown
+title: "When the Castle Became Two Buildings"
+description: "Three thousand four hundred and fifty-one dated castles, fortresses, palaces and ruins, drawn as a battlemented wall over its own reflection, and the half-century in which one building that was both home and defence became two buildings that were only one each."
+date: "2026-09-01"
+order: 20260901
+image: images/featured-light.png
+image-alt: "A single wide panel drawn as a castle wall standing over water. The horizontal axis runs from the year 800 to 1949 in half-century steps, and the vertical axis counts landmarks founded per half-century, from 200 below the waterline to 200 above it, unsigned on both sides. Above the waterline, one bar per half-century rises in two brown tones, dark for castles and pale for ruins, with a gap either side of every bar, so the top edge of the wall is a real crenellation and each merlon counts fifty years. A thin darker line traces that crest, climbing each merlon and dropping back to the waterline between them. Below the waterline the same bars hang downwards over a faint blue wash, in slate blue for fortresses and amber for palaces. The upper wall is low until about 1050, climbs to its height in the half-centuries from 1200 to 1349, and stands tallest at 1300 with 238 castles and ruins. It falls away sharply after 1600. The lower wall is almost nothing before 1450, grows through the sixteenth century, and reaches its deepest point at 1850 with 182 fortresses and palaces. A grey dashed vertical rule stands at 1650, where the upper wall drops and the lower one takes over. Two boxed notes sit in the empty top corners. The left one reads that in the half-century from 1300, 238 castles and ruins are founded against 24 fortresses and palaces. The right one reads that up to 1650 fortresses and palaces are 46 percent of new foundings, that from 1650 on they never fall below 75 percent, and that the fortified home never returns. Four small labels stand at the left edge, coloured to match their bars: Castles and Ruins above the waterline, Fortresses and Palaces below it."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-09-01
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "When the Castle Became Two Buildings"
+```
+
+Data: [TidyTuesday 2026-09-01](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-09-01).
+
+The week's data labels 5,793 landmarks with one of four words: castle, fortress, palace or ruin.
+The words look like four kinds of building.
+They are closer to two kinds, five hundred years apart.
+
+A medieval castle is one building doing two jobs.
+It is where a lord lives and it is what keeps the lord alive.
+The half-century from 1300 is the height of that arrangement: 238 castles and ruins founded against 24 fortresses and palaces.
+Then the two jobs come apart.
+An artillery fort has no hall, and a palace has no wall worth the name.
+Up to 1650, fortresses and palaces are 46% of new foundings.
+From 1650 on they never fall below 75% again, and the fortified home never returns.
+
+The figure is drawn as the thing it counts.
+Each half-century is one merlon of a wall, and the gap either side is what makes the top edge a crenellation rather than a row of columns.
+The waterline is zero.
+Above it stands the fortified home, whether it is still standing or has fallen to a ruin.
+Below it, in the reflection, are the two buildings that replaced it.
+
+Three cautions, and the first is the largest.
+Only 3,610 of the 5,793 landmarks carry a founding year, and the gap is not evenly spread: 77% of palaces are dated against 56% of castles.
+A later building is easier to date, so the lower wall is flattered by the same records that thin the upper one.
+The shape survives that bias, because the collapse after 1600 is visible in the castle count on its own, but the wall is a shape and not a census.
+
+Second, a ruin is a state and not a purpose.
+Most ruins here are medieval castles, and the median ruin is founded in 1300 against 1350 for the median standing castle, which is why they are counted together above the waterline.
+That is the figure's choice, not the data's.
+
+Third, this is a Wikidata census before it is an architectural one.
+France, Italy and Germany hold about 350 landmarks each and Japan 297, which says as much about who writes Wikipedia articles as about who built castles.
