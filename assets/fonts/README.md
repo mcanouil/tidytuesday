@@ -21,6 +21,9 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 | IBM Plex Mono | `IBMPlexMono-Regular.ttf`, `IBMPlexMono-Medium.ttf` | [`ofl/ibmplexmono`](https://github.com/google/fonts/tree/main/ofl/ibmplexmono) | 2026-07-21 |
 | Archivo | `Archivo[wdth,wght].ttf` | [`ofl/archivo`](https://github.com/google/fonts/tree/main/ofl/archivo) | 2026-07-28 |
 | Lato | `Lato-Regular.ttf`, `Lato-Bold.ttf` | [`ofl/lato`](https://github.com/google/fonts/tree/main/ofl/lato) | 2026-07-28 |
+| Cinzel | `Cinzel[wght].ttf` | [`ofl/cinzel`](https://github.com/google/fonts/tree/main/ofl/cinzel) | 2026-09-01 |
+| Bitter | `Bitter[wght].ttf` | [`ofl/bitter`](https://github.com/google/fonts/tree/main/ofl/bitter) | 2026-09-08 |
+| Karla | `Karla[wght].ttf` | [`ofl/karla`](https://github.com/google/fonts/tree/main/ofl/karla) | 2026-09-08 |
 
 Files in square brackets are variable fonts.
 Typst 0.15 reads their weight axis, so one file covers every weight a figure asks for.
