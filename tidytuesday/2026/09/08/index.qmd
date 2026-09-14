@@ -1,0 +1,69 @@
+---
+engine: markdown
+title: "Second Place Is Fifteen Cafés Wide"
+description: "The cappuccino index drawn as a spiral clock in a cup, where each country's uncertainty is an arc of the dial, and where Italy's arc for second place is wide enough to swallow first."
+date: "2026-09-08"
+order: 20260908
+image: images/featured-light.png
+image-alt: "A single panel showing a cup of coffee from above, centred, with six country labels standing well out from the cup, four on the right and two on the left. The cup is a dark brown disc inside a lighter brown rim, and the rim carries the numerals 0 min, 15, 30 and 45 at the quarters, so a position on it reads as minutes. A faint cream spiral, drawn as latte art, starts at the rim at the 0 position at the top and winds clockwise inwards, one full turn per hour, ending near the middle of the cup after three and a half turns, where it carries an arrowhead and the word longer. Faint cream labels reading 1 h, 2 h and 3 h mark where the spiral crosses the top again on each turn, stacked inwards from the rim. Along the spiral sit 46 small cream dots, one per country, each at the time a barista there works to buy a small cappuccino. They crowd the outermost turn, densest between about 10 and 25 minutes and right against the minute scale on the rim, and thin out on the turns further in. Six of the dots also carry a thin cream arc through them, their 95 percent intervals, and the six arc lengths differ sharply: the UK's is barely longer than its dot, France's spans about six minutes of the dial and Greece's about ten, and India's runs almost a whole turn. Two amber marks stand out on the outermost turn. One is an amber arc, Italy's interval, sweeping about a third of the way round that turn. The other is a short amber tick crossing the spiral at right angles, Australia's index, and it sits inside the amber arc rather than beside it. Thin leader lines run from six marks out past the rim to their labels. On the right, from top to bottom: Australia 10:04 and Italy 11:51, both named in amber to match their arcs, then UK 17:29 and France 21:14. On the left, from top to bottom: India 172:10 and Greece 35:32."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-09-08
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Second Place Is Fifteen Cafés Wide"
+```
+
+Data: [TidyTuesday 2026-09-08](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-09-08).
+
+The cappuccino index asks a good question: how long does the person who makes the coffee have to work to buy it?
+The answer arrives as a table of 87 countries, each with a time in minutes and seconds, sorted fastest first.
+It reads like a leaderboard.
+For most of its length it is not one.
+
+Twenty-five of the 87 countries were surveyed at exactly one café.
+Forty-one were surveyed at fewer than five.
+One café is enough to compute a ratio, and the ratio can be printed to the second, but it cannot say what the country does.
+Qatar sits at 186:59 on a single café.
+The figure leaves all 41 out, because a country with one café has no interval to draw, and drawing the number alone would repeat the table's mistake.
+
+Where there are enough cafés, the interval is worth having, and it changes the reading of the top of the table.
+Australia is genuinely first: 10:04 on 171 cafés, and its interval spans 9:48 to 10:20.
+Italy is second at 11:51, on 15 cafés, and its interval runs from 9:09 to 14:34.
+That reaches below Australia's index and past the fourth-placed country.
+Second place is not a fact about Italy, it is a fact about fifteen cafés.
+
+The clock is the unit of the index, so the figure uses it.
+One turn of the cup is an hour.
+Australia sits a sixth of the way round the first turn, the United Kingdom and France a little further on, and India is still going on the third turn at 172:10.
+Reading the spiral inwards is reading the working day get longer.
+Pakistan is further out still, at 277:02, and is one of the countries the figure does not draw: two cafés.
+
+Three cautions.
+The interval covers the sampling of cafés and nothing else.
+It says nothing about which cities were visited, and the survey is not a random sample of anywhere: it is what people sent in.
+A wide interval here means few cafés, and a narrow one means many, not that the number is right.
+
+Second, the index is a ratio of sums, not an average of ratios.
+It answers what the country's total coffee costs against the country's total wages, so the busiest, most expensive cities pull it more than a per-café average would.
+Within Mexico, the middle 80% of cafés run from 40 to 117 minutes, a spread of nearly three to one, and one national number cannot hold that.
+
+Third, tips are excluded throughout, which matters most in the countries where tips are most of the wage.
