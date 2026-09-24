@@ -59,7 +59,6 @@
     .sorted(key: r => r.median)
 }
 #let kept = regions.map(r => r.region)
-#let left-out = cities.map(c => c.region).dedup().filter(name => name not in kept)
 
 #let drawn = cities.filter(c => c.region in kept)
 #let lost-overall = drawn.filter(c => c.change < 0).len() / drawn.len()
@@ -141,7 +140,8 @@
     .flatten()
 }
 
-// The median city of each region, as a bar across its row.
+// The median city of each region, as a bar across its row. The bar sits at the
+// exact median, while each dot sits at the centre of its one-point bin.
 #let bar-half = 0.46
 #let medians = regions.map(r => (
   x: r.median,
@@ -243,7 +243,7 @@
     ],
     caption: [
       Green means vegetation that stays green most of the year in Landsat and Sentinel imagery; water is not counted. City boundaries follow the Degree of Urbanisation, not the municipality. \
-      The white bar is each region's median city. 2025 is published for too few cities to compare. #left-out.len() region with fewer than #min-cities cities is not drawn. \
+      The white bar is each region's median city. 2025 is published for too few cities to compare. Regions with fewer than #min-cities cities are not drawn. \
       Source: UN-Habitat Urban Indicators Database (TidyTuesday 2026-09-22). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
     x: none,
