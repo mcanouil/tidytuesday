@@ -1,0 +1,59 @@
+---
+engine: markdown
+title: "Only the North Held Its Green"
+description: "Thirty years of satellite greenness for 1,110 cities, drawn on a night-dark ground with sand for loss and green for gain, and one region whose typical city ends where it began."
+date: "2026-09-22"
+order: 20260922
+image: images/featured-light.png
+image-alt: "A single panel on a near-black ground, laid out as seven horizontal rows, one per world region, with a shared horizontal axis running from minus 60 to plus 20 percentage points and a faint vertical line at zero. Each row is a band of small dots, one per city, stacked into columns by how much the share of the city's area that is green changed from 1990 to 2020. Dots left of zero are sand-coloured and dots right of zero are green. A white vertical bar in each row marks the region's median city. Region names sit at the left with a line underneath giving the median and the share of cities that lost green area. From the top: North America and Europe, median plus 0.2, 48% of 313 lost, its bar just right of zero and its dots spread evenly either side. West Asia and North Africa, median minus 0.8, 59% of 172 lost. Australia and New Zealand, median minus 1.7, 57% of 23 lost. Sub-Saharan Africa, median minus 2.0, 77% of 117 lost, with a long tail of sand dots reaching past minus 60, where the leftmost is labelled Kenema, 76% to 13%. Central and South Asia, median minus 2.4, 73% of 165 lost. Latin America and Caribbean, median minus 3.8, 75% of 219 lost. East and South-East Asia, median minus 5.4, 79% of 101 lost, its bar furthest left. The rightmost dot in the top row is labelled Stoke-on-Trent, 8% to 26%."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-09-22
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Only the North Held Its Green"
+```
+
+Data: [TidyTuesday 2026-09-22](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-09-22).
+
+UN-Habitat reads greenness from space.
+For each city it takes satellite imagery, keeps the pixels that stay green for most of the year, and reports them as a share of the city's area.
+Trees, shrubs and perennial grass count, and water does not.
+The series runs from 1990 to 2020 for every city, so the figure uses that span.
+
+Across 1,110 cities, 65% have a smaller green share than they had in 1990.
+UN-Habitat's own global average falls from about 15% to about 10% of city area over the same years.
+
+The regions do not move together.
+In East and South-East Asia the median city lost 5.4 percentage points, and 79% of cities lost ground.
+Latin America and the Caribbean, Central and South Asia and Sub-Saharan Africa each lost between 2 and 4 points at the median.
+North America and Europe is the only region whose median city ends where it began, at plus 0.2 points, with its cities split almost evenly between gains and losses.
+
+The extremes are in Africa and Asia.
+Kenema and Bo, in Sierra Leone, were three-quarters green in 1990 and are about an eighth green now.
+Chengdu fell from 69% to 15%.
+At the other end, Stoke-on-Trent went from 8% to 26%, the largest gain in the data.
+
+Some cautions.
+A city here is the urban area defined by the Degree of Urbanisation, which can be larger or smaller than the municipality with the same name.
+The share says how much of that area is green, not whether parks were lost, so a fall can come from building over fields at the edge as much as from losing trees in the centre.
+The data for 2025 exists for only a small number of cities, so it is left out.
+The two cities in Oceania outside Australia and New Zealand are too few to draw as a row.
