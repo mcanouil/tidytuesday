@@ -34,7 +34,7 @@
     .map(row => (
       work: work-of(row.composition),
       doubtful: row.composition.ends-with("?"),
-      canonical: row.canon_status in ("Protocanonical", "Deuterocanonical"),
+      canonical: row.canon_status == "Protocanonical",
     ))
     .filter(row => row.work not in not-a-work)
 }
@@ -134,8 +134,8 @@
 }
 
 // Name on the left, in italic when the work is outside the canon, so the
-// distinction does not rest on the red alone. Count on the right, at the end
-// of the certain copies.
+// distinction does not rest on the red alone. Count on the right, after the
+// last tile of the row.
 #let name-rows = rows.map(w => (
   x: 0.2,
   y: w.row,
