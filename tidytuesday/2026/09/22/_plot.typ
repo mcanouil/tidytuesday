@@ -18,7 +18,6 @@
     if row.cityCode == "NA" or row.year not in (first-year, last-year) { continue }
     let city = found.at(row.cityCode, default: (
       city: row.cityName,
-      country: row.countryOrTerritoryName,
       region: row.sdgRegion,
     ))
     city.insert("y" + row.year, float(row.averageShareOfGreenAreaInCityUrbanAreaPct))
