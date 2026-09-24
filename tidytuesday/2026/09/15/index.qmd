@@ -1,0 +1,61 @@
+---
+engine: markdown
+title: "Jubilees Kept Pace With Exodus"
+description: "The Dead Sea Scrolls drawn as tiles on parchment, one per manuscript, with scripture in ink and the works left out of the Hebrew Bible in red, and a retelling of Genesis and Exodus that survives in as many copies as Exodus itself."
+date: "2026-09-15"
+order: 20260915
+image: images/featured-light.png
+image-alt: "A single panel on a parchment-coloured ground, laid out as fourteen rows of small square tiles, one row per work and one tile per surviving manuscript. The work's name sits at the left of each row and its count at the right. Rows run from the most copied at the top to the least copied at the bottom. Scripture rows are dark brown, like iron-gall ink, and rows for works outside the Hebrew Bible are red, with their names in italic. Every row is faded except two, drawn at full strength in the middle of the panel: Exodus in dark ink with 14 tiles, and Jubilees directly below it in red with 14 solid tiles and 2 outlined ones, so the solid runs end at the same place, with Jubilees' two uncertain copies extending past Exodus. From the top, the rows are Deuteronomy and Psalms with 29 tiles each plus 2 outlined, Isaiah 18, Genesis 15, Exodus 14, Jubilees 14 plus 2 outlined, Community Rule 11 in red, Leviticus 11, Damascus Document 10 in red, 1 Enoch 10 in red plus 5 outlined, Book of Giants 9 in red, Sabbath Songs 9 in red, Daniel 8 and Minor Prophets 8. Outlined tiles mark copies the editors are unsure of."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-09-15
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Jubilees Kept Pace With Exodus"
+```
+
+Data: [TidyTuesday 2026-09-15](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-09-15).
+
+The Dead Sea Scrolls are often described as the oldest Bible we have.
+That is true, and it leaves something out.
+The people who kept these scrolls did not have a Bible in the sense of a closed list of books.
+They had a library, and the catalogue of its 809 manuscripts shows what they copied, not what later tradition decided to keep.
+
+The figure counts copies of each work.
+A copy on papyrus, in the old Hebrew script, or in Greek still counts as a copy of its work, so every Exodus is an Exodus.
+Deuteronomy and Psalms lead, with 29 certain copies each.
+Isaiah follows with 18 and Genesis with 15.
+
+Then comes Jubilees, with 14 certain copies.
+It is a retelling of Genesis and the first part of Exodus, organised around a calendar of weeks of years, and it never entered the Hebrew Bible.
+Exodus also has 14 certain copies.
+A little further down, the Community Rule, the group's own rulebook, has 11 copies, which is as many as Leviticus.
+1 Enoch has 10 certain copies, more than Daniel's 8.
+
+So the red rows are not a fringe.
+Six of the 14 works copied at least eight times sit outside the canon, and they sit in the middle of the list rather than at its foot.
+
+Some cautions.
+A manuscript here can be a whole scroll or a few scraps, and the catalogue counts both the same way.
+What survived is what the caves happened to preserve, so a count is evidence of copying, not a measure of it.
+The catalogue also files the odd copy inconsistently: one copy of Daniel is marked as outside the canon, so each work takes the status of most of its copies.
+Outlined tiles are copies the editors mark with a question mark, and the counts leave them out; five of 1 Enoch's are fragments from Cave 7.
+Phylacteries, mezuzot, and fragments that the catalogue cannot tie to one work are not drawn.
