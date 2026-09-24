@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per castle, fortress, palace or ruin listed on Wikidata, with its
 // founding year where one is recorded.
@@ -61,59 +58,9 @@
   calc.round(years.at(calc.floor(years.len() / 2)))
 }
 
-// Castles stack up from the waterline, fortresses and palaces hang down from
-// it. Each segment carries the running edge it starts at, so the two walls are
-// built in one pass.
-#let wall = {
-  let out = ()
-  for bin in bins {
-    let edge = 0
-    for category in above {
-      let n = tally-at(bin, category)
-      out.push((
-        category: category,
-        xmin: bin + pad,
-        xmax: bin + pad + merlon,
-        ymin: edge,
-        ymax: edge + n,
-      ))
-      edge += n
-    }
-    edge = 0
-    for category in below {
-      let n = tally-at(bin, category)
-      out.push((
-        category: category,
-        xmin: bin + pad,
-        xmax: bin + pad + merlon,
-        ymin: edge - n,
-        ymax: edge,
-      ))
-      edge -= n
-    }
-  }
-  out.filter(r => r.ymin != r.ymax)
-}
-
 #let sum-over(bin, categories) = categories.map(c => tally-at(bin, c)).sum()
 #let keep-at(bin) = sum-over(bin, above)
 #let split-at(bin) = sum-over(bin, below)
-
-// The crest: the top edge of the upper wall, drawn as one path that climbs each
-// merlon and drops back to the waterline between them. It traces the same
-// counts the bars already carry, and it is what turns the skyline into
-// battlements rather than a row of columns.
-#let crest = {
-  let out = ()
-  for bin in bins {
-    let h = keep-at(bin)
-    out.push((x: bin + pad, y: 0))
-    out.push((x: bin + pad, y: h))
-    out.push((x: bin + pad + merlon, y: h))
-    out.push((x: bin + pad + merlon, y: 0))
-  }
-  out
-}
 
 // The hinge the figure is about: the half-century where the two buildings that
 // replaced the castle first take three quarters of the foundings.
@@ -135,35 +82,23 @@
 #let ink = theme-minimal().at("ink", default: black)
 #let paper-colour = theme-minimal().at("paper", default: white)
 #let note-colour = ink.transparentize(20%)
-#let rule-colour = ink.transparentize(45%)
 
 // Cinzel is cut from Roman inscriptional capitals, so the title reads as
 // something carved rather than typed. Alegreya carries the prose, Alegreya Sans
 // the axes. All three are vendored in assets/fonts, so CI renders them too.
-#let title-font = "Cinzel"
 #let body-font = "Alegreya"
 #let axis-font = "Alegreya Sans"
 
 // Above the waterline, one hue in two tones: the same building standing and
 // fallen. Below it, two hues for two different buildings, blue against amber,
 // the pair that survives every form of colour vision.
-#let stone = rgb("#9a6a42")
-#let weathered = rgb("#b9987a")
-#let slate = rgb("#3f7d9c")
-#let gilt = rgb("#c9962a")
-#let water = rgb("#3f7d9c")
-
 #let category-colours = (
-  castle: stone,
-  ruin: weathered,
-  fortress: slate,
-  palace: gilt,
+  castle: rgb("#9a6a42"),
+  ruin: rgb("#b9987a"),
+  fortress: rgb("#3f7d9c"),
+  palace: rgb("#c9962a"),
 )
-#let category-order = ("castle", "ruin", "fortress", "palace")
-#let category-scale = scale-discrete(
-  limits: category-order,
-  palette: category-order.map(c => category-colours.at(c)),
-)
+#let water = rgb("#3f7d9c")
 
 #let plural-of = (
   castle: "castles",
@@ -186,32 +121,40 @@
   width: width,
 )[#body]
 
-#let tag(category) = chip(
-  border: category-colours.at(category),
-  text(
-    font: body-font,
-    size: 7.5pt,
-    fill: category-colours.at(category),
-    weight: "bold",
-  )[#upper(plural-of.at(category).first())#plural-of.at(category).slice(1)],
-)
-
-// The tags stand in the order the bars stack: ruins over castles above the
-// waterline, fortresses over palaces below it. One row per tag, so the four
-// stand as a single layer rather than as four single-row annotations.
-#let tag-rows = (
-  (category: "ruin", y: 130),
-  (category: "castle", y: 96),
-  (category: "fortress", y: -42),
-  (category: "palace", y: -78),
-).map(row => (x: 812, y: row.y, label: tag(row.category)))
-
-// Counts read the same either side of the waterline, so the axis drops the sign
-// and the two walls are compared directly.
-#let unsigned = v => comma(calc.abs(v))
-
 #plot(
-  data: wall,
+  // Castles stack up from the waterline, fortresses and palaces hang down from
+  // it. Each segment carries the running edge it starts at, so the two walls are
+  // built in one pass.
+  data: {
+    let out = ()
+    for bin in bins {
+      let edge = 0
+      for category in above {
+        let n = tally-at(bin, category)
+        out.push((
+          category: category,
+          xmin: bin + pad,
+          xmax: bin + pad + merlon,
+          ymin: edge,
+          ymax: edge + n,
+        ))
+        edge += n
+      }
+      edge = 0
+      for category in below {
+        let n = tally-at(bin, category)
+        out.push((
+          category: category,
+          xmin: bin + pad,
+          xmax: bin + pad + merlon,
+          ymin: edge - n,
+          ymax: edge,
+        ))
+        edge -= n
+      }
+    }
+    out.filter(r => r.ymin != r.ymax)
+  },
   mapping: aes(
     xmin: "xmin",
     xmax: "xmax",
@@ -235,16 +178,30 @@
     // The handover, marked before the walls so the masonry sits over it.
     geom-vline(
       xintercept: hinge,
-      colour: rule-colour,
+      colour: ink.transparentize(45%),
       stroke: 0.7pt,
       linetype: "dashed",
     ),
     geom-rect(stroke: 0.4pt, colour: paper-colour),
     geom-path(
-      data: crest,
+      // The crest: the top edge of the upper wall, drawn as one path that climbs
+      // each merlon and drops back to the waterline between them. It traces the
+      // same counts the bars already carry, and it is what turns the skyline
+      // into battlements rather than a row of columns.
+      data: {
+        let out = ()
+        for bin in bins {
+          let h = keep-at(bin)
+          out.push((x: bin + pad, y: 0))
+          out.push((x: bin + pad, y: h))
+          out.push((x: bin + pad + merlon, y: h))
+          out.push((x: bin + pad + merlon, y: 0))
+        }
+        out
+      },
       mapping: aes(x: "x", y: "y"),
       inherit-aes: false,
-      colour: stone.darken(40%),
+      colour: category-colours.castle.darken(40%),
       stroke: 0.9pt,
     ),
     // The waterline. Everything below it is drawn as the castle's reflection,
@@ -265,13 +222,33 @@
       x: last-bin + bin-width - 10,
       y: 258,
       label: chip(width: 3.9cm, note[
-        The handover. Up to #str(hinge), #named("fortress") and #named("palace") are #format-percent(digits: 0)(share-at(hinge - bin-width)) of new foundings. From #str(hinge) on they never fall below #format-percent(digits: 0)(0.75), and the fortified home never returns.
+        The handover. Up to #str(hinge), #named("fortress") and #named("palace") are #format-percent()(share-at(hinge - bin-width)) of new foundings. From #str(hinge) on they never fall below 75%, and the fortified home never returns.
       ]),
       anchor: "north-east",
       clip: false,
     ),
+    // The tags stand in the order the bars stack: ruins over castles above the
+    // waterline, fortresses over palaces below it. One row per tag, so the four
+    // stand as a single layer rather than as four single-row annotations.
     geom-typst(
-      data: tag-rows,
+      data: (
+        (category: "ruin", y: 130),
+        (category: "castle", y: 96),
+        (category: "fortress", y: -42),
+        (category: "palace", y: -78),
+      ).map(row => (
+        x: 812,
+        y: row.y,
+        label: chip(
+          border: category-colours.at(row.category),
+          text(
+            font: body-font,
+            size: 7.5pt,
+            fill: category-colours.at(row.category),
+            weight: "bold",
+          )[#upper(plural-of.at(row.category).first())#plural-of.at(row.category).slice(1)],
+        ),
+      )),
       mapping: aes(x: "x", y: "y", label: "label"),
       inherit-aes: false,
       anchor: "west",
@@ -286,10 +263,12 @@
     y: scale-continuous(
       limits: (-215, 265),
       breaks: (-200, -100, 0, 100, 200),
-      labels: unsigned,
+      // Counts read the same either side of the waterline, so the axis drops the
+      // sign and the two walls are compared directly.
+      labels: v => comma(calc.abs(v)),
       expand: (0%, 0%),
     ),
-    fill: category-scale,
+    fill: scale-discrete(limits: category-colours.keys(), palette: category-colours.values()),
   ),
   guides: guides(default: none),
   labels: labels(
@@ -309,7 +288,7 @@
     fill: none,
   ),
   theme: theme-minimal(
-    plot-title: element-text(font: title-font, size: 16pt, weight: "bold"),
+    plot-title: element-text(font: "Cinzel", size: 16pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8pt),
     plot-caption: element-text(font: body-font, size: 6.5pt),
     axis-title: element-text(font: axis-font, size: 8pt),
@@ -319,6 +298,6 @@
     // A faint grid, so the wall stays a silhouette instead of a ruled chart.
     panel-grid-major: element-line(colour: ink.transparentize(88%), stroke: 0.4pt),
   ),
-  width: 18cm,
-  height: 9.45cm,
+  width: auto,
+  height: auto,
 )

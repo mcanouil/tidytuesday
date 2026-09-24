@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per galaxy: the Palomar survey of nearby bright galaxies, with the
 // emission-line ratios and the class Ho, Filippenko and Sargent gave it.
@@ -38,13 +35,6 @@
   "Transition": rgb("#c47a12"),
   "LINER": rgb("#2f7fc4"),
   "Seyfert": rgb("#b03e5c"),
-)
-// Shape repeats what colour says, so no class rests on hue alone.
-#let class-shapes = (
-  "H II": "circle",
-  "Transition": "triangle",
-  "LINER": "square",
-  "Seyfert": "diamond",
 )
 
 // One pass over the 486 rows. A galaxy is drawn only with a class and all three
@@ -135,9 +125,7 @@
 // Ink, paper and rules come from the theme that typst-render resolved, so they
 // follow the light and dark toggle. The alpha holds the rules behind the marks.
 #let ink = theme-minimal().at("ink", default: black)
-#let paper-colour = theme-minimal().at("paper", default: white)
 #let rule-colour = ink.transparentize(30%)
-#let note-colour = ink.transparentize(20%)
 
 // A signage grotesque for the headings and a warm text face for the prose. Both
 // are vendored in assets/fonts, so CI renders them too.
@@ -145,7 +133,7 @@
 #let chart-font = "Archivo"
 
 #let panel-theme = theme-minimal(
-  legend-background: element-rect(fill: paper-colour),
+  legend-background: element-rect(fill: theme-minimal().at("paper", default: white)),
   axis-title: element-text(font: body-font, size: 8pt),
   axis-text: element-text(font: body-font, size: 7pt),
   legend-text: element-text(font: body-font, size: 7pt),
@@ -153,15 +141,11 @@
 )
 
 // The note beside each rule, in the theme's own ink.
-#let note(body) = text(font: body-font, size: 6.5pt, fill: note-colour)[#body]
+#let note(body) = text(font: body-font, size: 6.5pt, fill: ink.transparentize(20%))[#body]
 
 #let class-scale = scale-discrete(
   limits: class-order,
   palette: class-order.map(c => class-colours.at(c)),
-)
-#let shape-scale = scale-manual(
-  limits: class-order,
-  values: class-order.map(c => class-shapes.at(c)),
 )
 
 // Boxed so a class never breaks across a line: "H II" split over two lines reads
@@ -191,7 +175,11 @@
     y: scale-continuous(breaks: (-1, -0.5, 0, 0.5, 1), expand: (6%, 6%)),
     colour: class-scale,
     fill: class-scale,
-    shape: shape-scale,
+    // Shape repeats what colour says, so no class rests on hue alone.
+    shape: scale-manual(
+      limits: class-order,
+      values: ("circle", "triangle", "square", "diamond"),
+    ),
   ),
   // One key for three aesthetics: colour, fill and shape describe the same four
   // classes, so one guide merges them into a single set of swatches. It carries
@@ -206,8 +194,6 @@
     shape: none,
   ),
   theme: panel-theme,
-  width: 11.4cm,
-  height: 6.2cm,
 )
 
 // Right panel: the same galaxies, one ratio swapped. Densities rather than a
@@ -241,8 +227,6 @@
     y: none,
   ),
   theme: panel-theme,
-  width: 5.7cm,
-  height: 6.2cm,
 )
 
 #compose(
@@ -270,6 +254,6 @@
     plot-subtitle: element-text(font: body-font, size: 8.5pt),
     plot-caption: element-text(font: body-font, size: 6.5pt),
   ),
-  width: 18cm,
-  height: 9.45cm,
+  width: auto,
+  height: auto,
 )

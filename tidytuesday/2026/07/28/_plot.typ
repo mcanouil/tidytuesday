@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per biodiversity record: what was seen, where, and when. Every number
 // in the chart comes from this table. The tourism table is quarterly and the
@@ -12,7 +9,6 @@
 
 // A record with no month has no place on a dial, so it is dropped. The caption
 // states how many.
-#let month-of(v) = if v == none or v == "" or v == "NA" { none } else { int(v) }
 #let comma = format-comma()
 #let pct = format-percent()
 
@@ -28,13 +24,12 @@
 #let n-human = 0
 #for r in raw {
   if r.record_type == "HUMAN_OBSERVATION" { n-human += 1 }
-  let m = month-of(r.month)
-  if m == none {
+  if r.month in (none, "", "NA") {
     n-dropped += 1
     continue
   }
   let counts = tally.at(r.organism_name, default: (0,) * 12)
-  counts.at(m - 1) += 1
+  counts.at(int(r.month) - 1) += 1
   tally.insert(r.organism_name, counts)
 }
 
@@ -73,7 +68,6 @@
 // the caption, so no number sits on a wedge. The outer bound clears the tallest.
 #let rings = (10, 20, 30, 40)
 #let ring-list = rings.slice(0, -1).map(str).join(", ") + " and " + str(rings.last())
-#let ring-max = 45
 
 // The long table the dials are drawn from: one wedge per organism per month.
 //
@@ -102,10 +96,6 @@
   "Manta ray": rgb("#2f7fc4"),
   "Glowworm": rgb("#3aa270"),
 )
-// A dark seam rather than a white one: it splits neighbouring wedges on the pale
-// page without cutting a bright gap in the dark one.
-#let wedge-edge = rgb("#3333334d")
-#let grid-col = rgb("#8a8f9673") // the rings, the only scale the dials carry
 #let dial-order = dials.map(d => d.organism)
 
 // A grotesque for the headings and a text face for the prose, for the feel of a
@@ -117,8 +107,10 @@
   data: wedges,
   mapping: aes(x: "month", y: "share", fill: "organism"),
   layers: (
-    // A full-width wedge per month, so each dial reads as a year.
-    geom-col(width: 1, colour: wedge-edge, stroke: 0.5pt),
+    // A full-width wedge per month, so each dial reads as a year. A dark seam
+    // rather than a white one: it splits neighbouring wedges on the pale page
+    // without cutting a bright gap in the dark one.
+    geom-col(width: 1, colour: rgb("#3333334d"), stroke: 0.5pt),
   ),
   scales: scales(
     // Only the quarter months are labelled: twelve labels on dials this size
@@ -128,7 +120,7 @@
       labels: month-names.map(m => if m in ("Jan.", "Apr.", "Jul.", "Oct.") { m } else { "" }),
       expand: false,
     ),
-    y: scale-continuous(breaks: rings, limits: (0, ring-max)),
+    y: scale-continuous(breaks: rings, limits: (0, 45)),
     fill: scale-discrete(
       limits: dial-order,
       palette: dial-order.map(n => organism-colours.at(n)),
@@ -167,8 +159,9 @@
     axis-text: element-text(font: body-font, size: 7pt),
     strip-background: element-blank(),
     strip-text: element-text(font: chart-font, size: 8.5pt, weight: "bold"),
-    // Rings and spokes share this stroke, and both stop inside the month labels.
-    panel-grid: element-line(colour: grid-col),
+    // Rings and spokes share this stroke, the only scale the dials carry, and
+    // both stop inside the month labels.
+    panel-grid: element-line(colour: rgb("#8a8f9673")),
     panel-spacing: 0.5cm,
     panel-background: element-rect(
       fill: rgb("#f7f0e7"),

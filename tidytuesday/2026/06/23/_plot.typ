@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let raw = csv("data/papal_encyclicals.csv", row-type: dictionary)
 
@@ -29,16 +26,6 @@
   }
 }
 
-// Leo XIII's 86 encyclicals by year of his reign (1-25). The inset shows that
-// his output held across the whole pontificate.
-#let leo-counts = (:)
-#for r in raw {
-  if r.pope != leo-name { continue }
-  let y = r.pontificate_year
-  leo-counts.insert(y, leo-counts.at(y, default: 0) + 1)
-}
-#let leo-by-year = range(1, 26).map(y => (yr: y, n: leo-counts.at(str(y), default: 0)))
-
 // Ranking is the message, so the order is by count. The discrete y-axis draws its
 // first level at the bottom, so ascending count puts Leo XIII at the top.
 #let ranked = pope-meta.pairs().map(pair => {
@@ -46,21 +33,13 @@
 }).sorted(key: row => row.count)
 #let pope-order = ranked.map(row => row.pope)
 
-// The apex of the funnel, read from the data so it pins to the Leo XIII point:
-// x just past his count, y at his level.
-#let leo-count = pope-meta.at(leo-name).count
-#let leo-level = pope-order.position(p => p == leo-name) + 1
-
 // One muted ink for every pope, and one warm accent for the record holder.
 #let muted = luma(62%)
 #let accent = rgb("#d55e00")
-// `x0` anchors each stem at zero and `lx` places the count label past the point
-// head. Mapping `nudge-x` instead trips the discrete-scale trainer.
+// `x0` anchors each stem at zero.
 #let rows = ranked.map(row => (
   ..row,
   x0: 0,
-  lx: row.count + 2,
-  clabel: str(row.count),
   // Two groups, the record holder against everyone else, mapped through colour
   // and fill so one segment layer and one point layer carry the highlight.
   group: if row.pope == leo-name { leo-name } else { "Other" },
@@ -77,8 +56,13 @@
     radius: 3pt,
     stroke: 0.5pt + accent,
   )[
+    // Leo XIII's 86 encyclicals by year of his reign (1-25). The inset shows
+    // that his output held across the whole pontificate.
     #plot(
-      data: leo-by-year,
+      data: {
+        let leo = raw.filter(r => r.pope == leo-name)
+        range(1, 26).map(y => (yr: y, n: leo.filter(r => r.pontificate_year == str(y)).len()))
+      },
       mapping: aes(x: "yr", y: "n"),
       layers: (geom-col(fill: accent, width: 0.7),),
       scales: scales(
@@ -91,8 +75,7 @@
         y: none,
       ),
       theme: theme-minimal(
-        axis-text-x: element-text(size: 7pt),
-        axis-text-y: element-text(size: 7pt),
+        axis-text: element-text(size: 7pt),
         plot-title: element-text(align: center, size: 8pt, weight: "bold", colour: accent),
         // The stems carry the values, so vertical gridlines only compete.
         panel-grid-major-x: element-blank(),
@@ -114,7 +97,9 @@
       data: (
         (x: 34.15, y: 8.374),
         (x: 82.4, y: 0.8),
-        (x: leo-count + 0.25, y: leo-level),
+        // The apex, read from the data so it pins to the Leo XIII point: x just
+        // past his count, y at his level.
+        (x: pope-meta.at(leo-name).count + 0.25, y: pope-order.position(p => p == leo-name) + 1),
       ),
       mapping: aes(x: "x", y: "y"),
       fill: accent,
@@ -124,24 +109,26 @@
     // The stem length is the count, on a common axis from zero. The group
     // aesthetic tints the record holder and leaves the rest muted.
     geom-segment(
-      mapping: aes(x: "x0", y: "pope", xend: "count", yend: "pope", colour: "group"),
+      mapping: aes(x: "x0", xend: "count", yend: "pope", colour: "group"),
       stroke: 1.4pt,
     ),
     geom-point(mapping: aes(fill: "group"), size: 3.4pt),
     // The count sits at the head of each stem, so no reader hunts an axis tick
     // for "86". The record holder's count is bold, to match its stem and tick.
+    // `lx` places the label past the point head. Mapping `nudge-x` instead trips
+    // the discrete-scale trainer.
     geom-typst(
       data: d => d.map(r => (
         ..r,
+        lx: r.count + 2,
         lab: text(
           size: 8pt,
           fill: if r.pope == leo-name { accent } else { muted },
           weight: "bold",
-        )[#r.clabel],
+        )[#str(r.count)],
       )),
-      mapping: aes(x: "lx", y: "pope", label: "lab"),
+      mapping: aes(x: "lx", label: "lab"),
       anchor: "west",
-      inherit-aes: false,
     ),
     // The inset sits in the empty right-hand space, clear of the stems and the
     // labels below.

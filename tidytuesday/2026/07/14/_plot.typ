@@ -1,15 +1,10 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per museum specimen, covering the whole penguin family rather than the
 // three species of palmerpenguins. Every number in the chart comes from this
 // table.
 // Source: data/many_penguins.csv (TidyTuesday 2026-07-14).
-#let raw = csv("data/many_penguins.csv", row-type: dictionary)
-
 // The CSV writes an absent measurement as "NA". Parsing it to `none` drops that
 // bird from this panel alone.
 #let num(v) = if v == none or v == "" or v == "NA" { none } else { float(v) }
@@ -21,12 +16,10 @@
 
 // Beak length against beak depth: the palmerpenguins axes, extended from three
 // species to all eighteen. A bird missing either measurement is dropped.
-#let birds = ()
-#for r in raw {
-  let x = num(r.at("beak.length_culmen"))
-  let y = num(r.at("beak.depth"))
-  if x == none or y == none { continue }
-  birds.push((x: x, y: y, species: r.shortname, genus: r.genus))
+#let birds = {
+  csv("data/many_penguins.csv", row-type: dictionary)
+    .map(r => (x: num(r.at("beak.length_culmen")), y: num(r.at("beak.depth")), species: r.shortname, genus: r.genus))
+    .filter(b => b.x != none and b.y != none)
 }
 
 #let n-birds = birds.len()
@@ -34,7 +27,6 @@
 #let n-genera = birds.map(b => b.genus).dedup().len()
 
 #let famous = birds.filter(b => b.species in palmer)
-#let others = birds.filter(b => b.species not in palmer)
 #let n-famous = famous.len()
 #let n-others = n-species - palmer.len()
 // The title and the subtitle call the palmerpenguins set "three", the one count
@@ -87,18 +79,12 @@
 #let body-font = "Alegreya Sans"
 #let chart-font = "Alegreya"
 
-#let famous-colours = (adelie-col, chinstrap-col, gentoo-col)
-#let famous-shapes = ("circle", "triangle", "square")
-
 // No fill means "say nothing about the colour", so the text takes the page ink
 // whichever way the site is toggled. A colour is passed only for text naming a
 // coloured mark.
 //
 // Species names are binomials, so they are set in italic wherever they appear.
-#let sp(name, fill: none, size: 8pt, weight: "regular") = {
-  set text(fill: fill) if fill != none
-  text(font: chart-font, style: "italic", size: size, weight: weight)[#name]
-}
+#let sp(name, size: 8pt, weight: "regular") = text(font: chart-font, style: "italic", size: size, weight: weight)[#name]
 #let note(body, fill: none, size: 7pt, weight: "regular") = {
   set text(fill: fill) if fill != none
   text(font: body-font, size: size, weight: weight)[#body]
@@ -107,10 +93,11 @@
 // The three clouds overlap almost completely, so a label per cloud would sit on
 // its neighbours. The legend goes in the empty band below them. Both scales
 // carry the same labels, so the fill and shape guides merge into one key.
-#let famous-labels = palmer.map(name => sp(name, size: 8.5pt, weight: "bold")
-  + note(size: 6.5pt)[ n = #famous.filter(b => b.species == name).len()])
 #let famous-scale(values) = scale-discrete(
-  limits: palmer, palette: values, labels: famous-labels,
+  limits: palmer,
+  palette: values,
+  labels: palmer.map(name => sp(name, size: 8.5pt, weight: "bold")
+    + note(size: 6.5pt)[ n = #famous.filter(b => b.species == name).len()]),
 )
 
 // A named specimen at one edge of the family, with the measurement that puts it
@@ -129,7 +116,7 @@
     // The fifteen species nobody plots: small, translucent and neutral, so they
     // read as context rather than as a fourth category.
     geom-point(
-      data: others,
+      data: d => d.filter(b => b.species not in palmer),
       size: 2.2pt, fill: other-col, colour: mark-edge, stroke: 0.4pt, alpha: 0.85,
     ),
     // The box the figure is about: the range the three famous species cover,
@@ -177,8 +164,8 @@
       breaks: (10, 15, 20, 25, 30),
       expand: (5%, 12%),
     ),
-    fill: famous-scale(famous-colours),
-    shape: famous-scale(famous-shapes),
+    fill: famous-scale((adelie-col, chinstrap-col, gentoo-col)),
+    shape: famous-scale(("circle", "triangle", "square")),
   ),
   // The key sits inside the panel, in the empty band under the three clouds.
   guides: guides(default: guide-legend(position: (x: 82%, y: 78%), key-size: 0.22cm)),

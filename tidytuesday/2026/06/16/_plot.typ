@@ -1,73 +1,26 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
-// Treat every missing sentinel as `none` so a single guard filters them out.
-#let num(s) = if s in ("NA", "N/A", "") { none } else { float(s) }
-
-#let files = (
-  ("England & Wales", "data/england_wales_names.csv"),
-  ("Scotland", "data/scotland_names.csv"),
-  ("Northern Ireland", "data/ni_names.csv"),
-)
-
-// Keep only years where all three nations publish data (E&W ends at 2024).
-#let start_year = 1997
-#let end_year = 2024
 // A name counts as gender-neutral when the UK total for each sex reaches this
 // many births. The floor removes ONS-suppressed entries and noise.
 #let min_n = 3
 
-// Pass 1: sum births across nations per (year, name, sex) for shared years only.
-#let year_name_sex = (:)
-#for (_, path) in files {
-  for r in csv(path, row-type: dictionary) {
-    let yr = int(r.Year)
-    if yr < start_year or yr > end_year { continue }
-    let n = num(r.Number)
-    if n == none { continue }
-    let key = r.Year + "|" + r.Name + "|" + r.Sex
-    year_name_sex.insert(key, year_name_sex.at(key, default: 0.0) + n)
-  }
-}
-
-// Pass 2: apply threshold after combining; index which names qualify per sex.
+// Sum births across nations per (year, name), with one total per sex.
 #let year_name = (:)
-#for (key, total_n) in year_name_sex {
-  if total_n < min_n { continue }
-  let parts = key.split("|")
-  let name_key = parts.at(0) + "|" + parts.at(1)
-  let sex = parts.at(2)
-  let cur = year_name.at(name_key, default: (:))
-  cur.insert(sex, true)
-  year_name.insert(name_key, cur)
-}
-
-// Pass 3: count shared and total distinct names per year.
-#let per_year = (:)
-#for (key, counts) in year_name {
-  let yr = key.split("|").at(0)
-  let cur = per_year.at(yr, default: (shared: 0, total: 0))
-  cur.insert("total", cur.total + 1)
-  if "Boy" in counts and "Girl" in counts {
-    cur.insert("shared", cur.shared + 1)
+#for path in ("data/england_wales_names.csv", "data/scotland_names.csv", "data/ni_names.csv") {
+  for r in csv(path, row-type: dictionary) {
+    // Keep only years where all three nations publish data (E&W ends at 2024).
+    if int(r.Year) < 1997 or int(r.Year) > 2024 { continue }
+    if r.Number in ("NA", "N/A", "") { continue }
+    let key = r.Year + "|" + r.Name
+    let cur = year_name.at(key, default: (:))
+    cur.insert(r.Sex, cur.at(r.Sex, default: 0.0) + float(r.Number))
+    year_name.insert(key, cur)
   }
-  per_year.insert(yr, cur)
 }
 
-// Mean total distinct names across all years (used in y-axis "% (N)" label).
-#let total_sum = 0.0
-#let n_yrs = 0
-#for (_, v) in per_year {
-  total_sum += v.total
-  n_yrs += 1
-}
-#let mean_total = total_sum / n_yrs
-
-// Pass 4: the commonest gender-neutral name per 5-year interval, by combined
-// births. Intervals are half-open, and labels sit at the midpoint year.
+// The commonest gender-neutral name per 5-year interval, by combined births.
+// Intervals are half-open, and labels sit at the midpoint year.
 #let intervals = (
   (start: 1997, end: 2000, mid: 1998),
   (start: 2000, end: 2005, mid: 2002),
@@ -77,21 +30,28 @@
   (start: 2020, end: 2025, mid: 2022),
 )
 
+// Apply the threshold after combining nations, then count shared and total
+// distinct names per year and sum the births of shared names per interval.
+#let per_year = (:)
 #let interval_totals = (:)
-#for (key, total_n) in year_name_sex {
-  let parts = key.split("|")
-  let yr = int(parts.at(0))
-  let name = parts.at(1)
-  let name_key = parts.at(0) + "|" + name
-  let sexes = year_name.at(name_key, default: (:))
-  if "Boy" not in sexes or "Girl" not in sexes { continue }
-  for (i, iv) in intervals.enumerate() {
-    if yr >= iv.start and yr < iv.end {
-      let k = str(i) + "|" + name
-      interval_totals.insert(k, interval_totals.at(k, default: 0.0) + total_n)
-    }
+#for (key, sexes) in year_name {
+  let boy = sexes.at("Boy", default: 0.0) >= min_n
+  let girl = sexes.at("Girl", default: 0.0) >= min_n
+  if not (boy or girl) { continue }
+  let (yr, name) = key.split("|")
+  let cur = per_year.at(yr, default: (shared: 0, total: 0))
+  cur.insert("total", cur.total + 1)
+  if boy and girl {
+    cur.insert("shared", cur.shared + 1)
+    let i = intervals.position(iv => int(yr) >= iv.start and int(yr) < iv.end)
+    let k = str(i) + "|" + name
+    interval_totals.insert(k, interval_totals.at(k, default: 0.0) + sexes.values().sum())
   }
+  per_year.insert(yr, cur)
 }
+
+// Mean total distinct names across all years (used in y-axis "% (N)" label).
+#let mean_total = mean(per_year.values().map(v => v.total)).y
 
 #let label_rows = ()
 #for (i, iv) in intervals.enumerate() {
@@ -110,14 +70,13 @@
   label_rows.push((year: iv.mid + 0.5, pct: pct, label: best_name))
 }
 
-#let rows = ()
-#let max_pct = 0.0
-#for (yr, v) in per_year {
-  let pct = v.shared / v.total * 100
-  if pct > max_pct { max_pct = pct }
-  rows.push((year: int(yr), pct: pct))
+#let rows = {
+  per_year
+    .pairs()
+    .map(((yr, v)) => (year: int(yr), pct: v.shared / v.total * 100))
+    .sorted(key: r => r.year)
 }
-#let rows = rows.sorted(key: r => r.year)
+#let max_pct = calc.max(..rows.map(r => r.pct))
 
 #let teal = rgb("#009e73")
 

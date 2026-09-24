@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per test type, nationality, band and year, holding the share of that
 // group at that band. Each group sums to 1, so a small country counts as much
@@ -10,7 +7,7 @@
 // Source: data/demo_by_nationality.csv (TidyTuesday 2026-08-18).
 #let raw = csv("data/demo_by_nationality.csv", row-type: dictionary)
 
-#let pct0 = format-percent(digits: 0)
+#let pct0 = format-percent()
 #let pct1 = format-percent(digits: 1)
 #let dp2 = format-number(digits: 2)
 
@@ -26,29 +23,15 @@
 // Each band sits at its own score, so the vertical axis is the band scale. The
 // open bucket has no score of its own and is drawn at 3.5. Every mean here
 // leans on that choice, and the caption says so.
-#let band-score = (
-  "<4": 3.5,
-  "4": 4.0,
-  "4.5": 4.5,
-  "5": 5.0,
-  "5.5": 5.5,
-  "6": 6.0,
-  "6.5": 6.5,
-  "7": 7.0,
-  "7.5": 7.5,
-  "8": 8.0,
-  "8.5": 8.5,
-  "9": 9.0,
-)
+#let band-score(b) = if b == "<4" { 3.5 } else { float(b) }
 
 // Four names are too long for a column 0.28 cm wide. Only the label changes.
-#let short-name = (
+#let label-of(nat) = (
   "United Arab Emirates": "UAE",
   "Korea, Republic of": "South Korea",
   "Iran, Islamic Republic of": "Iran",
   "Russian Federation": "Russia",
-)
-#let label-of(nat) = short-name.at(nat, default: nat)
+).at(nat, default: nat)
 
 // The band most universities ask for. It falls between the 6 and 6.5 tiles, so
 // the rule is drawn at 6.25.
@@ -76,37 +59,39 @@
 }
 
 #let mass-from(bands, floor) = {
-  band-order.filter(b => band-score.at(b) >= floor).map(b => bands.at(b)).sum()
+  band-order.filter(b => band-score(b) >= floor).map(b => bands.at(b)).sum()
 }
 
-#let summarise-nat(nat, bands) = {
-  let mean = band-order.map(b => band-score.at(b) * bands.at(b)).sum()
-  let variance = band-order.map(b => bands.at(b) * calc.pow(band-score.at(b) - mean, 2)).sum()
-  (
-    nationality: nat,
-    mean: mean,
-    sd: calc.sqrt(variance),
-    clears: mass-from(bands, requirement),
-    below: 1 - mass-from(bands, 5.5),
-  )
+#let ordered = {
+  by-nat
+    .pairs()
+    .map(((nat, bands)) => {
+      let mean = band-order.map(b => band-score(b) * bands.at(b)).sum()
+      let variance = band-order.map(b => bands.at(b) * calc.pow(band-score(b) - mean, 2)).sum()
+      (
+        nationality: nat,
+        mean: mean,
+        sd: calc.sqrt(variance),
+        clears: mass-from(bands, requirement),
+        below: 1 - mass-from(bands, 5.5),
+      )
+    })
+    .sorted(key: s => s.mean)
 }
-
-#let summary = by-nat.pairs().map(p => summarise-nat(p.first(), p.last()))
-#let ordered = summary.sorted(key: s => s.mean)
 #let nat-order = ordered.map(s => s.nationality)
 
 // The claim the order rests on: a higher mean band comes with a tighter spread.
 // It is measured here, so a change upstream fails the render.
-#let correlation(xs, ys) = {
-  let n = xs.len()
-  let mx = xs.sum() / n
-  let my = ys.sum() / n
+#let spread-corr = {
+  let xs = ordered.map(s => s.mean)
+  let ys = ordered.map(s => s.sd)
+  let mx = mean(xs).y
+  let my = mean(ys).y
   let dx = xs.map(x => x - mx)
   let dy = ys.map(y => y - my)
-  let cov = range(n).map(i => dx.at(i) * dy.at(i)).sum()
+  let cov = dx.zip(dy).map(((a, b)) => a * b).sum()
   cov / calc.sqrt(dx.map(d => d * d).sum() * dy.map(d => d * d).sum())
 }
-#let spread-corr = correlation(ordered.map(s => s.mean), ordered.map(s => s.sd))
 #assert(
   spread-corr < -0.3,
   message: "spread no longer narrows as the mean band rises",
@@ -146,25 +131,13 @@
   for b in band-order {
     tiles.push((
       nationality: label-of(nat),
-      score: band-score.at(b),
+      score: band-score(b),
       share: bands.at(b),
     ))
   }
 }
 
-// The two profiles, in band order, so the path joins neighbouring bands.
-#let profiles = ()
-#for nat in pair-order {
-  for b in band-order {
-    profiles.push((
-      nationality: nat,
-      score: band-score.at(b),
-      share: by-nat.at(nat).at(b),
-    ))
-  }
-}
-
-#let peak-share = tiles.map(t => t.share).fold(0, calc.max)
+#let peak-share = calc.max(..tiles.map(t => t.share))
 
 // Where the fill ramp stops, and how many tiles sit above it.
 #let fill-ceiling = 0.20
@@ -177,10 +150,9 @@
 #let rule-colour = ink.transparentize(30%)
 #let note-colour = ink.transparentize(20%)
 
-// A grotesque for the headings and a text face for the prose. Both are vendored
-// in assets/fonts, so CI renders them too.
+// A text face for the prose, and a grotesque (Archivo) for the title. Both are
+// vendored in assets/fonts, so CI renders them too.
 #let body-font = "Lato"
-#let chart-font = "Archivo"
 
 // Blue against amber is the strongest pair on both surfaces: a worst-case
 // colour-vision distance of 23.2, and both clear the 3:1 contrast floor. Shape
@@ -189,31 +161,9 @@
   (wide.nationality): rgb("#c47a12"),
   (tight.nationality): rgb("#2f7fc4"),
 )
-#let pair-shapes = (
-  (wide.nationality): "circle",
-  (tight.nationality): "square",
-)
-
-#let pair-scale = scale-discrete(
-  limits: pair-order,
-  palette: pair-order.map(n => pair-colours.at(n)),
-  labels: pair-order.map(label-of),
-)
-#let shape-scale = scale-manual(
-  limits: pair-order,
-  values: pair-order.map(n => pair-shapes.at(n)),
-  labels: pair-order.map(label-of),
-)
-
-#let note(body) = text(font: body-font, size: 6.5pt, fill: note-colour)[#body]
 
 // The two nationalities wear their colour wherever they are named: in the
 // subtitle, and under their own column.
-#let axis-label(nat) = if nat in pair-order {
-  box(text(fill: pair-colours.at(nat), weight: "bold")[#label-of(nat)])
-} else {
-  label-of(nat)
-}
 #let coloured(name) = box(text(fill: pair-colours.at(name), weight: "bold")[#label-of(name)])
 
 #let panel-theme = theme-minimal(
@@ -224,8 +174,7 @@
   legend-title: element-text(font: body-font, size: 7pt),
   axis-ticks: element-tick(length: 0.05cm),
   // Nothing is read off a fraction of a band, so the minor rules do no work.
-  panel-grid-minor-x: element-blank(),
-  panel-grid-minor-y: element-blank(),
+  panel-grid-minor: element-blank(),
 )
 
 // Both panels use the same band scale, so one height means the same on each.
@@ -252,113 +201,116 @@
   labels: pct0,
 )
 
-// Left panel: one column of twelve tiles per nationality, ordered by mean band.
-// The mass climbs and tightens, which is what the correlation counts.
-#let heat-panel = defer(
-  plot,
-  data: tiles,
-  mapping: aes(x: "nationality", y: "score", fill: "share"),
-  layers: (
-    geom-tile(width: 0.82, height: 0.42),
-    geom-hline(
-      yintercept: requirement-rule,
-      colour: rule-colour,
-      stroke: 0.7pt,
-      linetype: "dashed",
-    ),
-  ),
-  scales: scales(
-    x: scale-discrete(
-      limits: nat-order.map(label-of),
-      labels: nat-order.map(axis-label),
-      expand: (1.5%, 1.5%),
-    ),
-    y: band-scale,
-    fill: share-scale,
-  ),
-  guides: guides(x: guide-axis(angle: 60)),
-  labels: labels(
-    x: none,
-    y: "Overall band",
-    fill: "Share of candidates",
-  ),
-  theme: panel-theme,
-  width: 11.6cm,
-  height: 8.2cm,
-)
-
-// Right panel: the two nationalities with the same mean band. Profiles rather
-// than columns, because the shape of one curve against the other is the point.
-#let profile-panel = defer(
-  plot,
-  data: profiles,
-  // The markers carry the share twice: in position and in fill. That gives this
-  // panel the same key as the one beside it, which is what `compose` lifts out.
-  // The ring keeps the nationality.
-  mapping: aes(
-    x: "share",
-    y: "score",
-    colour: "nationality",
-    shape: "nationality",
-    fill: "share",
-  ),
-  layers: (
-    geom-hline(
-      yintercept: requirement-rule,
-      colour: rule-colour,
-      stroke: 0.7pt,
-      linetype: "dashed",
-    ),
-    geom-path(stroke: 1pt),
-    geom-point(size: 2.4pt, stroke: 0.8pt),
-    annotate(
-      "segment",
-      x: 0.17,
-      xend: 0.085,
-      y: 4.3,
-      yend: 4.7,
-      stroke: 0.6pt + note-colour,
-      arrow: arrow(length: 4pt),
-      clip: false,
-    ),
-    annotate(
-      "typst",
-      x: 0.175,
-      y: 4.25,
-      label: note[
-        #pct1(wide.below) of #label-of(wide.nationality) \
-        sit below 5.5, against \
-        #pct1(tight.below) of #label-of(tight.nationality)
-      ],
-      anchor: "west",
-      clip: false,
-    ),
-  ),
-  scales: scales(
-    x: scale-continuous(breaks: (0, 0.1, 0.2, 0.3), labels: pct0, expand: (4%, 4%)),
-    y: band-scale,
-    colour: pair-scale,
-    shape: shape-scale,
-    fill: share-scale,
-  ),
-  // No key here. The subtitle and the note name both nationalities, so the ramp
-  // stays the only legend.
-  guides: guides(default: none),
-  labels: labels(
-    x: "Share of candidates",
-    y: none,
-    colour: none,
-    shape: none,
-    fill: "Share of candidates",
-  ),
-  theme: panel-theme,
-  width: 5.5cm,
-  height: 8.2cm,
-)
-
 #compose(
-  heat-panel,
-  profile-panel,
+  // Left panel: one column of twelve tiles per nationality, ordered by mean band.
+  // The mass climbs and tightens, which is what the correlation counts.
+  defer(
+    plot,
+    data: tiles,
+    mapping: aes(x: "nationality", y: "score", fill: "share"),
+    layers: (
+      geom-tile(width: 0.82, height: 0.42),
+      geom-hline(
+        yintercept: requirement-rule,
+        colour: rule-colour,
+        stroke: 0.7pt,
+        linetype: "dashed",
+      ),
+    ),
+    scales: scales(
+      x: scale-discrete(
+        limits: nat-order.map(label-of),
+        labels: nat-order.map(nat => if nat in pair-order { coloured(nat) } else { label-of(nat) }),
+        expand: (1.5%, 1.5%),
+      ),
+      y: band-scale,
+      fill: share-scale,
+    ),
+    guides: guides(x: guide-axis(angle: 60)),
+    labels: labels(
+      x: none,
+      y: "Overall band",
+      fill: "Share of candidates",
+    ),
+    theme: panel-theme,
+  ),
+  // Right panel: the two nationalities with the same mean band. Profiles rather
+  // than columns, because the shape of one curve against the other is the point.
+  defer(
+    plot,
+    // The two profiles, in band order, so the path joins neighbouring bands.
+    data: pair-order
+      .map(nat => band-order.map(b => (nationality: nat, score: band-score(b), share: by-nat.at(nat).at(b))))
+      .flatten(),
+    // The markers carry the share twice: in position and in fill. That gives this
+    // panel the same key as the one beside it, which is what `compose` lifts out.
+    // The ring keeps the nationality.
+    mapping: aes(
+      x: "share",
+      y: "score",
+      colour: "nationality",
+      shape: "nationality",
+      fill: "share",
+    ),
+    layers: (
+      geom-hline(
+        yintercept: requirement-rule,
+        colour: rule-colour,
+        stroke: 0.7pt,
+        linetype: "dashed",
+      ),
+      geom-path(stroke: 1pt),
+      geom-point(size: 2.4pt, stroke: 0.8pt),
+      annotate(
+        "segment",
+        x: 0.17,
+        xend: 0.085,
+        y: 4.3,
+        yend: 4.7,
+        stroke: 0.6pt + note-colour,
+        arrow: arrow(length: 4pt),
+        clip: false,
+      ),
+      annotate(
+        "typst",
+        x: 0.175,
+        y: 4.25,
+        label: text(font: body-font, size: 6.5pt, fill: note-colour)[
+          #pct1(wide.below) of #label-of(wide.nationality) \
+          sit below 5.5, against \
+          #pct1(tight.below) of #label-of(tight.nationality)
+        ],
+        anchor: "west",
+        clip: false,
+      ),
+    ),
+    scales: scales(
+      x: scale-continuous(breaks: (0, 0.1, 0.2, 0.3), labels: pct0, expand: (4%, 4%)),
+      y: band-scale,
+      colour: scale-discrete(
+        limits: pair-order,
+        palette: pair-colours.values(),
+        labels: pair-order.map(label-of),
+      ),
+      shape: scale-manual(
+        limits: pair-order,
+        values: ("circle", "square"),
+        labels: pair-order.map(label-of),
+      ),
+      fill: share-scale,
+    ),
+    // No key here. The subtitle and the note name both nationalities, so the ramp
+    // stays the only legend.
+    guides: guides(default: none),
+    labels: labels(
+      x: "Share of candidates",
+      y: none,
+      colour: none,
+      shape: none,
+      fill: "Share of candidates",
+    ),
+    theme: panel-theme,
+  ),
   columns: 2,
   widths: (2, 1),
   gutter: 0.2cm,
@@ -382,10 +334,10 @@
     ]),
   ),
   theme: theme-minimal(
-    plot-title: element-text(font: chart-font, size: 17pt, weight: "bold"),
+    plot-title: element-text(font: "Archivo", size: 17pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8pt),
     plot-caption: element-text(font: body-font, size: 6.5pt),
   ),
-  width: 18cm,
-  height: 9.45cm,
+  width: auto,
+  height: auto,
 )

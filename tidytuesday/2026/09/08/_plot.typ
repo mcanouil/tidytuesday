@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per surveyed cafe: what a small cappuccino costs there and what the
 // barista serving it earns in an hour, both converted to pounds.
@@ -87,7 +84,6 @@
 #let drawn = countries.filter(c => c.interval != none)
 #let fastest = countries.first()
 #let runner-up = countries.at(1)
-#let furthest = drawn.last()
 
 // The claim the figure is built on: the country in second place cannot be told
 // from the country in first.
@@ -114,21 +110,12 @@
 // The swirl stops just past the furthest interval drawn, and the gap between
 // turns is whatever is left over. Fewer turns means a wider gap, which is what
 // keeps the arcs apart.
-#let spiral-end = furthest.interval.hi + 6
+#let spiral-end = drawn.last().interval.hi + 6
 #let ring = (start-radius - end-radius) * turn / spiral-end
 
 // The cup keeps a margin inside the panel, so the rim never runs under the
-// subtitle or the caption. Gribouille sizes the panel from the height it has
-// left once the title, subtitle and caption have taken their share, so the two
-// data ranges carry the aspect of that panel, not of the whole figure.
-// `panel-body` is the height of the drawn panel; change the header text and it
-// has to be measured again.
-#let figure-width = 18cm
-#let figure-height = 9.3cm
-#let panel-body = 6.8cm
-#let margin = 0.14
-#let panel-half-y = bezel + margin
-#let panel-half-x = panel-half-y * (figure-width / panel-body)
+// subtitle or the caption.
+#let panel-half-y = bezel + 0.14
 
 #let radius-at(minutes) = start-radius - ring * (minutes / turn)
 #let on-ray(minutes, r) = {
@@ -152,8 +139,6 @@
   })
 }
 
-#let swirl = arc(0, spiral-end, steps: 900)
-
 // The countries the figure names: the two the title compares, the largest
 // sample, the two ends of the range, and one from each half of the dial so the
 // two label columns come out even. Everything else is a mark without a name.
@@ -165,13 +150,6 @@
   "Greece",
   "India",
 )
-
-// The comparison the title is about, and the only amber on the page. Second
-// place gets the arc, first place a radial tick, so the one visibly straddles
-// the other instead of two amber arcs overlapping into a single blur.
-#let headline-arc = runner-up.country
-#let headline-tick = fastest.country
-#let accented = (headline-tick, headline-arc)
 
 #assert(
   runner-up.interval.hi > fastest.index,
@@ -190,17 +168,6 @@
 // what the band could not: the arc is short where the survey reached many cafés
 // and long where it did not.
 #let band-for(c) = arc(c.interval.lo, c.interval.hi).map(p => (:..p, country: c.country))
-#let plain-bands = {
-  named
-    .filter(name => name != headline-arc)
-    .map(name => band-for(country-at(name)))
-    .flatten()
-}
-#let keyed-band = band-for(country-at(headline-arc))
-
-#let marks = drawn.map(c => (:..point-at(c.index), ..c))
-#let plain-marks = marks.filter(c => c.country != headline-tick)
-
 // The tick crosses the swirl at first place, so it reads as a position rather
 // than as one more arc.
 #let tick-reach = 0.065
@@ -231,15 +198,12 @@
 #let note-colour = ink.transparentize(20%)
 
 #let coffee = rgb("#3e2a21")
-#let crema = rgb("#6b4a35")
 #let foam = rgb("#f2e6d3")
-#let porcelain = rgb("#d9d2c7")
 #let amber = rgb("#e9a33c")
 
-// Bitter is a slab serif with the weight of a menu board, Karla a grotesque
-// that stays legible at label size. Both are vendored in assets/fonts, so CI
-// renders them too.
-#let title-font = "Bitter"
+// Bitter, for the title, is a slab serif with the weight of a menu board, Karla
+// a grotesque that stays legible at label size. Both are vendored in
+// assets/fonts, so CI renders them too.
 #let body-font = "Karla"
 
 #let as-time(minutes) = {
@@ -252,9 +216,8 @@
 // labels on the side they already point at. Slots are handed out top to bottom
 // in the order the marks stand, so no two leaders cross.
 // The labels stand well out from the rim, so the callouts use the width the
-// circle leaves spare instead of crowding the cup. The fraction is of the
-// half-panel, so the columns hold their place if the panel changes shape.
-#let callout-x = panel-half-x * 0.6
+// circle leaves spare instead of crowding the cup.
+#let callout-x = bezel + 0.9
 #let slot-top = panel-half-y - 0.16
 #let slot-bottom = -slot-top
 
@@ -300,7 +263,7 @@
     font: body-font,
     size: 7.5pt,
     weight: "bold",
-    fill: if c.country in accented { amber.darken(15%) } else { ink },
+    fill: if c.country in (fastest.country, runner-up.country) { amber.darken(15%) } else { ink },
   )[#c.country]
   #text(font: body-font, size: 7.5pt, fill: note-colour)[#as-time(c.index)]
 ]
@@ -315,54 +278,43 @@
   text-x: c.label-x + c.side * 0.04,
   content: label-text(c),
 ))
-#let label-rows-left = label-rows.filter(c => c.side < 0)
-#let label-rows-right = label-rows.filter(c => c.side > 0)
-
-// The hour label sits on the swirl it names, so it carries a patch of coffee to
-// break the line behind it.
-#let hour-chip(body) = box(
-  fill: coffee,
-  inset: (x: 2.5pt, y: 0.5pt),
-  text(font: body-font, size: 5.5pt, fill: foam.transparentize(25%))[#body],
-)
 
 // Where the hand crosses twelve again. Without these the spiral is unreadable:
 // a mark on the third turn is three hours, not three minutes. Each label sits
 // exactly on its own crossing, not in the gap beside it, or it reads as naming
-// the turn below.
+// the turn below. Each label carries a patch of coffee to break the line behind
+// it.
 #let hours = {
   range(1, calc.floor(spiral-end / turn) + 1).map(h => (
     x: 0,
     y: radius-at(h * turn),
-    label: hour-chip(str(h) + " h"),
+    label: box(
+      fill: coffee,
+      inset: (x: 2.5pt, y: 0.5pt),
+      text(font: body-font, size: 5.5pt, fill: foam.transparentize(25%))[#h h],
+    ),
   ))
 }
 
 #plot(
-  data: marks,
+  data: drawn.map(c => (:..point-at(c.index), ..c)),
   mapping: aes(x: "x", y: "y"),
   layers: (
     // The cup, from the rim inwards.
     geom-polygon(
       data: circle-at(bezel),
-      mapping: aes(x: "x", y: "y"),
-      inherit-aes: false,
-      fill: crema,
-      colour: porcelain,
+      fill: rgb("#6b4a35"),
+      colour: rgb("#d9d2c7"),
       stroke: 1.6pt,
     ),
     geom-polygon(
       data: circle-at(disc),
-      mapping: aes(x: "x", y: "y"),
-      inherit-aes: false,
       fill: coffee,
       stroke: none,
     ),
     // The swirl: the working-time axis, one hour per turn.
     geom-path(
-      data: swirl,
-      mapping: aes(x: "x", y: "y"),
-      inherit-aes: false,
+      data: arc(0, spiral-end, steps: 900),
       colour: foam,
       alpha: 0.22,
       stroke: 0.7pt,
@@ -370,8 +322,7 @@
     ),
     geom-text(
       data: heading,
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
+      mapping: aes(label: "label"),
       size: 5.5pt,
       font: body-font,
       colour: foam,
@@ -382,9 +333,11 @@
     // translucent, because where the countries crowd, the arcs overlap, and the
     // overlap is the point: the brighter the cream, the less the order means.
     geom-path(
-      data: plain-bands,
-      mapping: aes(x: "x", y: "y", group: "country"),
-      inherit-aes: false,
+      data: named
+        .filter(name => name != runner-up.country)
+        .map(name => band-for(country-at(name)))
+        .flatten(),
+      mapping: aes(group: "country"),
       colour: foam,
       alpha: 0.75,
       stroke: 1.6pt,
@@ -392,37 +345,34 @@
     // The published index, for every country drawn. The dark outline keeps the
     // dot visible where it sits on its own arc.
     geom-point(
-      data: plain-marks,
-      mapping: aes(x: "x", y: "y"),
-      inherit-aes: false,
+      data: d => d.filter(c => c.country != fastest.country),
       size: 1.7pt,
       fill: foam,
       colour: coffee,
       stroke: 0.45pt,
     ),
+    // The comparison the title is about, and the only amber on the page.
+    // Second place gets the arc, first place a radial tick, so the one visibly
+    // straddles the other instead of two amber arcs overlapping into a blur.
     geom-path(
-      data: keyed-band,
-      mapping: aes(x: "x", y: "y", group: "country"),
-      inherit-aes: false,
+      data: band-for(runner-up),
+      mapping: aes(group: "country"),
       colour: amber,
       stroke: 3pt,
     ),
     geom-segment(
       data: tick,
-      mapping: aes(x: "x", y: "y", xend: "xend", yend: "yend"),
-      inherit-aes: false,
+      mapping: aes(xend: "xend", yend: "yend"),
       colour: amber,
       stroke: 2pt,
     ),
     geom-typst(
       data: hours,
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
+      mapping: aes(label: "label"),
     ),
     geom-text(
       data: numerals,
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
+      mapping: aes(label: "label"),
       size: 6.5pt,
       font: body-font,
       colour: foam,
@@ -430,29 +380,26 @@
     ),
     geom-segment(
       data: leaders,
-      mapping: aes(x: "x", y: "y", xend: "xend", yend: "yend"),
-      inherit-aes: false,
+      mapping: aes(xend: "xend", yend: "yend"),
       colour: note-colour,
       alpha: 0.55,
       stroke: 0.4pt,
     ),
     geom-typst(
-      data: label-rows-left,
+      data: label-rows.filter(c => c.side < 0),
       mapping: aes(x: "text-x", y: "label-y", label: "content"),
-      inherit-aes: false,
       anchor: "east",
     ),
     geom-typst(
-      data: label-rows-right,
+      data: label-rows.filter(c => c.side > 0),
       mapping: aes(x: "text-x", y: "label-y", label: "content"),
-      inherit-aes: false,
       anchor: "west",
     ),
   ),
   scales: scales(
-    // The two ranges carry the aspect of the drawn panel, so the cup stays a
-    // circle and keeps its margin inside it.
-    x: scale-continuous(limits: (-panel-half-x, panel-half-x), expand: (0%, 0%)),
+    // The x range holds the cup and the two label columns. The fixed coord
+    // keeps the cup a circle whatever the size of the figure.
+    x: scale-continuous(limits: (-callout-x - 1, callout-x + 1), expand: (0%, 0%)),
     y: scale-continuous(limits: (-panel-half-y, panel-half-y), expand: (0%, 0%)),
   ),
   coord: coord-fixed(ratio: 1),
@@ -472,11 +419,11 @@
     y: none,
   ),
   theme: theme-void(
-    plot-title: element-text(font: title-font, size: 16pt, weight: "bold"),
+    plot-title: element-text(font: "Bitter", size: 16pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8pt),
     plot-caption: element-text(font: body-font, size: 6pt),
     plot-background: element-rect(),
   ),
-  width: figure-width,
-  height: figure-height,
+  width: auto,
+  height: auto,
 )

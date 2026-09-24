@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 #let raw = csv("data/wreck_inventory.csv", row-type: dictionary)
 
@@ -14,7 +11,7 @@
 
 // Group a whole number with thousands separators, e.g. 1382 -> "1,382".
 #let thousands = format-comma(digits: 0)
-#let pct(part, whole) = format-percent(digits: 0)(part / whole)
+#let pct(part, whole) = format-percent()(part / whole)
 
 // One palette, one source of truth. The cool depths read on both surfaces, and
 // one vermillion accent is reserved for the WWI pivot.
@@ -22,9 +19,7 @@
 #let lost-col = rgb("#7aa6c6") // a mid steel-blue that lifts off the water at every depth
 #let bar-edge = rgb("#0c2b42") // thin dark edge so every column reads against the sea
 #let accent = rgb("#d55e00") // the WWI pivot ring and bars (graphical mark, 3:1)
-#let accent-ink = rgb("#9c3f00") // a darker orange for the pivot callout text, legible on pale surface water
 #let body-font = "PT Serif"
-#let chart-font = "Libre Caslon Text"
 
 // The story runs on dated wrecks. An undated record has no year for the
 // timeline. A wreck is "found" when it carries coordinates in the inventory.
@@ -51,23 +46,6 @@
   if hit == none { 0 } else { hit.n }
 }
 #let cell(d) = (found: tally-of(d, "found"), lost: tally-of(d, "lost"))
-// Found rise above the waterline and lost sink below it. Two layers rather than
-// one stacked column, so each fate keeps its own colour and haze.
-#let found-bars = decades.map(d => (decade: d, n: cell(d).found))
-#let lost-bars = decades.map(d => (decade: d, n: -1 * cell(d).lost))
-
-// The water column: light at the surface, dark in the deep. Vertical position is
-// the fate of a wreck, so the gradient is the found-to-lost axis.
-#let water = gradient.linear(
-  (rgb("#dcecf3"), 0%),
-  (rgb("#a9d2e5"), 20%),
-  (rgb("#6ba0c1"), 33%),
-  (rgb("#356f95"), 52%),
-  (rgb("#1d4560"), 80%),
-  (rgb("#0f2c42"), 100%),
-  angle: 90deg,
-)
-
 // Annotation helper: a quiet serif on the murk, so callouts read without a
 // legend.
 #let note(body, fill: rgb("#eef4f9"), size: 7.5pt, weight: "regular") = text(
@@ -78,31 +56,35 @@
 )[#body]
 
 #plot(
-  data: found-bars,
+  // Found rise above the waterline and lost sink below it. Two layers rather than
+  // one stacked column, so each fate keeps its own colour and haze.
+  data: decades.map(d => (decade: d, n: cell(d).found)),
   mapping: aes(x: "decade", y: "n"),
   layers: (
     geom-hline(yintercept: 0, stroke: 0.8pt, colour: rgb("#eaf4f8"), alpha: 0.9),
     // Lost below, found above. Both carry a thin edge, so they read at any depth.
     geom-col(fill: found-col, stroke: 0.4pt, colour: bar-edge),
-    geom-col(data: lost-bars, fill: lost-col, stroke: 0.4pt, colour: bar-edge),
+    geom-col(data: decades.map(d => (decade: d, n: -cell(d).lost)), fill: lost-col, stroke: 0.4pt, colour: bar-edge),
     // An accent ring traces the WWI pivot column and ties its callout to the
     // data. The bar half-width is 4.5: the 10-year slot times the 0.9 default.
     geom-rect(
-      data: ((xmin: pivot - 4.5, xmax: pivot + 4.5, ymin: -1 * cell(pivot).lost, ymax: cell(pivot).found),),
+      data: ((xmin: pivot - 4.5, xmax: pivot + 4.5, ymin: -cell(pivot).lost, ymax: cell(pivot).found),),
       mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
       fill: none, stroke: 1.3pt, colour: accent, inherit-aes: false,
     ),
     // A quieter off-white ring traces the 1850s famine column, to match its
     // callout.
     geom-rect(
-      data: ((xmin: famine - 4.5, xmax: famine + 4.5, ymin: -1 * cell(famine).lost, ymax: cell(famine).found),),
+      data: ((xmin: famine - 4.5, xmax: famine + 4.5, ymin: -cell(famine).lost, ymax: cell(famine).found),),
       mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
       fill: none, stroke: 1.3pt, colour: rgb("#eef4f9"), inherit-aes: false,
     ),
     annotate("typst", x: 1745, y: 550, label: note(fill: rgb("#0d3450"), weight: "bold")[▲ found · mapped], anchor: "west", clip: false),
     annotate("typst", x: 1745, y: -750, label: note(fill: rgb("#eaf4f8"), weight: "bold")[▼ lost · no position], anchor: "west", clip: false),
     annotate("typst", x: famine - 3, y: -1180, label: box(width: 4.4cm)[#note(size: 8pt)[*#(str(famine) + "s") famine-era exodus:* #thousands(cell(famine).lost) wrecks lost, #pct(cell(famine).lost, cell(famine).found + cell(famine).lost) never located.]], anchor: "east", clip: false),
-    annotate("typst", x: pivot, y: 665, label: box(width: 3.4cm)[#set align(center); #note(fill: accent-ink, size: 8pt, weight: "bold")[WWI turning point \ #(str(pivot) + "s"): #pct(cell(pivot).found, cell(pivot).found + cell(pivot).lost) found (#thousands(cell(pivot).found))]], anchor: "south", clip: false),
+    // A darker orange than the accent keeps the pivot callout text legible on pale
+    // surface water.
+    annotate("typst", x: pivot, y: 665, label: box(width: 3.4cm)[#set align(center); #note(fill: rgb("#9c3f00"), size: 8pt, weight: "bold")[WWI turning point \ #(str(pivot) + "s"): #pct(cell(pivot).found, cell(pivot).found + cell(pivot).lost) found (#thousands(cell(pivot).found))]], anchor: "south", clip: false),
     annotate("typst", x: 1978, y: 470, label: box(width: 3cm)[#set align(center); #note(fill: rgb("#0d3450"), size: 7.5pt)[Since 1950, nearly every wreck is charted]], anchor: "south", clip: false),
     // A wreck on the seabed, in the deep bottom-right corner. Its steel tint is
     // set in wreck.svg.
@@ -137,12 +119,22 @@
     ]),
   ),
   theme: theme-minimal(
-    plot-title: element-text(font: chart-font, size: 15pt, weight: "bold"),
+    plot-title: element-text(font: "Libre Caslon Text", size: 15pt, weight: "bold"),
     plot-subtitle: element-text(font: body-font, size: 8.5pt),
     plot-caption: element-text(font: body-font, size: 6.5pt),
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text: element-text(font: body-font, size: 7.5pt),
-    panel-background: element-rect(fill: water),
+    // The water column: light at the surface, dark in the deep. Vertical position
+    // is the fate of a wreck, so the gradient is the found-to-lost axis.
+    panel-background: element-rect(fill: gradient.linear(
+      (rgb("#dcecf3"), 0%),
+      (rgb("#a9d2e5"), 20%),
+      (rgb("#6ba0c1"), 33%),
+      (rgb("#356f95"), 52%),
+      (rgb("#1d4560"), 80%),
+      (rgb("#0f2c42"), 100%),
+      angle: 90deg,
+    )),
     panel-grid: element-blank(),
     axis-ticks: element-tick(length: 0.1cm),
   ),
