@@ -16,7 +16,7 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 | Fira Sans | `FiraSans-Regular.ttf`, `FiraSans-Bold.ttf` | [`ofl/firasans`](https://github.com/google/fonts/tree/main/ofl/firasans) | 2026-07-07 |
 | Oswald | `Oswald[wght].ttf` | [`ofl/oswald`](https://github.com/google/fonts/tree/main/ofl/oswald) | 2026-07-07 |
 | Alegreya | `Alegreya[wght].ttf`, `Alegreya-Italic[wght].ttf` | [`ofl/alegreya`](https://github.com/google/fonts/tree/main/ofl/alegreya) | 2026-07-14 |
-| Alegreya Sans | `AlegreyaSans-Regular.ttf`, `AlegreyaSans-Bold.ttf` | [`ofl/alegreyasans`](https://github.com/google/fonts/tree/main/ofl/alegreyasans) | 2026-07-14 |
+| Alegreya Sans | `AlegreyaSans-Regular.ttf`, `AlegreyaSans-Bold.ttf`, `AlegreyaSans-Italic.ttf`, `AlegreyaSans-BoldItalic.ttf` | [`ofl/alegreyasans`](https://github.com/google/fonts/tree/main/ofl/alegreyasans) | 2026-07-14, 2026-09-15 |
 | Public Sans | `PublicSans[wght].ttf` | [`ofl/publicsans`](https://github.com/google/fonts/tree/main/ofl/publicsans) | 2026-07-21 |
 | IBM Plex Mono | `IBMPlexMono-Regular.ttf`, `IBMPlexMono-Medium.ttf` | [`ofl/ibmplexmono`](https://github.com/google/fonts/tree/main/ofl/ibmplexmono) | 2026-07-21 |
 | Archivo | `Archivo[wdth,wght].ttf` | [`ofl/archivo`](https://github.com/google/fonts/tree/main/ofl/archivo) | 2026-07-28 |
@@ -24,6 +24,8 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 | Cinzel | `Cinzel[wght].ttf` | [`ofl/cinzel`](https://github.com/google/fonts/tree/main/ofl/cinzel) | 2026-09-01 |
 | Bitter | `Bitter[wght].ttf` | [`ofl/bitter`](https://github.com/google/fonts/tree/main/ofl/bitter) | 2026-09-08 |
 | Karla | `Karla[wght].ttf` | [`ofl/karla`](https://github.com/google/fonts/tree/main/ofl/karla) | 2026-09-08 |
+| Frank Ruhl Libre | `FrankRuhlLibre[wght].ttf` | [`ofl/frankruhllibre`](https://github.com/google/fonts/tree/main/ofl/frankruhllibre) | 2026-09-15 |
+| Barlow | `Barlow-Regular.ttf`, `Barlow-SemiBold.ttf`, `Barlow-Bold.ttf` | [`ofl/barlow`](https://github.com/google/fonts/tree/main/ofl/barlow) | 2026-09-22 |
 
 Files in square brackets are variable fonts.
 Typst 0.15 reads their weight axis, so one file covers every weight a figure asks for.
