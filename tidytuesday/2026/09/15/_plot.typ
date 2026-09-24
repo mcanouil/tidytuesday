@@ -45,8 +45,8 @@
 #let min-copies = 8
 
 // The catalogue files the odd copy of a work under another status: one Daniel
-// as outside the canon, the two doubtful Psalms under Sirach and nothing. A work
-// takes the status of most of its copies.
+// as outside the canon, one certain Psalms under Sirach and one doubtful Psalms
+// outside the canon. A work takes the status of most of its copies.
 #let works = {
   let tally = (:)
   for row in copies {
@@ -128,7 +128,7 @@
       y: w.row,
       doubtful: k >= w.sure,
       paint: ink-of(w),
-      strength: if w.strong { 1 } else { 0.45 },
+      strength: if w.strong { 1 } else { 0.7 },
     )))
     .flatten()
 }
@@ -144,7 +144,7 @@
     size: 7.5pt,
     weight: if w.strong { "bold" } else { "regular" },
     style: if w.canonical { "normal" } else { "italic" },
-    fill: ink-of(w).transparentize(if w.strong { 0% } else { 25% }),
+    fill: ink-of(w),
   )[#display.at(w.work, default: w.work)],
 ))
 
@@ -155,7 +155,7 @@
     font: body-font,
     size: 7pt,
     weight: if w.strong { "bold" } else { "regular" },
-    fill: ink.transparentize(if w.strong { 0% } else { 35% }),
+    fill: ink.transparentize(if w.strong { 0% } else { 25% }),
   )[#str(w.sure)#if w.doubtful > 0 { " (+" + str(w.doubtful) + "?)" }],
 ))
 
