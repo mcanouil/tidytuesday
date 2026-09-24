@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // Treat every missing sentinel as `none` so a single guard filters them out.
 #let num(s) = if s in ("NA", "N/A", "") { none } else { float(s) }
@@ -26,11 +23,28 @@
 #let profit = rgb("#009e73")
 #let accent = rgb("#0f8b8d")
 
-// Main frame: one currency, so the y axis reads in dollars, and only rows that
-// carry a budget and a critic score, so every channel is honest. All of those
-// rows are theatrical releases, so shape carries time rather than category.
-#let films = (
-  raw
+// Inset frame: every film scored by both critics and an opening audience. The
+// two means carry the sub-story on their own.
+#let scored = raw.filter(r => (
+  num(r.rotten_tomatoes) != none and r.cinema_score in cinemascore
+))
+#let critic-mean = mean(scored.map(r => num(r.rotten_tomatoes))).y
+#let audience-mean = mean(scored.map(r => cinemascore.at(r.cinema_score))).y
+
+// A dataset title against the label to draw for it. The keys pick the films to
+// emphasise, and the coordinates come from the inherited frame.
+#let label-text = (
+  "The Super Mario Bros. Movie": [*The \ Super Mario Bros. \ Movie*],
+  "Pokémon Detective Pikachu": [*Detective \ Pikachu*],
+  "Sonic the Hedgehog 3": [*Sonic \ the Hedgehog 3*],
+  "Postal": [*Postal* \ (Uwe Boll)],
+)
+
+#plot(
+  // Main frame: one currency, so the y axis reads in dollars, and only rows that
+  // carry a budget and a critic score, so every channel is honest. All of those
+  // rows are theatrical releases, so shape carries time rather than category.
+  data: raw
     .filter(r => (
       r.worldwide_box_office_currency == "\u{0024}"
         and num(r.worldwide_box_office) != none
@@ -42,97 +56,17 @@
       let box = num(r.worldwide_box_office)
       let bud = num(r.budget_high)
       let yr = int(r.release_date.slice(0, 4))
-      let era = if yr >= 2019 { "2019 onward" } else { "Before 2019" }
       (
         title: r.title,
         rt: num(r.rotten_tomatoes),
         box: box,
         budget: bud,
-        // The log10 of the profit multiple, so the fill spreads across orders of
+        // The log2 of the profit multiple, so the fill spreads across orders of
         // magnitude and pivots at 0, where box office equals budget.
         logmult: calc.log(box / bud, base: 2),
-        era: era,
+        era: if yr >= 2019 { "2019 onward" } else { "Before 2019" },
       )
-    })
-)
-
-// Inset frame: every film scored by both critics and an opening audience. The
-// two means carry the sub-story on their own.
-#let scored = raw.filter(r => (
-  num(r.rotten_tomatoes) != none and r.cinema_score in cinemascore
-))
-#let critic-mean = scored.map(r => num(r.rotten_tomatoes)).sum() / scored.len()
-#let audience-mean = scored.map(r => cinemascore.at(r.cinema_score)).sum() / scored.len()
-
-// A dumbbell on a 0-100 track: the gap between the critic dot and the audience
-// dot is the disagreement. Built from plain Typst primitives, with no nested
-// canvas, and it reads `page.fill` to follow the light and dark toggle.
-#let inset = context {
-  let bg = if page.fill in (auto, none) { white } else { page.fill }
-  let w = 4.6cm
-  box(
-    fill: bg,
-    inset: 7pt,
-    radius: 4pt,
-    stroke: 0.5pt + accent,
-  )[
-    #set text(size: 7pt)
-    #set par(leading: 4pt)
-    #align(center)[#strong[Critics pan them; audiences don't]]
-    #v(-5pt)
-    #box(width: w, height: 8pt)[
-      #place(left + horizon, line(length: w, stroke: 0.4pt + luma(75%)))
-      #place(
-        left + horizon,
-        dx: critic-mean / 100 * w,
-        line(
-          length: (audience-mean - critic-mean) / 100 * w,
-          stroke: 1.4pt + luma(55%),
-        ),
-      )
-      #place(
-        left + horizon,
-        dx: critic-mean / 100 * w - 2.5pt,
-        circle(radius: 2.5pt, fill: loss, stroke: none),
-      )
-      #place(
-        left + horizon,
-        dx: audience-mean / 100 * w - 2.5pt,
-        circle(radius: 2.5pt, fill: profit, stroke: none),
-      )
-    ]
-    #v(-7pt)
-    #grid(
-      columns: (1fr, 1fr),
-      align: (left, right),
-      text(fill: loss)[#strong[Critics] (_mean_): #calc.round(critic-mean)],
-      text(fill: profit)[#strong[Audiences] (_mean_): #calc.round(audience-mean)],
-    )
-  ]
-}
-
-// A label on a translucent paper background, so the text holds over the marker
-// cloud. The background reads `page.fill` to follow the toggle.
-#let pill(body) = context {
-  let bg = if page.fill in (auto, none) { white } else { page.fill }
-  box(
-    fill: bg.transparentize(12%),
-    inset: (x: 2pt, y: 0.5pt),
-    radius: 1.5pt,
-  )[#text(size: 7.5pt)[#body]]
-}
-
-// A dataset title against the pill to draw for it. The keys pick the films to
-// emphasise, and the coordinates come from the inherited frame.
-#let label-text = (
-  "The Super Mario Bros. Movie": align(center)[*The \ Super Mario Bros. \ Movie*],
-  "Pokémon Detective Pikachu": align(center)[*Detective \ Pikachu*],
-  "Sonic the Hedgehog 3": align(center)[*Sonic \ the Hedgehog 3*],
-  "Postal": align(center)[*Postal* \ (Uwe Boll)],
-)
-
-#plot(
-  data: films,
+    }),
   mapping: aes(
     x: "rt",
     y: "box",
@@ -170,17 +104,79 @@
       stroke: 1.2pt,
     ),
     // Direct labels rather than a per-film legend. The data function filters the
-    // inherited frame and attaches each pill, so the coordinates come from it.
+    // inherited frame and attaches each label, so the coordinates come from it.
+    // Each label sits on a translucent paper background, so the text holds over
+    // the marker cloud; the background reads `page.fill` to follow the toggle.
     geom-typst(
       data: d => d
         .filter(r => r.title in label-text)
-        .map(r => (..r, lab: pill(label-text.at(r.title)))),
-      mapping: aes(x: "rt", y: "box", label: "lab", nudge-y: 0.35),
+        .map(r => (
+          ..r,
+          lab: context {
+            let bg = if page.fill in (auto, none) { white } else { page.fill }
+            box(
+              fill: bg.transparentize(12%),
+              inset: (x: 2pt, y: 0.5pt),
+              radius: 1.5pt,
+            )[#text(size: 7.5pt)[#align(center, label-text.at(r.title))]]
+          },
+        )),
+      mapping: aes(label: "lab", nudge-y: 0.35),
       anchor: "south",
-      inherit-aes: false,
     ),
     // The inset dumbbell sits in the sparse top-left corner, above the cloud.
-    annotate("typst", x: 25, y: 1.75e6, label: inset, anchor: "north-west"),
+    // The gap between the critic dot and the audience dot on a 0-100 track is
+    // the disagreement. Built from plain Typst primitives, with no nested
+    // canvas, and it reads `page.fill` to follow the light and dark toggle.
+    annotate(
+      "typst",
+      x: 25,
+      y: 1.75e6,
+      label: context {
+        let bg = if page.fill in (auto, none) { white } else { page.fill }
+        let w = 4.6cm
+        box(
+          fill: bg,
+          inset: 7pt,
+          radius: 4pt,
+          stroke: 0.5pt + accent,
+        )[
+          #set text(size: 7pt)
+          #set par(leading: 4pt)
+          #align(center)[#strong[Critics pan them; audiences don't]]
+          #v(-5pt)
+          #box(width: w, height: 8pt)[
+            #place(left + horizon, line(length: w, stroke: 0.4pt + luma(75%)))
+            #place(
+              left + horizon,
+              dx: critic-mean / 100 * w,
+              line(
+                length: (audience-mean - critic-mean) / 100 * w,
+                stroke: 1.4pt + luma(55%),
+              ),
+            )
+            #place(
+              left + horizon,
+              dx: critic-mean / 100 * w - 2.5pt,
+              circle(radius: 2.5pt, fill: loss, stroke: none),
+            )
+            #place(
+              left + horizon,
+              dx: audience-mean / 100 * w - 2.5pt,
+              circle(radius: 2.5pt, fill: profit, stroke: none),
+            )
+          ]
+          #v(-7pt)
+          #grid(
+            columns: (1fr, 1fr),
+            align: (left, right),
+            text(fill: loss)[#strong[Critics] (_mean_): #calc.round(critic-mean)],
+            text(fill: profit)[#strong[Audiences] (_mean_): #calc.round(audience-mean)],
+          )
+        ]
+      },
+      anchor: "north-west",
+    ),
   ),
   scales: scales(
     x: scale-continuous(

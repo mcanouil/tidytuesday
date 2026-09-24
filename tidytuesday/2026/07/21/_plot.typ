@@ -1,8 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // One row per account in the near-death experience archive. The Greyson score and
 // the eight theme flags come from the narrative text rather than from an
@@ -20,20 +17,6 @@
 #let threshold = 7
 #let scale-max = 32
 
-// The eight coded themes, each with the gloss the axis carries beside its column
-// name. This order is the source order. The rows sort by how many accounts carry
-// each theme.
-#let theme-specs = (
-  (col: "ai_clinical", gloss: "clinical crisis"),
-  (col: "ai_obe", gloss: "out-of-body"),
-  (col: "ai_unity", gloss: "oneness, unity"),
-  (col: "ai_esp", gloss: "extrasensory perception"),
-  (col: "ai_hellish", gloss: "distressing, hellish"),
-  (col: "ai_world_future", gloss: "the world's future"),
-  (col: "ai_past_lives", gloss: "past lives"),
-  (col: "ai_aliens", gloss: "aliens"),
-)
-
 // Every account carrying a score: the denominator behind the headline share.
 #let scored = raw.map(r => score-of(r.greyson_score)).filter(s => s != none)
 #let n-accounts = raw.len()
@@ -46,7 +29,20 @@
 // One pass per theme, collecting the scores of the accounts that carry it. An
 // account can carry several themes, so it appears in several rows. Commonest
 // first: the panel is built upright and flipped, so slot 1 lands at the bottom.
-#let rows = theme-specs.map(spec => {
+//
+// The eight coded themes, each with the gloss the axis carries beside its column
+// name. This order is the source order. The rows sort by how many accounts carry
+// each theme.
+#let rows = (
+  (col: "ai_clinical", gloss: "clinical crisis"),
+  (col: "ai_obe", gloss: "out-of-body"),
+  (col: "ai_unity", gloss: "oneness, unity"),
+  (col: "ai_esp", gloss: "extrasensory perception"),
+  (col: "ai_hellish", gloss: "distressing, hellish"),
+  (col: "ai_world_future", gloss: "the world's future"),
+  (col: "ai_past_lives", gloss: "past lives"),
+  (col: "ai_aliens", gloss: "aliens"),
+).map(spec => {
   let s = raw
     .filter(r => r.at(spec.col) == "TRUE")
     .map(r => score-of(r.greyson_score))
@@ -69,19 +65,7 @@
 #let biggest = rows.first()
 #let thinnest = rows.last()
 
-// One point per account per theme it carries. Colour encodes one thing: whether
-// the account reaches the threshold.
 #let bands = ("below", "at or above")
-#let points = ()
-#for (i, t) in rows.enumerate() {
-  for s in t.scores {
-    points.push((
-      slot: slot-of(i),
-      score: s,
-      band: if s >= threshold { bands.last() } else { bands.first() },
-    ))
-  }
-}
 
 // The subtitle claims no theme shifts the middle, so a median crossing the
 // threshold fails the render.
@@ -99,7 +83,6 @@
 // colour. Both clear the checks on both surfaces.
 #let above-col = rgb("#c93b4c") // crimson: reaches the diagnostic threshold
 #let below-col = rgb("#9a8f80") // warm neutral: the rest of the archive
-#let rule-col = rgb("#8a8f96") // the row medians, a mark rather than a category
 
 // A public-record sans for the prose, and a data face for the column names,
 // because the row labels are columns of the dataset. Both are vendored in
@@ -114,29 +97,18 @@
   set text(fill: fill) if fill != none
   text(font: body-font, size: size, weight: weight)[#body]
 }
-#let col-name(name, size: 8pt) = text(
-  font: mono-font, size: size, weight: "medium",
-)[#name]
+#let col-name(name, size) = text(font: mono-font, size: size, weight: "medium")[#name]
 
-// Two-line tick label: the column name as it appears in the data, then the gloss,
-// the number of accounts, and how many reach the threshold. Those counts do the
-// work of a legend.
-#let row-label(t) = box(inset: (right: 3pt))[
-  #set align(right)
-  #set par(leading: 2pt)
-  #col-name(t.col, size: 7.5pt) \
-  #note(size: 6pt)[#t.gloss · n #t.n, #t.above at #sym.gt.eq #threshold]
-]
-
-// Each row's median, as a rule across its own swarm. Sized in data units off the
-// swarm width, so it tracks the rows.
 #let swarm-width = 0.32
-#let median-marks = rows.enumerate().map(((i, t)) => (
-  slot: slot-of(i), median: t.median,
-))
 
 #plot(
-  data: points,
+  // One point per account per theme it carries. Colour encodes one thing:
+  // whether the account reaches the threshold.
+  data: rows.enumerate().map(((i, t)) => t.scores.map(s => (
+    slot: slot-of(i),
+    score: s,
+    band: if s >= threshold { bands.last() } else { bands.first() },
+  ))).join(),
   mapping: aes(x: "slot", y: "score", fill: "band", alpha: "band"),
   layers: (
     // The threshold: the line almost nothing crosses. Drawn half a point below 7,
@@ -151,10 +123,13 @@
       size: 1.6pt, stroke: 0pt,
       position: position-beeswarm(width: swarm-width),
     ),
+    // Each row's median, as a rule across its own swarm, in a neutral that
+    // reads as a mark rather than a category. Sized in data units off the swarm
+    // width, so it tracks the rows.
     geom-errorbarh(
-      data: median-marks,
+      data: rows.enumerate().map(((i, t)) => (slot: slot-of(i), median: t.median)),
       mapping: aes(x: "slot", xmin: "median", xmax: "median"),
-      inherit-aes: false, height: swarm-width, stroke: 2pt, colour: rule-col,
+      inherit-aes: false, height: swarm-width, stroke: 2pt, colour: rgb("#8a8f96"),
     ),
     // Both rules are labelled in the empty band above the top row, so the panel
     // needs no legend.
@@ -171,7 +146,7 @@
     // One callout in the empty tail, where the scores the scale was built for
     // would sit.
     annotate(
-      "typst", x: n-rows - 0, y: 11,
+      "typst", x: n-rows, y: 11,
       label: box(width: 8.4cm)[
         #note(fill: above-col, size: 9pt, weight: "bold")[
           #n-above of #n-scored scored accounts (#pct-above) reach #threshold.
@@ -187,7 +162,15 @@
   scales: scales(
     x: scale-continuous(
       breaks: range(n-rows).map(slot-of),
-      labels: rows.map(row-label),
+      // Two-line tick label: the column name as it appears in the data, then the
+      // gloss, the number of accounts, and how many reach the threshold. Those
+      // counts do the work of a legend.
+      labels: rows.map(t => box(inset: (right: 3pt))[
+        #set align(right)
+        #set par(leading: 2pt)
+        #col-name(t.col, 7.5pt) \
+        #note(size: 6pt)[#t.gloss · n #t.n, #t.above at #sym.gt.eq #threshold]
+      ]),
       limits: (0.4, n-rows + 0.85),
       expand: (0%, 0%),
     ),
@@ -217,13 +200,13 @@
       #text(fill: below-col.darken(15%), weight: "bold")[below that line], and
       no theme shifts the middle: every row's median sits between
       #median-lo and #median-hi. 
-      Even #col-name(stretch.col, size: 8.5pt), whose
+      Even #col-name(stretch.col, 8.5pt), whose
       tail clears the threshold most often, does so in only #stretch-pct of the
       accounts that carry it.
     ],
     caption: typst([
       #n-accounts accounts, #n-scored of them scored; one dot per account per theme, so an account carrying several themes appears in several rows and the rows are not a partition. \
-      Score and themes are both derived from the narrative text, not from an interview. Rows run from #biggest.n accounts down to #thinnest.n, and #col-name(thinnest.col, size: 6.5pt) supports no inference. \
+      Score and themes are both derived from the narrative text, not from an interview. Rows run from #biggest.n accounts down to #thinnest.n, and #col-name(thinnest.col, 6.5pt) supports no inference. \
       Source: near-death experience archive (TidyTuesday 2026-07-21). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ]),
   ),

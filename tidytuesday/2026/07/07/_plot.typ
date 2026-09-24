@@ -1,52 +1,33 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
 // so this file does not import it.
-// #import "@preview/gribouille:0.7.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
 
 // Group a whole number with thousands separators, e.g. 8258 -> "8,258".
 #let thousands = format-comma(digits: 0)
-#let pct(part, whole) = format-percent(digits: 0)(part / whole)
-// Division limits are stated in pounds. This converts them to whole kilograms,
-// so no weight is typed by hand twice.
-#let kg(lb) = calc.round(lb * 0.45359237)
+#let pct(part, whole) = format-percent()(part / whole)
 
 // Every number below comes from the raw fight table.
 // Source: data/ufc_fights.csv, one row per UFC bout (UFCStats via {fightr}).
-#let raw = csv("data/ufc_fights.csv", row-type: dictionary)
-
-// Canonical division names, longest first, so "Light Heavyweight" matches before
-// "Heavyweight" when scanned inside the raw "weight_class". That column carries
-// prefixes and suffixes such as "UFC ... Title" and " Bout".
-#let div-names = (
-  "Light Heavyweight", "Heavyweight", "Middleweight", "Welterweight",
-  "Lightweight", "Featherweight", "Bantamweight", "Flyweight", "Strawweight",
-)
-#let division-of(wc) = {
-  for n in div-names { if wc.contains(n) { return n } }
-  none
-}
-
-// Collapse the raw "method" strings into the three finish types the chart shows.
-// A disqualification, an overturned result or a stoppage is not a finish, so it
-// is dropped.
-#let finish-of(m) = {
-  if m.starts-with("KO/TKO") { "ko" } else if m.starts-with("Submission") {
-    "sub"
-  } else if m.starts-with("Decision") { "dec" } else { none }
-}
-
 // One pass over the raw fights, counting knockouts, submissions and decisions per
-// gender and division, keyed "Gender|Division". A weight class with no fixed
-// limit has no position on the weight axis, so it is excluded.
-#let no-limit = ("Open Weight", "Catch Weight", "Tournament")
+// gender and division. A weight class with no fixed limit has no position on the
+// weight axis, so it is excluded.
 #let fights = {
-  raw
-    .filter(r => not no-limit.any(w => r.weight_class.contains(w)))
+  csv("data/ufc_fights.csv", row-type: dictionary)
+    .filter(r => not ("Open Weight", "Catch Weight", "Tournament").any(w => r.weight_class.contains(w)))
     .map(r => (
       gender: if r.weight_class.contains("Women's") { "Women" } else { "Men" },
-      division: division-of(r.weight_class),
-      finish: finish-of(r.method),
+      // Canonical division names, longest first, so "Light Heavyweight" matches
+      // before "Heavyweight" when scanned inside the raw "weight_class". That
+      // column carries prefixes and suffixes such as "UFC ... Title" and " Bout".
+      division: (
+        "Light Heavyweight", "Heavyweight", "Middleweight", "Welterweight",
+        "Lightweight", "Featherweight", "Bantamweight", "Flyweight", "Strawweight",
+      ).find(n => r.weight_class.contains(n)),
+      // Collapse the raw "method" strings into the three finish types the chart
+      // shows. A disqualification, an overturned result or a stoppage is not a
+      // finish, so it is dropped.
+      finish: if r.method.starts-with("KO/TKO") { "ko" } else if r.method.starts-with("Submission") {
+        "sub"
+      } else if r.method.starts-with("Decision") { "dec" } else { none },
     ))
     .filter(r => r.division != none and r.finish != none)
 }
@@ -98,87 +79,65 @@
 #let ko-col = rgb("#d55e00") // KO/TKO: the finish that lands hardest
 #let sub-col = rgb("#5f8aa8") // submission: the flat middle, muted so it recedes behind the hero
 #let dec-col = rgb("#a9a198") // decision: no finish, left to the scorecards
-#let seg-edge = rgb("#3333334d") // thin edge so segments split on light or dark paper
 #let body-font = "Fira Sans"
 #let chart-font = "Oswald" // condensed scoreboard face
-#let ring-col = rgb("#7a3300") // burnt vermillion: reads on the pale and the dark paper
-#let ink = rgb("#1c1c1c") // near-black text ink, so nothing on the page is pure #000
-#let paper-white = rgb("#faf6f0") // warm off-white for the KO label, never pure #fff
-#let guide-col = rgb("#2b2b2bcc") // dark neutral for the 50% guide: holds contrast on the vermillion, blue and grey segments alike
 
 // Men on top, women below, lightest to heaviest in each group, so the knockout
 // wedge widens downward. A one-row gap separates the two genders.
 #let gap = 1
-#let slot(r) = if r.gender == "Men" { r.order } else { r.order + gap }
 #let n-slots = spec.len() + gap
-#let ypos(r) = n-slots - slot(r) + 1
+#let ypos(r) = n-slots - (if r.gender == "Men" { r.order } else { r.order + gap }) + 1
 #let half = 0.38
 
-// Each bar is three segments from 0 to 100 percent: knockout at the left edge,
-// then submission, then decision.
-#let segs = ()
-#for r in rows {
-  let y = ypos(r)
-  let ko-p = 100 * r.ko / r.n
-  let sub-p = 100 * r.sub / r.n
-  segs.push((xmin: 0, xmax: ko-p, ymin: y - half, ymax: y + half, cat: "KO/TKO"))
-  segs.push((xmin: ko-p, xmax: ko-p + sub-p, ymin: y - half, ymax: y + half, cat: "Submission"))
-  segs.push((xmin: ko-p + sub-p, xmax: 100, ymin: y - half, ymax: y + half, cat: "Decision"))
-}
-
-// Two-line tick label: the division name over its gender and weight limit, so
-// the axis states the gender and the ordering itself.
-#let y-breaks = rows.map(r => ypos(r))
-#let y-labels = rows.map(r => box(inset: (right: 2pt))[
-  #set align(right)
-  #text(font: chart-font, size: 9pt, weight: "bold")[#upper(r.class)] #text(font: body-font, size: 6.5pt, fill: dec-col.darken(20%))[#r.gender · #r.lb lb (#kg(r.lb) kg)]
-])
-
-#let note(body, fill: rgb("#f4f4f4"), size: 7.5pt, weight: "regular", font: body-font) = text(
-  size: size,
-  fill: fill,
-  font: font,
-  weight: weight,
-)[#body]
-
-// Per-row value labels on their own tables, one mark per division. The knockout
-// share sits white on the vermillion wedge, and the decision share closes each
-// bar in dark ink on the grey.
-#let ko-labels = rows.map(r => (
-  x: (100 * r.ko / r.n) / 2,
-  y: ypos(r),
-  label: text(font: chart-font, fill: paper-white, weight: "bold", size: 9.5pt)[#pct(r.ko, r.n)],
-))
-#let dec-labels = rows.map(r => (
-  x: 100 - (100 * r.dec / r.n) / 2,
-  y: ypos(r),
-  label: text(font: chart-font, fill: rgb("#3a352f"), size: 8pt)[#pct(r.dec, r.n)],
-))
-
 #plot(
-  data: segs,
+  // Each bar is three segments from 0 to 100 percent: knockout at the left edge,
+  // then submission, then decision.
+  data: rows.map(r => {
+    let y = ypos(r)
+    let ko-p = 100 * r.ko / r.n
+    let sub-p = 100 * r.sub / r.n
+    (
+      (xmin: 0, xmax: ko-p, ymin: y - half, ymax: y + half, cat: "KO/TKO"),
+      (xmin: ko-p, xmax: ko-p + sub-p, ymin: y - half, ymax: y + half, cat: "Submission"),
+      (xmin: ko-p + sub-p, xmax: 100, ymin: y - half, ymax: y + half, cat: "Decision"),
+    )
+  }).join(),
   mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax", fill: "cat"),
   layers: (
-    geom-rect(stroke: 0.4pt, colour: seg-edge),
+    // Thin edge so segments split on light or dark paper.
+    geom-rect(stroke: 0.4pt, colour: rgb("#3333334d")),
     // A dashed line at the halfway mark, which only the men's heavyweight
     // knockout wedge passes. Dark neutral, so it holds across all three
     // segment colours.
-    geom-vline(xintercept: 50, stroke: 0.8pt, colour: guide-col, linetype: "dashed", inherit-aes: false),
-    // The knockout share, white on vermillion, on every bar.
-    geom-typst(data: ko-labels, mapping: aes(x: "x", y: "y", label: "label"), inherit-aes: false),
-    // The decision share, dark ink on the quiet grey, closing each bar at 100%.
-    geom-typst(data: dec-labels, mapping: aes(x: "x", y: "y", label: "label"), inherit-aes: false),
+    geom-vline(xintercept: 50, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
+    // Per-row value labels, one mark per division. The knockout share sits in
+    // warm off-white on the vermillion wedge, and the decision share closes each
+    // bar in dark ink on the quiet grey at 100%.
+    geom-typst(
+      data: rows.map(r => (
+        x: (100 * r.ko / r.n) / 2,
+        y: ypos(r),
+        label: text(font: chart-font, fill: rgb("#faf6f0"), weight: "bold", size: 9.5pt)[#pct(r.ko, r.n)],
+      )) + rows.map(r => (
+        x: 100 - (100 * r.dec / r.n) / 2,
+        y: ypos(r),
+        label: text(font: chart-font, fill: rgb("#3a352f"), size: 8pt)[#pct(r.dec, r.n)],
+      )),
+      mapping: aes(x: "x", y: "y", label: "label"),
+      inherit-aes: false,
+    ),
     // An accent ring traces the men's heavyweight knockout wedge, tying its
-    // callout to the data without recolouring the segment.
+    // callout to the data without recolouring the segment. Burnt vermillion reads
+    // on the pale and the dark paper.
     annotate(
       "rect",
       xmin: 0, xmax: 100 * m-heavy.ko / m-heavy.n, ymin: ypos(m-heavy) - half, ymax: ypos(m-heavy) + half,
-      fill: none, stroke: 1.3pt, colour: ring-col, clip: false,
+      fill: none, stroke: 1.3pt, colour: rgb("#7a3300"), clip: false,
     ),
     // One callout, in the gutter the x-scale expansion opens, aligned to the
     // heavyweight bar so it never lands on the data. Vermillion reads on both
     // surfaces.
-    annotate("typst", x: 0, y: ypos(m-heavy) - 0.9, label: box(width: 9cm)[#note(fill: ko-col, size: 7.5pt, weight: "bold")[Over half of men's heavyweight bouts (#pct(m-heavy.ko, m-heavy.n)) end in a knockout.]], anchor: "west", clip: false),
+    annotate("typst", x: 0, y: ypos(m-heavy) - 0.9, label: box(width: 9cm)[#text(size: 7.5pt, fill: ko-col, font: body-font, weight: "bold")[Over half of men's heavyweight bouts (#pct(m-heavy.ko, m-heavy.n)) end in a knockout.]], anchor: "west", clip: false),
   ),
   scales: scales(
     x: scale-continuous(
@@ -190,8 +149,14 @@
     ),
     y: scale-continuous(
       name: none,
-      breaks: y-breaks,
-      labels: y-labels,
+      breaks: rows.map(ypos),
+      // Two-line tick label: the division name over its gender and weight limit
+      // (converted from pounds to whole kilograms), so the axis states the gender
+      // and the ordering itself.
+      labels: rows.map(r => box(inset: (right: 2pt))[
+        #set align(right)
+        #text(font: chart-font, size: 9pt, weight: "bold")[#upper(r.class)] #text(font: body-font, size: 6.5pt, fill: dec-col.darken(20%))[#r.gender · #r.lb lb (#calc.round(r.lb * 0.45359237) kg)]
+      ]),
       limits: (0.4, n-slots + 1),
       expand: (0%, 0%),
     ),
