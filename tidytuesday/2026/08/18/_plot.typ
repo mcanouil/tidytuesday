@@ -85,8 +85,10 @@
 #let spread-corr = {
   let xs = ordered.map(s => s.mean)
   let ys = ordered.map(s => s.sd)
-  let dx = xs.map(x => x - mean(xs).y)
-  let dy = ys.map(y => y - mean(ys).y)
+  let mx = mean(xs).y
+  let my = mean(ys).y
+  let dx = xs.map(x => x - mx)
+  let dy = ys.map(y => y - my)
   let cov = dx.zip(dy).map(((a, b)) => a * b).sum()
   cov / calc.sqrt(dx.map(d => d * d).sum() * dy.map(d => d * d).sum())
 }

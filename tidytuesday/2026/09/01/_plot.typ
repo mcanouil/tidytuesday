@@ -169,6 +169,8 @@
     // colour as a fill value and train the discrete fill scale on it.
     geom-rect(
       data: ((xmin: first-bin - 20, xmax: last-bin + bin-width + 20, ymin: -215, ymax: 0),),
+      mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
+      inherit-aes: false,
       fill: water,
       alpha: 0.1,
       stroke: none,
@@ -198,6 +200,7 @@
         out
       },
       mapping: aes(x: "x", y: "y"),
+      inherit-aes: false,
       colour: category-colours.castle.darken(40%),
       stroke: 0.9pt,
     ),

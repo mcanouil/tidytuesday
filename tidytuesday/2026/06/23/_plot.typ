@@ -59,10 +59,10 @@
     // Leo XIII's 86 encyclicals by year of his reign (1-25). The inset shows
     // that his output held across the whole pontificate.
     #plot(
-      data: range(1, 26).map(y => (
-        yr: y,
-        n: raw.filter(r => r.pope == leo-name and r.pontificate_year == str(y)).len(),
-      )),
+      data: {
+        let leo = raw.filter(r => r.pope == leo-name)
+        range(1, 26).map(y => (yr: y, n: leo.filter(r => r.pontificate_year == str(y)).len()))
+      },
       mapping: aes(x: "yr", y: "n"),
       layers: (geom-col(fill: accent, width: 0.7),),
       scales: scales(
