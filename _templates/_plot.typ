@@ -1,23 +1,16 @@
-// Gribouille is imported by the typst-render preamble (see assets/typst/_preamble.typ);
-// importing it again here is redundant.
-// #import "@preview/gribouille:0.6.0": *
-// #import "@local/gribouille:0.0.0": *
-// #set page(width: 18cm, height: 9.45cm, margin: 0cm)
+// Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
+// so this file does not import it.
 
-#let data = csv("__CSVPATH__", row-type: dictionary)
-
-// TODO: map real column names from the CSV above.
+// TODO: map the real column names from this CSV.
 #plot(
-  data: data,
+  data: csv("__CSVPATH__", row-type: dictionary),
   mapping: aes(x: "x-column", y: "y-column"),
   layers: (geom-point(),),
-  // Scales are keyed by aesthetic through `scales()`, e.g.:
-  // scales: scales(
-  //   x: scale-continuous(name: "X"),
-  //   y: scale-continuous(name: "Y"),
-  // ),
   labels: labels(
     title: "__TITLE__",
+    caption: [
+      Source: TidyTuesday __DATE__. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
+    ],
     x: "x-column",
     y: "y-column",
   ),

@@ -53,7 +53,7 @@ for name in "${csv_names[@]}"; do
 	curl -fsSL "${url}" -o "${dir}/data/${name}"
 done
 
-csv_path="${dir}/data/${csv_names[0]}"
+csv_path="data/${csv_names[0]}"
 # Deliberate TODO placeholder so the generic title is never shipped unedited;
 # replace it with the figure's actual headline finding before publishing.
 title="TODO: figure title (TidyTuesday ${date_arg})"
@@ -63,6 +63,7 @@ order="${year}${month}${day}"
 sed \
 	-e "s|__CSVPATH__|${csv_path}|g" \
 	-e "s|__TITLE__|${title}|g" \
+	-e "s|__DATE__|${date_arg}|g" \
 	_templates/_plot.typ >"${dir}/_plot.typ"
 
 sed \
