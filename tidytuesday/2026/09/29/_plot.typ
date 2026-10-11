@@ -68,16 +68,16 @@
   ymax: c.row + half,
 ))
 
-#let strong(c, body) = if c.city in highlighted { text(weight: "bold", body) } else { body }
+#let emphasise(c, body) = if c.city in highlighted { text(weight: "bold", body) } else { body }
 #let names = rows.map(c => (
   x: -0.6,
   y: c.row,
-  content: text(font: body-font, size: 6.5pt, fill: ink)[#strong(c, c.city)],
+  content: text(font: body-font, size: 6.5pt, fill: ink)[#emphasise(c, c.city)],
 ))
 #let values = rows.map(c => (
   x: c.rate + 1,
   y: c.row,
-  content: box(fill: paper, inset: 1pt, text(font: body-font, size: 5.5pt, fill: cross)[#strong(c, rate-label(c.rate))]),
+  content: box(fill: paper, inset: 1pt, text(font: body-font, size: 5.5pt, fill: cross)[#emphasise(c, rate-label(c.rate))]),
 ))
 
 // The second fact, in a column of its own: how many people live within 1 km of
@@ -86,19 +86,19 @@
 #let nears = rows.map(c => (
   x: near-x,
   y: c.row,
-  content: text(font: body-font, size: 6pt, fill: ink.transparentize(25%))[#strong(c, share-label(c.near))],
+  content: text(font: body-font, size: 6pt, fill: ink.transparentize(25%))[#emphasise(c, share-label(c.near))],
 ))
 
-#let top = rows.len() + 1.1
+#let top-y = rows.len() + 1.1
 #let headers = (
   (
     x: national-rate,
-    y: top,
+    y: top-y,
     content: text(font: body-font, size: 6pt, fill: ink)[France: #rate-label(national-rate)],
   ),
   (
     x: near-x,
-    y: top,
+    y: top-y,
     content: align(center, text(font: body-font, size: 6pt, fill: ink)[within 1 km \ of a pharmacy]),
   ),
 )
@@ -114,7 +114,7 @@
       fill: hatch,
     ),
     geom-segment(
-      data: ((x: national-rate, xend: national-rate, y: 0.5, yend: top),),
+      data: ((x: national-rate, xend: national-rate, y: 0.5, yend: top-y),),
       mapping: aes(xend: "xend", yend: "yend"),
       colour: ink,
       stroke: 0.6pt,
@@ -143,7 +143,7 @@
       breaks: (0, 10, 20),
       expand: (0%, 0%),
     ),
-    y: scale-continuous(limits: (0.4, top + 1.6), breaks: (), expand: (0%, 0%)),
+    y: scale-continuous(limits: (0.4, top-y + 1.6), breaks: (), expand: (0%, 0%)),
   ),
   guides: guides(default: none),
   labels: labels(
