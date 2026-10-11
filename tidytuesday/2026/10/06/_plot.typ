@@ -64,13 +64,13 @@
 // they are stacked in a column there, in order of price, with the lab values
 // in their labels.
 #let stack-step = 0.75
+#let soybean-x = calc.min(..soybean.map(b => b.linoleic))
 #let marks = (
-  pure.map(b => (..b, x: b.linoleic, y: b.palmitoleic))
-    + suspected.map(b => (..b, x: b.linoleic, y: b.palmitoleic))
+  (pure + suspected).map(b => (..b, x: b.linoleic, y: b.palmitoleic))
     + soybean
       .sorted(key: b => b.price)
       .enumerate()
-      .map(((i, b)) => (..b, x: calc.min(..soybean.map(s => s.linoleic)), y: 0.2 + i * stack-step))
+      .map(((i, b)) => (..b, x: soybean-x, y: 0.2 + i * stack-step))
 ).map(b => (..b, content: glyph(b.purity)))
 
 #let money(v) = "$" + format-number(digits: 2)(v)
@@ -87,12 +87,15 @@
 
 // R1 sits just below and left of U4, so its label goes on its left.
 #let left-labels = ("R1",)
-#let suspected-labels = suspected.map(b => (
-  x: b.linoleic + if b.code in left-labels { -1.2 } else { 1.2 },
-  y: b.palmitoleic,
-  content: reading(b),
-  side: if b.code in left-labels { "east" } else { "west" },
-))
+#let suspected-labels = suspected.map(b => {
+  let left = b.code in left-labels
+  (
+    x: b.linoleic + if left { -1.2 } else { 1.2 },
+    y: b.palmitoleic,
+    content: reading(b),
+    side: if left { "east" } else { "west" },
+  )
+})
 
 #let notes = (
   (
