@@ -34,16 +34,15 @@
   message: "a suspected bottle now has as much palmitoleic acid as a pure one",
 )
 
-// A lab notebook: white paper, a pale graph-paper grid and dark ink. The marks
-// are the emoji themselves, so the fruit, the bean and the flower carry their
-// own colours. The figure keeps its colours on the light and the dark site
-// theme alike.
-#let paper = rgb("#fbfbf6")
-#let ink = rgb("#1d2b2a")
-#let grid = rgb("#cfe1dc")
-#let flesh = rgb("#c9dc8a")
-#let bean = rgb("#a0522d")
-#let flower = rgb("#b07f00")
+// A lab notebook: a graph-paper grid drawn in the ink of the theme that
+// typst-render resolved, so the figure follows the light and dark toggle of the
+// site. The marks are the emoji themselves, so the fruit, the bean and the
+// flower carry their own colours. The text accents are mixed a quarter towards
+// the ink so they keep their contrast on both grounds.
+#let ink = theme-minimal().at("ink", default: black)
+#let flesh = rgb("#a9c25a")
+#let bean = color.mix((rgb("#b5603a"), 75%), (ink, 25%))
+#let flower = color.mix((rgb("#c99400"), 75%), (ink, 25%))
 
 // IBM Plex Sans for the title, IBM Plex Mono for every reading, as on a lab
 // printout. Both, and the emoji font, are vendored in assets/fonts.
@@ -57,7 +56,7 @@
 // The range the dataset's dictionary gives for authentic avocado oil, filled
 // with a stipple of avocado flesh.
 #let stipple = tiling(size: (3pt, 3pt))[
-  #place(dx: 1pt, dy: 1pt, circle(radius: 0.5pt, fill: flesh.darken(10%)))
+  #place(dx: 1pt, dy: 1pt, circle(radius: 0.5pt, fill: flesh))
 ]
 #let typical = (xmin: 9, xmax: 20, ymin: 5, ymax: 9)
 
@@ -128,7 +127,7 @@
       mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
       inherit-aes: false,
       fill: stipple,
-      colour: flesh.darken(20%),
+      colour: flesh,
       stroke: 0.6pt,
     ),
     geom-vline(xintercept: soybean-line, colour: bean, stroke: 0.6pt, linetype: "dashed"),
@@ -173,15 +172,13 @@
     y: "Palmitoleic acid (C16:1)",
   ),
   theme: theme-minimal(
-    ink: ink,
-    paper: paper,
     plot-title: element-text(font: title-font, size: 16pt, weight: "bold", colour: ink),
     plot-subtitle: element-text(font: title-font, size: 7.5pt, colour: ink),
     plot-caption: element-text(font: title-font, size: 5.5pt, colour: ink.transparentize(30%)),
     axis-text: element-text(font: mono-font, size: 6pt, colour: ink.transparentize(25%)),
     axis-title: element-text(font: mono-font, size: 6.5pt, colour: ink),
-    panel-grid-major: element-line(colour: grid, stroke: 0.5pt),
-    panel-grid-minor: element-line(colour: grid.lighten(40%), stroke: 0.3pt),
+    panel-grid-major: element-line(colour: ink.transparentize(82%), stroke: 0.5pt),
+    panel-grid-minor: element-line(colour: ink.transparentize(92%), stroke: 0.3pt),
   ),
   width: auto,
   height: auto,
