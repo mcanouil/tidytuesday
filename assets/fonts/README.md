@@ -7,7 +7,9 @@ These files are passed to the Typst CLI through `extensions.typst-render.font-pa
 
 Every family below is licensed under the SIL Open Font License 1.1.
 Each family's `OFL.txt` is kept alongside its font files, as the licence requires.
-All files were taken from [`google/fonts`](https://github.com/google/fonts).
+All files were taken from [`google/fonts`](https://github.com/google/fonts), except Noto Color Emoji, which comes from [`googlefonts/noto-emoji`](https://github.com/googlefonts/noto-emoji).
+Noto Color Emoji is the COLRv1 build without flags.
+Its glyphs are vectors, so they stay sharp in the SVG output, and the file is a third of the size of the bitmap build.
 
 | Family | Files | Upstream | Used by |
 | --- | --- | --- | --- |
@@ -18,7 +20,7 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 | Alegreya | `Alegreya[wght].ttf`, `Alegreya-Italic[wght].ttf` | [`ofl/alegreya`](https://github.com/google/fonts/tree/main/ofl/alegreya) | 2026-07-14 |
 | Alegreya Sans | `AlegreyaSans-Regular.ttf`, `AlegreyaSans-Bold.ttf`, `AlegreyaSans-Italic.ttf`, `AlegreyaSans-BoldItalic.ttf` | [`ofl/alegreyasans`](https://github.com/google/fonts/tree/main/ofl/alegreyasans) | 2026-07-14, 2026-09-15 |
 | Public Sans | `PublicSans[wght].ttf` | [`ofl/publicsans`](https://github.com/google/fonts/tree/main/ofl/publicsans) | 2026-07-21 |
-| IBM Plex Mono | `IBMPlexMono-Regular.ttf`, `IBMPlexMono-Medium.ttf` | [`ofl/ibmplexmono`](https://github.com/google/fonts/tree/main/ofl/ibmplexmono) | 2026-07-21 |
+| IBM Plex Mono | `IBMPlexMono-Regular.ttf`, `IBMPlexMono-Medium.ttf` | [`ofl/ibmplexmono`](https://github.com/google/fonts/tree/main/ofl/ibmplexmono) | 2026-07-21, 2026-10-06 |
 | Archivo | `Archivo[wdth,wght].ttf` | [`ofl/archivo`](https://github.com/google/fonts/tree/main/ofl/archivo) | 2026-07-28 |
 | Lato | `Lato-Regular.ttf`, `Lato-Bold.ttf` | [`ofl/lato`](https://github.com/google/fonts/tree/main/ofl/lato) | 2026-07-28 |
 | Cinzel | `Cinzel[wght].ttf` | [`ofl/cinzel`](https://github.com/google/fonts/tree/main/ofl/cinzel) | 2026-09-01 |
@@ -26,6 +28,9 @@ All files were taken from [`google/fonts`](https://github.com/google/fonts).
 | Karla | `Karla[wght].ttf` | [`ofl/karla`](https://github.com/google/fonts/tree/main/ofl/karla) | 2026-09-08 |
 | Frank Ruhl Libre | `FrankRuhlLibre[wght].ttf` | [`ofl/frankruhllibre`](https://github.com/google/fonts/tree/main/ofl/frankruhllibre) | 2026-09-15 |
 | Barlow | `Barlow-Regular.ttf`, `Barlow-SemiBold.ttf`, `Barlow-Bold.ttf` | [`ofl/barlow`](https://github.com/google/fonts/tree/main/ofl/barlow) | 2026-09-22 |
+| Spectral | `Spectral-Regular.ttf`, `Spectral-Italic.ttf`, `Spectral-Bold.ttf` | [`ofl/spectral`](https://github.com/google/fonts/tree/main/ofl/spectral) | 2026-09-29 |
+| IBM Plex Sans | `IBMPlexSans[wdth,wght].ttf` | [`ofl/ibmplexsans`](https://github.com/google/fonts/tree/main/ofl/ibmplexsans) | 2026-09-29, 2026-10-06 |
+| Noto Color Emoji | `Noto-COLRv1-noflags.ttf` | [`2D/fonts`](https://github.com/googlefonts/noto-emoji/tree/main/2D/fonts) in `googlefonts/noto-emoji` | 2026-09-29, 2026-10-06 |
 
 Files in square brackets are variable fonts.
 Typst 0.15 reads their weight axis, so one file covers every weight a figure asks for.
