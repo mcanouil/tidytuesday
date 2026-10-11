@@ -1,0 +1,63 @@
+---
+engine: markdown
+title: "Two Fatty Acids Give Away Every Fake Avocado Oil"
+description: "Twenty-two bottles of avocado oil on a lab-notebook grid, drawn as avocados, sunflowers and beans, where one fatty acid catches the soybean fakes and another catches the blends the first one misses."
+date: "2026-10-06"
+order: 20261006
+image: images/featured-light.png
+image-alt: "A scatter plot on white graph paper. The horizontal axis is linoleic acid from 0 to 70% of fatty acids and the vertical axis is palmitoleic acid from 0 to 10%. Each bottle is drawn as an emoji. Sixteen avocado emoji, the bottles judged pure, cluster at the top left between about 10 and 19% linoleic and 4 and 9% palmitoleic, almost all inside a stippled green box labelled typical avocado oil. Three sunflower emoji, the suspected sunflower or safflower blends, sit just below them at the same linoleic values but with palmitoleic between 0.6 and 2%, labelled R1 refined at 0.44 dollars per fluid ounce, U4 with no grade at 0.47 dollars and U5 with no grade at 0.79 dollars. A note says their linoleic looks normal but their palmitoleic is too low. Far to the right, past a dashed line at 50% linoleic labelled soybean oil, three bean emoji are stacked near 55% linoleic and 0% palmitoleic. They are labelled EV3 extra virgin at 0.65 dollars, EV6 extra virgin at 0.49 dollars and U6 with no grade at 0.34 dollars."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-10-06
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Two Fatty Acids Give Away Every Fake Avocado Oil"
+```
+
+Data: [TidyTuesday 2026-10-06](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-10-06).
+
+In 2020, Hilary Green and Selina Wang at UC Davis tested 22 bottles of avocado oil sold in the US.
+They measured each oil's fatty acids, sterols and vitamin E, and compared the profile with what authentic avocado oil looks like.
+Sixteen bottles were judged pure.
+Three were soybean oil, and three more looked like blends with sunflower or safflower oil.
+
+The lab used the whole profile, but two fatty acids are enough to tell the story.
+Soybean oil is more than half linoleic acid, while avocado oil sits between about 10% and 20%.
+The three soybean bottles are at 54% to 55%, far from everything else.
+The sunflower or safflower blends are harder to spot, because their linoleic acid looks normal.
+Palmitoleic acid gives them away: avocado oil has plenty of it, the other oils have almost none, and every blend has less than the least of the 16 pure bottles.
+
+It works like a small biomarker panel.
+Each marker catches one kind of fake, and neither would catch both on its own.
+
+Two of the three soybean bottles were labelled extra virgin.
+They were also the two cheapest extra virgin bottles, at $0.65 and $0.49 a fluid ounce, against $1.29 to $2.35 for the extra virgin oils that were real.
+Being pure did not mean being fresh, though: 14 of the 16 pure bottles had oxidised before their best-by date.
+
+The same lab came back in 2026 with processed foods.
+Of 54 lots of chips, mayonnaise and dressings made with avocado oil, 48 failed the authenticity test.
+Of 20 lots made with olive oil, which has been regulated for decades, only one failed.
+That data is in the folder too, but the figure stays with the bottles.
+
+Some cautions.
+The bottles are a small sample bought for one study, not a survey of the market.
+"Suspected" means the profile fell outside the authentic range without proof of a specific adulterant.
+The stippled box is the typical range given in the dataset's notes, and one pure bottle sits just below it.
