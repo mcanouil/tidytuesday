@@ -33,13 +33,14 @@
 #assert(lille.rate / paris.rate >= 7, message: "Lille no longer has seven times the mapped pharmacies of Paris")
 #assert(cities.all(c => c.rate < national-rate), message: "a city now reaches the national rate")
 
-// Paper and ink from a dispensing label, with the green of the French pharmacy
-// cross for what was mapped and a warm grey hatch for what was not. The figure
-// keeps its colours on the light and the dark site theme alike.
-#let paper = rgb("#f6f3ea")
-#let ink = rgb("#1f2a24")
-#let cross = rgb("#0b8a4b")
-#let gap = rgb("#b9ae98")
+// Ink and paper come from the theme that typst-render resolved, so the figure
+// follows the light and dark toggle of the site. The green of the French
+// pharmacy cross marks what was mapped and a warm grey hatch what was not; the
+// green is mixed a quarter towards the ink so it keeps its contrast on both.
+#let ink = theme-minimal().at("ink", default: black)
+#let paper = theme-minimal().at("paper", default: white)
+#let cross = color.mix((rgb("#0b9a52"), 75%), (ink, 25%))
+#let gap = rgb("#a89c84")
 
 // Spectral comes from Production Type, a Paris foundry; IBM Plex Sans keeps
 // the small labels plain. Both, and the emoji font, are vendored in assets/fonts.
@@ -156,8 +157,6 @@
     y: none,
   ),
   theme: theme-minimal(
-    ink: ink,
-    paper: paper,
     plot-title: element-text(font: title-font, size: 16pt, weight: "bold", colour: ink),
     plot-subtitle: element-text(font: body-font, size: 7.5pt, colour: ink),
     plot-caption: element-text(font: body-font, size: 5.5pt, colour: ink.transparentize(30%)),
