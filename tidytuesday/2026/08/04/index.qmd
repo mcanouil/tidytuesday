@@ -35,14 +35,14 @@ categories: [2026]
 Data: [TidyTuesday 2026-08-04](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-08-04).
 
 This week's table is a mirror: Lesotho's wool exports are read off the countries that bought them, month by month, from 2010 to 2024.
-Two things move at once, and the chart is an attempt to hold both.
+Two things move at once, and the chart shows both.
 The first is where the wool went, and for six years the answer was entirely South Africa, whose Port Elizabeth auctions took every kilo.
 The second is when it arrived, and that used to be November, straight off the southern spring shearing.
 
 Then Lesotho's 2018 wool and mohair regulations routed the national clip through a broker at home rather than across the border, and both numbers moved together.
 78% of the 2018 clip landed in China, and by 2019 the average consignment did not arrive until late April, 4.4 months later in the year than in 2010.
 A longer route through a new intermediary shows up as a later arrival, which is why the excursion runs diagonally rather than straight up.
-The circles shrink along the way, and that is the part worth pausing on: 2018 and 2019 are the two lightest years after 2011, at 2,462 and 3,621 tonnes against 9,626 in 2020.
+The circles shrink along the way: 2018 and 2019 are the two lightest years after 2011, at 2,462 and 3,621 tonnes against 9,626 in 2020.
 The share peak is a share of a badly shrunken clip, so the top of the excursion is not the moment the most wool went east.
 The rules were reversed and the thread came most of the way back, but not all of it: the last four years sit beside the original knot on the calendar while roughly a third of the clip still goes east.
 

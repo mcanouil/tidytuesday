@@ -43,7 +43,7 @@ No vertical cut anywhere along the axis gets more than 69.5% of the two classes 
 Swap one ratio and the picture changes completely.
 Against [O I] rather than [N II], the same two classes barely overlap: a single cut at −0.78 separates 151 of the 154, because every LINER in the survey sits above −0.77 and only three transition objects reach that high.
 Two ratios of the same four elements, measured on the same spectra of the same galaxies, and one of them carries almost all of the information the other is missing.
-The lesson is not that the famous diagram is wrong, but that it is one projection of a classification that was never two-dimensional.
+The famous diagram is one projection of a classification that was never two-dimensional.
 
 Two cautions, and the first is the larger.
 Ho, Filippenko and Sargent defined transition objects partly on [O I]/Hα in the first place, so the right panel is marking its own homework and the 98.1% is a measure of how consistently they applied their own rule, not an independent discovery.

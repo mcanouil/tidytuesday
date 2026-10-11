@@ -36,7 +36,7 @@ Data: [TidyTuesday 2026-06-09](https://github.com/rfordatascience/tidytuesday/tr
 
 Video-game film adaptations have a long reputation for being review-proof.
 The horizontal axis is the Rotten Tomatoes critics' score, the vertical axis is worldwide box office on a logarithmic scale, and the shaded band marks the films that critics called rotten yet that still grossed past one hundred million dollars.
-The band is crowded, which is the whole point: a low score has rarely stopped one of these films from making money.
+The band is crowded: a low score has rarely stopped one of these films from making money.
 
 The biggest earners cluster towards the recent end of the story.
 The Super Mario Bros. Movie sits at the top with about 1.4 billion dollars on a fifty-nine per cent score, and Sonic the Hedgehog 3, the best reviewed of the set at eighty-six per cent, follows well behind it.

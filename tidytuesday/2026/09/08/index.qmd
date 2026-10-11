@@ -36,8 +36,7 @@ Data: [TidyTuesday 2026-09-08](https://github.com/rfordatascience/tidytuesday/tr
 
 The cappuccino index asks a good question: how long does the person who makes the coffee have to work to buy it?
 The answer arrives as a table of 87 countries, each with a time in minutes and seconds, sorted fastest first.
-It reads like a leaderboard.
-For most of its length it is not one.
+It reads like a leaderboard, but for most of its length it is not one.
 
 Twenty-five of the 87 countries were surveyed at exactly one café.
 Forty-one were surveyed at fewer than five.
@@ -49,7 +48,7 @@ Where there are enough cafés, the interval is worth having, and it changes the 
 Australia is genuinely first: 10:04 on 171 cafés, and its interval spans 9:48 to 10:20.
 Italy is second at 11:51, on 15 cafés, and its interval runs from 9:09 to 14:34.
 That reaches below Australia's index and past the fourth-placed country.
-Second place is not a fact about Italy, it is a fact about fifteen cafés.
+Second place says more about fifteen cafés than about Italy.
 
 The clock is the unit of the index, so the figure uses it.
 One turn of the cup is an hour.

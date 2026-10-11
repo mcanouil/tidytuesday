@@ -44,7 +44,6 @@ The right panel is what that costs a reader who stops at the mean.
 Hong Kong and Ghana share a mean band of 6.63, to two decimals, out of 40 nationalities.
 Ghana sends 70.8% of its candidates over 6.5 and Hong Kong 62.2%, a gap of more than eight points hidden inside an identical average.
 Ghana covers half its candidates in two bands and Hong Kong needs four, and the tail is where the two really part: 7.1% of Hong Kong candidates come out below 5.5, against 2.5% of Ghana's.
-Two countries, one average, and a different answer to the only question the number is usually asked to settle.
 
 Three cautions.
 The shares are of each nationality's own candidates and the data carries no candidate counts, so a country that sends a few hundred people counts as much here as one that sends hundreds of thousands, and nothing in the figure is a population estimate.

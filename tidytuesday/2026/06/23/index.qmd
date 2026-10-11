@@ -34,5 +34,5 @@ categories: [2026]
 
 Data: [TidyTuesday 2026-06-23](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-23).
 
-Leo XIII (1878--1903) towers above every other modern pope: 86 encyclicals against Pius XII's 39, the next highest.
-His output is the more striking for being sustained across a 25-year reign rather than concentrated in a few years.
+Leo XIII (1878 to 1903) wrote more encyclicals than any other modern pope: 86, against 39 for Pius XII, the next highest.
+He wrote them across a 25-year reign, not in a few busy years.

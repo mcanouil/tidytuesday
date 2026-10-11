@@ -34,9 +34,10 @@ categories: [2026]
 
 Data: [TidyTuesday 2026-06-16](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-06-16).
 
-Combining births registered across all three UK nations, roughly 4–5 per cent of all distinct names in use each year are registered for both boys and girls — around 400 to 600 names depending on the year.
+Combining births registered across all three UK nations, roughly 4 to 5 per cent of all distinct names in use each year are registered for both boys and girls, around 400 to 600 names depending on the year.
 A name counts here only when at least three babies of each sex were registered with it in the combined UK total for that year, filtering out statistical noise and names suppressed for small counts.
-The shaded area shows each year; the y-axis label pairs the percentage with the approximate count in parentheses so both scales are readable without a dual axis.
+The shaded area shows each year.
+The y-axis label pairs the percentage with the approximate count in parentheses so both scales are readable without a dual axis.
 
 Each label marks the single most-registered gender-neutral name in its window.
 Jordan led in the late 1990s, Cameron took over briefly in the early 2000s, and Charlie then dominated for a full decade.

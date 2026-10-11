@@ -40,7 +40,7 @@ That asymmetry is the oldest and most stubborn feature of the data.
 
 The co-parent line stays close to the floor until the turn of the century.
 Only four countries reserved any leave for the co-parent in 1980, but nineteen did by 2024, as "use it or lose it" quotas spread across the continent.
-The line lifts off after 2000 and reaches roughly five months, about a third of what mothers receive, so the gap closes but only slowly.
+The line lifts off after 2000 and reaches roughly five months, about a third of what mothers receive, so the gap closes only slowly.
 
 The shaded band around each line spans one standard error of the mean, so it widens when countries disagree.
 The mothers band is consistently the wider of the two, a reminder that "European maternity leave" hides very different national choices, and the mean is pulled upward by a few countries with unusually long leave.
@@ -50,4 +50,3 @@ The right panel is a dumbbell chart that makes the national divergence concrete 
 Each country is a pair of dots, one for mothers and one for the co-parent, joined by a bar whose length is the gap between them.
 Spain, Slovakia and the United Kingdom have closed it completely, reserving the same amount for both parents, while at the other end Ireland reserves forty-two months for mothers and barely two for the co-parent.
 France sits in the lower half: sixteen months for mothers but only about four for the co-parent, despite matching Spain on maternity leave.
-That is the spread the European average smooths away.
