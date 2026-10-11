@@ -1,0 +1,59 @@
+---
+engine: markdown
+title: "On the Map, Lille Has Seven Times the Pharmacies of Paris"
+description: "Pharmacies per person in the 20 largest French cities, drawn as pill-tipped lollipops against the national rate, with a hatched gap for every pharmacy the open map does not show."
+date: "2026-09-29"
+order: 20260929
+image: images/featured-light.png
+image-alt: "A lollipop chart on a pale paper ground with 20 rows, one per French city, sorted from top to bottom by pharmacies per 100,000 people. Each row has a green stem from zero ending in a pill emoji at the city's value, with the value written beside it. From the pill to a dashed vertical line at 29.5, labelled France, the row is filled with a light diagonal hatch. A right-hand column gives the share of people who live within 1 km of a pharmacy. Lille is at the top in bold, at 16.3 per 100,000 with 60% within 1 km. Bordeaux follows at 10.9 and 46%, then Tours at 8.0 and Strasbourg at 6.2. Most cities sit between 2 and 5. Paris, also in bold, is near the bottom at 2.3 with 23% within 1 km, below Lyon at 2.3 and above Marseille at 2.0, Nancy at 1.8 and Nice at 1.0. No city reaches the national line."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-09-29
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "On the Map, Lille Has Seven Times the Pharmacies of Paris"
+```
+
+Data: [TidyTuesday 2026-09-29](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-09-29).
+
+The Joint Research Centre of the European Commission describes more than 11,000 urban centres worldwide.
+For health, it counts the hospitals and pharmacies found inside each one in 2024, and the share of people who live within 1 km of one.
+Those facilities come from open map data, so a count is what someone mapped, not what exists.
+
+Taken at face value, the French numbers say something odd.
+Lille has 148 pharmacies for about 907,000 people, or 16.3 per 100,000.
+Paris has 210 for 9.3 million, or 2.3 per 100,000.
+That makes Lille seven times better served than Paris, with 60% of its people near a pharmacy against 23% in Paris.
+
+Anyone who has walked through Paris knows that is not true.
+France had 20,242 pharmacies on 1 January 2025, according to the Ordre national des pharmaciens.
+That is about 29.5 for every 100,000 people, and every city in the figure falls well short of it.
+Across all 73 French urban centres in the data, the map finds only 1,004 pharmacies for 23 million people.
+
+So the ranking measures the map, not the pharmacies.
+Lille and Bordeaux look well served because their pharmacies were mapped more fully than elsewhere.
+Paris looks like a desert because most of its pharmacies were not mapped.
+The hatched part of each row is the gap between what the map shows and the national rate.
+
+Some cautions.
+The national rate is a yardstick, not a target for each city, since pharmacies in France are spread by the population of each commune and are not concentrated in cities.
+A city here is the urban centre defined by the Degree of Urbanisation, which can be larger or smaller than the commune with the same name.
+The 20 cities are the largest French urban centres by population in 2025.
