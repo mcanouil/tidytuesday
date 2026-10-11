@@ -62,11 +62,9 @@
 ]
 #let typical = (xmin: 9, xmax: 20, ymin: 5, ymax: 9)
 
-// The three soybean bottles share one point to within a percentage point, so
-// they are stacked in a column there, in order of price, with the lab values
-// in their labels.
+// The three soybean bottles share one palmitoleic value, so each keeps its own
+// linoleic value and they are stacked upwards from there in order of price.
 #let stack-step = 0.75
-#let soybean-x = calc.min(..soybean.map(b => b.linoleic))
 #let soybean-y = soybean.first().palmitoleic
 #assert(soybean.all(b => b.palmitoleic == soybean-y), message: "the soybean bottles no longer share one palmitoleic value")
 #let marks = (
@@ -74,7 +72,7 @@
     + soybean
       .sorted(key: b => b.price)
       .enumerate()
-      .map(((i, b)) => (..b, x: soybean-x, y: 0.2 + i * stack-step))
+      .map(((i, b)) => (..b, x: b.linoleic, y: soybean-y + i * stack-step))
 ).map(b => (..b, content: glyph(b.purity)))
 
 #let money(v) = "$" + format-number(digits: 2)(v)
@@ -83,10 +81,12 @@
   *#b.code* #grade(b), #money(b.price)/fl oz
 ]
 
+// One column of labels just right of the rightmost bean.
+#let soybean-label-x = calc.max(..soybean.map(b => b.linoleic)) + 1.4
 #let soybean-labels = {
   marks
     .filter(b => b.purity == "adulterated")
-    .map(b => (x: b.x + 1.4, y: b.y, content: reading(b)))
+    .map(b => (x: soybean-label-x, y: b.y, content: reading(b)))
 }
 
 // R1 sits just below and left of U4, so its label goes on its left.
@@ -149,7 +149,7 @@
   ),
   scales: scales(
     x: scale-continuous(
-      limits: (0, 70),
+      limits: (0, 73),
       breaks: range(0, 71, step: 10),
       minor-breaks: range(0, 71, step: 2),
       labels: format-number(suffix: "%"),
