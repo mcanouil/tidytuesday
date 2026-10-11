@@ -67,7 +67,6 @@
   ymin: c.row - half,
   ymax: c.row + half,
 ))
-#let pills = rows.map(c => (x: c.rate, y: c.row, content: text(font: emoji-font)[💊]))
 
 #let strong(c, body) = if c.city in highlighted { text(weight: "bold", body) } else { body }
 #let names = rows.map(c => (
@@ -127,7 +126,12 @@
       colour: cross,
       stroke: 1.2pt,
     ),
-    geom-typst(data: pills, mapping: aes(label: "content"), size: 9pt),
+    geom-typst(
+      data: rows,
+      mapping: aes(x: "rate", y: "row"),
+      label: text(font: emoji-font)[💊],
+      size: 9pt,
+    ),
     geom-typst(data: names, mapping: aes(label: "content"), anchor: "east"),
     geom-typst(data: values, mapping: aes(label: "content"), anchor: "west"),
     geom-typst(data: nears, mapping: aes(label: "content"), anchor: "center"),
