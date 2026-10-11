@@ -146,7 +146,7 @@
     title: [On the Map, Lille Has Seven Times the Pharmacies of Paris],
     subtitle: [
       #text(font: emoji-font)[💊] Pharmacies per 100,000 people in the #top-n largest French cities, counted from open map data in 2024. \
-      #text(fill: cross, weight: "semibold")[Lille: #rate-label(lille.rate)], #text(fill: cross, weight: "semibold")[Paris: #rate-label(paris.rate)]. Every city falls short of France's #rate-label(national-rate), and the #box(width: 1.6em, height: 0.8em, fill: hatch, stroke: 0.4pt + gap) gap is what the map is missing.
+      #text(fill: cross, weight: "semibold")[Lille: #rate-label(lille.rate)], #text(fill: cross, weight: "semibold")[Paris: #rate-label(paris.rate)]. France as a whole has #rate-label(national-rate) (dashed line), so the #box(width: 1.6em, height: 0.8em, fill: hatch, stroke: 0.4pt + gap) hatching shows the pharmacies the map missed.
     ],
     caption: [
       A pharmacy counts only where someone mapped it, so a ranking by pharmacies per person ranks the mappers. City boundaries follow the Degree of Urbanisation, not the commune. \
