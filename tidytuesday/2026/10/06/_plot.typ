@@ -10,6 +10,7 @@
   code: r.sample_code,
   grade: r.grade_labeled,
   price: float(r.cost_per_fl_oz),
+  adulterant: r.adulterant,
   purity: r.purity_result,
   linoleic: float(r.c18_2_linoleic_pct),
   palmitoleic: float(r.c16_1_palmitoleic_pct),
@@ -23,6 +24,7 @@
 // Soybean oil is more than half linoleic acid, and the sunflower or safflower
 // blends have less palmitoleic acid than any pure bottle.
 #let soybean-line = 50
+#assert(soybean.all(b => b.adulterant == "soybean oil"), message: "an adulterated bottle is no longer soybean oil")
 #assert(soybean.all(b => b.linoleic > soybean-line), message: "a soybean bottle is now below 50% linoleic acid")
 #assert(
   (pure + suspected).all(b => b.linoleic < soybean-line),
@@ -40,7 +42,7 @@
 // flower carry their own colours. The text accents are mixed a quarter towards
 // the ink so they keep their contrast on both grounds.
 #let ink = theme-minimal().at("ink", default: black)
-#let flesh = rgb("#a9c25a")
+#let flesh = color.mix((rgb("#a9c25a"), 70%), (ink, 30%))
 #let bean = color.mix((rgb("#b5603a"), 75%), (ink, 25%))
 #let flower = color.mix((rgb("#c99400"), 75%), (ink, 25%))
 
@@ -65,6 +67,8 @@
 // in their labels.
 #let stack-step = 0.75
 #let soybean-x = calc.min(..soybean.map(b => b.linoleic))
+#let soybean-y = soybean.first().palmitoleic
+#assert(soybean.all(b => b.palmitoleic == soybean-y), message: "the soybean bottles no longer share one palmitoleic value")
 #let marks = (
   (pure + suspected).map(b => (..b, x: b.linoleic, y: b.palmitoleic))
     + soybean
@@ -167,8 +171,8 @@
       #text(fill: bean, weight: "semibold")[Linoleic acid] catches the #soybean.len() bottles of soybean oil. #text(fill: flower, weight: "semibold")[Palmitoleic acid] catches the #suspected.len() blends it misses.
     ],
     caption: [
-      Each mark is one bottle. The three soybean bottles sit at the same point and are stacked by price. The stippled box is the range the dataset gives for authentic avocado oil. \
-      Purity was judged by UC Davis from the full fatty acid, sterol and vitamin E profile; only two of those readings are drawn here. \
+      Each mark is one bottle. The three soybean bottles all measure #format-number(digits: 1)(soybean-y)% palmitoleic acid, and are stacked upwards by price only so each can be read. \
+      The stippled box is the dataset's range for authentic avocado oil. UC Davis judged purity from the full fatty acid, sterol and vitamin E profile. \
       Source: Green & Wang (2020), _Food Control_ 116, 107328 (TidyTuesday 2026-10-06). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
     x: "Linoleic acid (C18:2), % of fatty acids",
