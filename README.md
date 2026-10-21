@@ -2,7 +2,7 @@
 
 ![TidyTuesday in Typst — weekly figures with Gribouille.](assets/og-card.png)
 
-My weekly [TidyTuesday](https://github.com/rfordatascience/tidytuesday) figures, drawn entirely in [Typst](https://typst.app) with [Gribouille](https://m.canouil.dev/gribouille), a grammar-of-graphics package.
+My weekly [TidyTuesday](https://github.com/rfordatascience/tidytuesday) figures, drawn entirely in [Typst](https://typst.app) with [Gribouille](https://m.canouil.dev/gribouille), a grammar-of-graphics package, and [keisen](https://m.canouil.dev/keisen), a table package.
 
 Live gallery: <https://m.canouil.dev/tidytuesday>.
 
@@ -55,11 +55,13 @@ quarto preview                   # browse locally; figures compile on render
 `new-week.sh` needs [`gh`](https://cli.github.com), `jq`, and `curl`.
 The `pre-render` hook runs `scripts/install-gribouille.sh`, which installs the latest Gribouille development build into Typst's `local` package namespace, pinned to the constant version `0.0.0` so the import in `assets/typst/_preamble.typ` never changes (network required).
 It skips the download when `0.0.0` is already installed; set `GRIBOUILLE_FORCE_UPDATE=1` to refresh.
+In the same way, `scripts/install-keisen.sh` installs the latest keisen development build as `@local/keisen:0.0.0`; set `KEISEN_FORCE_UPDATE=1` to refresh.
 
 ## Tooling
 
 - Typst `0.14.2`.
 - Gribouille development build, pinned locally as `0.0.0` (CeTZ `0.5` backend); the social card stays on Gribouille `0.1.0`.
+- keisen development build, pinned locally as `0.0.0`.
 - Quarto `1.9.37`.
 
 ## Publishing

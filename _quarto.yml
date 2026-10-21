@@ -2,6 +2,7 @@ project:
   type: website
   pre-render:
     - scripts/install-gribouille.sh
+    - scripts/install-keisen.sh
     - scripts/check-fonts.sh
   output-dir: _site
   render:
@@ -23,7 +24,7 @@ authors:
 
 website:
   title: "TidyTuesday"
-  description: "Mickaël Canouil's weekly TidyTuesday figures, drawn in Typst with Gribouille."
+  description: "Mickaël Canouil's weekly TidyTuesday figures, drawn in Typst with Gribouille and keisen."
   site-url: "https://m.canouil.dev/tidytuesday"
   repo-url: "https://github.com/mcanouil/tidytuesday"
   repo-actions: none

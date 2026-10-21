@@ -1,6 +1,6 @@
 ---
 title: "TidyTuesday Gallery"
-description: "Weekly data figures drawn in Typst with Gribouille."
+description: "Weekly data figures drawn in Typst with Gribouille and keisen."
 listing:
   id: gallery
   contents:
@@ -19,7 +19,7 @@ page-layout: full
 sidebar: false
 ---
 
-Each week takes a [TidyTuesday](https://github.com/rfordatascience/tidytuesday) dataset and turns it into a figure drawn entirely in [Typst](https://typst.app), mostly with [Gribouille](https://m.canouil.dev/gribouille).
+Each week takes a [TidyTuesday](https://github.com/rfordatascience/tidytuesday) dataset and turns it into a figure drawn entirely in [Typst](https://typst.app), mostly with [Gribouille](https://m.canouil.dev/gribouille) and [keisen](https://m.canouil.dev/keisen).
 Pick a card to see the figure and its source.
 
 ::: {#gallery}

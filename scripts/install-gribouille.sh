@@ -29,7 +29,7 @@ esac
 
 dest="${base}/gribouille/${version}"
 
-if [[ "${GRIBOUILLE_FORCE_UPDATE:-0}" != "1" && -d "${dest}" && -f "_variables.yml" ]]; then
+if [[ "${GRIBOUILLE_FORCE_UPDATE:-0}" != "1" && -d "${dest}" ]] && grep -qs '^gribouille-version: ' "_variables.yml"; then
 	echo "Gribouille ${version} already installed; skipping (set GRIBOUILLE_FORCE_UPDATE=1 to refresh)."
 	exit 0
 fi
@@ -49,7 +49,11 @@ if [[ -n "${build}" ]] && [[ "${build}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)($|[[:space:
 else
 	gribouille_version="main (build \`${build:-unknown}\`)"
 fi
-printf 'gribouille-version: "%s"\n' "${gribouille_version}" > "_variables.yml"
+{
+	grep -vs '^gribouille-version: ' "_variables.yml" || true
+	printf 'gribouille-version: "%s"\n' "${gribouille_version}"
+} >"${tmp}/_variables.yml"
+mv "${tmp}/_variables.yml" "_variables.yml"
 
 sed -i.bak -E "s|^version *= *\"[^\"]*\"|version = \"${version}\"|" "${tmp}/extract/typst.toml"
 rm -f "${tmp}/extract/typst.toml.bak"
