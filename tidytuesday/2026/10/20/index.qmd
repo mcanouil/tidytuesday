@@ -5,7 +5,7 @@ description: "A table of the 14 broad fields with 8 or more majors, each with a 
 date: "2026-10-20"
 order: 20261020
 image: images/featured-light.png
-image-alt: "A table with one row for each of the 14 broad fields that have 8 or more majors, from the lowest median AI exposure percentile at the top to the highest at the bottom. Each row shows the field, its number of majors, a horizontal bar and its median exposure percentile, and a strip of one point for each major. In the strips, the horizontal axis is median starting salary, from below $25k to above $100k, light vertical guides mark $25k, $50k, $75k and $100k, and a dashed line marks the median of all 285 majors, $41,189. Points are blue, and a darker blue in the light theme means a higher exposure percentile. From the top: Engineering Tech, 17 majors, median 14. Agriculture, 15 majors, 19. Health Professions, 18 majors, 20. Visual & Performing Arts, 10 majors, 20. Biological Sciences, 14 majors, 45. Engineering, 38 majors, 55. Architecture, 8 majors, 56. Education, 12 majors, 61. Business, 19 majors, 71. Computer Science, 8 majors, 71. Physical Sciences, 8 majors, 71. Social Sciences, 12 majors, 72. Foreign Languages, 8 majors, 79. Interdisciplinary, 22 majors, 81. The bars grow from short and pale at the top to long and dark at the bottom, but the strips show no such trend. All 17 Engineering Tech points and all 38 Engineering points sit to the right of the dashed line, although their medians are 14 and 55, and all 10 Visual & Performing Arts points, at 20, sit to its left. The other 11 fields have points on both sides of the line."
+image-alt: "A table with one row for each of the 14 broad fields that have 8 or more majors, from the lowest median AI exposure percentile at the top to the highest at the bottom. Each row shows the field, its number of majors, a horizontal bar with the median exposure percentile, and a strip of one point for each major. Colour shows exposure percentile on a scale from orange for low exposure, through grey at the middle, to blue for high exposure, and the bars use the same colours. In the strips, the horizontal axis is median starting salary, from below $25k to above $100k, with the axis repeated under the last row. Light vertical guides mark $25k, $50k, $75k and $100k, and a dashed line marks the median of all 285 majors, $41,189. From the top: Engineering Tech, 17 majors, median 14. Agriculture, 15 majors, 19. Health Professions, 18 majors, 20. Visual & Performing Arts, 10 majors, 20. Biological Sciences, 14 majors, 45. Engineering, 38 majors, 55. Architecture, 8 majors, 56. Education, 12 majors, 61. Business, 19 majors, 71. Computer Science, 8 majors, 71. Physical Sciences, 8 majors, 71. Social Sciences, 12 majors, 72. Foreign Languages, 8 majors, 79. Interdisciplinary, 22 majors, 81. The bars get longer from the top to the bottom, and their colour moves from orange to blue, but the strips show no such trend along the salary axis. All 17 Engineering Tech points and all 38 Engineering points sit to the right of the dashed line, although their medians are 14 and 55, and all 10 Visual & Performing Arts points, at 20, sit to its left. In 11 of the 14 fields, orange and blue points are mixed along the salary axis, with majors both below and above the 50th percentile of exposure."
 categories: [2026]
 ---
 
@@ -27,7 +27,7 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| width: 18cm
-//| height: 13.5cm
+//| height: 15cm
 //| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "Fields Sit at Different AI Exposure, but Pay Ignores It"
 ```
@@ -44,6 +44,10 @@ The fields show it as well.
 Every one of the 17 Engineering Tech majors and the 38 Engineering majors starts above the all-majors median of $41,189, and their fields sit at 14 and 55.
 All 10 Visual & Performing Arts majors start below it, at 20.
 The other 11 fields have majors on both sides of the dashed line.
+
+Within a field, high and low exposure are mixed along the salary axis.
+In 11 of the 14 fields, the majors include some below and some above the 50th percentile of exposure, and they sit side by side in the strip.
+The link between the two is weak and has no fixed direction: inside a field it is positive in 9 fields and negative in 5.
 
 Some cautions.
 AI exposure measures how much a job overlaps with what AI can do, not whether the job will be lost.

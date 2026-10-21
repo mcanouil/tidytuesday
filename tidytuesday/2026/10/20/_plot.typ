@@ -39,15 +39,16 @@
 #let all-median = median(majors.map(m => m.salary))
 
 // Pearson correlation of exposure and starting salary.
-#let r = {
-  let n = majors.len()
-  let mx = majors.map(m => m.exposure).sum() / n
-  let my = majors.map(m => m.salary).sum() / n
-  let sxy = majors.map(m => (m.exposure - mx) * (m.salary - my)).sum()
-  let sxx = majors.map(m => calc.pow(m.exposure - mx, 2)).sum()
-  let syy = majors.map(m => calc.pow(m.salary - my, 2)).sum()
+#let correlation(ms) = {
+  let n = ms.len()
+  let mx = ms.map(m => m.exposure).sum() / n
+  let my = ms.map(m => m.salary).sum() / n
+  let sxy = ms.map(m => (m.exposure - mx) * (m.salary - my)).sum()
+  let sxx = ms.map(m => calc.pow(m.exposure - mx, 2)).sum()
+  let syy = ms.map(m => calc.pow(m.salary - my, 2)).sum()
   sxy / calc.sqrt(sxx * syy)
 }
+#let r = correlation(majors)
 
 #assert(majors.len() == 285, message: "the major count changed")
 #assert(
@@ -79,6 +80,17 @@
 )
 #let field(name) = fields.find(f => f.name == name)
 #assert(
+  fields.filter(f => f.majors.any(m => m.pct < 50) and f.majors.any(m => m.pct > 50)).len() == 11,
+  message: "the number of fields with majors on both sides of the 50th percentile changed",
+)
+#assert(
+  (
+    fields.filter(f => correlation(f.majors) > 0).len(),
+    fields.filter(f => correlation(f.majors) < 0).len(),
+  ) == (9, 5),
+  message: "the signs of the within-field correlations changed",
+)
+#assert(
   ("Engineering Tech", "Engineering").all(f => field(f).majors.all(m => m.salary > all-median)),
   message: "an Engineering Tech or Engineering major no longer starts above the all-majors median",
 )
@@ -103,15 +115,18 @@
 #let ink = theme-minimal().at("ink", default: black)
 #let dark = ink.oklab().components().first() > 50%
 
-// One blue hue, paler for low exposure on the light page and paler for high
-// exposure on the dark page, so the stronger mark always stands out more.
-// Both ramps pass validate_palette.js --ordinal against #fbfaf7 and #0d1626.
+// A diverging ramp centred on the 50th percentile: orange for low exposure, blue
+// for high, and a grey in the middle. On the light page the strong ends are the
+// dark ones, and on the dark page they are the pale ones. Each arm passes
+// validate_palette.js --ordinal against #fbfaf7 or #0d1626, and the grey clears
+// 3:1 on the dark page and 2:1 on the light page.
 #let ramp = if dark {
-  (rgb("#2a5ea0"), rgb("#3f78bf"), rgb("#5f95d6"), rgb("#8cb5e8"), rgb("#bcd5f3"))
+  (rgb("#f6bb86"), rgb("#dd9250"), rgb("#b5703f"), rgb("#5c6575"), rgb("#4f7fc0"), rgb("#7aa6e0"), rgb("#b0cdf5"))
 } else {
-  (rgb("#8fb4e3"), rgb("#5a90d4"), rgb("#2f6bb8"), rgb("#1b4a8c"), rgb("#0f2f5f"))
+  (rgb("#8f3305"), rgb("#d4580f"), rgb("#eda35f"), rgb("#aaa59b"), rgb("#8fb4e3"), rgb("#2f6bb8"), rgb("#0f2f5f"))
 }
 #let ramp-gradient = gradient.linear(..ramp, space: oklab)
+#let page-colour = rgb(sys.inputs.at("typst-render-background", default: "#fbfaf7"))
 
 // IBM Plex Sans for the words, IBM Plex Mono for every reading. Both are
 // vendored in assets/fonts.
@@ -131,11 +146,14 @@
   expand: (0%, 0%),
 )
 
+// Points are offset vertically by salary rank, so neighbours in salary do not overlap.
+#let levels = 6
+
 #let strip(name) = {
   let f = field(name)
   plot(
-    data: f.majors.enumerate().map(((i, m)) => (..m, y: calc.rem(i, 4) - 1.5)),
-    mapping: aes(x: "salary", y: "y", colour: "pct", fill: "pct"),
+    data: f.majors.enumerate().map(((i, m)) => (..m, y: calc.rem(i, levels) - (levels - 1) / 2)),
+    mapping: aes(x: "salary", y: "y", fill: "pct"),
     layers: (
       geom-vline(
         data: guides-at.map(v => (v: v)),
@@ -144,18 +162,17 @@
         stroke: 0.4pt,
       ),
       geom-vline(xintercept: all-median, colour: muted, stroke: 0.6pt, linetype: "dashed"),
-      geom-point(size: 2pt),
+      geom-point(size: 2.6pt, colour: page-colour, stroke: 0.4pt),
     ),
     scales: scales(
       x: x-scale,
-      y: scale-continuous(limits: (-2, 2), expand: (0%, 0%)),
-      colour: scale-gradientn(colours: ramp, limits: (0, 100)),
+      y: scale-continuous(limits: (-levels / 2 - 0.5, levels / 2 + 0.5), expand: (0%, 0%)),
       fill: scale-gradientn(colours: ramp, limits: (0, 100)),
     ),
     guides: guides(default: none),
     theme: theme-void(),
     width: strip-width,
-    height: 0.55cm,
+    height: 0.62cm,
   )
 }
 
@@ -214,6 +231,7 @@
     keisen.columns-width((field: width - n-width - med-width - strip-column, n: n-width, med: med-width, strip: strip-column)),
     keisen.format("med", bar),
     keisen.format("strip", strip),
+    keisen.grand-summary-rows(functions: ("": col => axis), columns: "strip", format: v => v),
     keisen.table-source-note(text(font: sans, size: 5.5pt)[
       Salaries are pooled medians one year after graduation, and the exposure of a major is the mean over the occupations it leads to.
       Source: TidyTuesday 2026-10-20. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
