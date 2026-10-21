@@ -146,13 +146,16 @@
   expand: (0%, 0%),
 )
 
-// Points are offset vertically by salary rank, so neighbours in salary do not overlap.
-#let levels = 6
+// Points are offset vertically by salary rank, so neighbours in salary do not
+// overlap. The order of the levels is interleaved so that neighbours never form a
+// rising or falling run that would read as a slope.
+#let level-order = (0, 3, 1, 4, 2, 5)
+#let levels = level-order.len()
 
 #let strip(name) = {
   let f = field(name)
   plot(
-    data: f.majors.enumerate().map(((i, m)) => (..m, y: calc.rem(i, levels) - (levels - 1) / 2)),
+    data: f.majors.enumerate().map(((i, m)) => (..m, y: level-order.at(calc.rem(i, levels)) - (levels - 1) / 2)),
     mapping: aes(x: "salary", y: "y", fill: "pct"),
     layers: (
       geom-vline(
