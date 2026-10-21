@@ -1,7 +1,7 @@
 ---
 engine: markdown
 title: "Remote Islands Keep Their Frogs to Themselves"
-description: "A scatter of 91 countries by native frog and toad species and the share found nowhere else, with two zoom panels on Madagascar and Bolivia."
+description: "A scatter of 91 countries by native frog and toad species and the share found in no other country, with two zoom panels on Madagascar and Bolivia."
 date: "2026-10-13"
 order: 20261013
 image: images/featured-light.png
@@ -39,7 +39,7 @@ That is true of 5,985 species, or 75%.
 So the interesting question is where.
 
 Islands far from any mainland keep almost all of their frogs.
-Madagascar has 443 species and 440 of them live nowhere else, and 296 of those belong to one family, the Mantellidae.
+Madagascar has 443 species and 440 of them are found in no other country, and 296 of those belong to one family, the Mantellidae.
 Six of the nine remote islands keep more than 80% of their species.
 Papua New Guinea and Indonesia sit lower, at 78% and 59%, and they share the island of New Guinea with each other.
 Islands close to a mainland look like the mainland instead: Singapore keeps one species out of 28.
