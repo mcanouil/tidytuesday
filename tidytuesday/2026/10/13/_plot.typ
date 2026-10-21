@@ -100,6 +100,23 @@
 )
 #assert((family-size("Mantellidae"), mg-families.first().last()) == (300, 296), message: "Mantellidae changed")
 
+// Every country the alt text or prose prints: species count and whole-number
+// share of them found in no other country.
+#let printed = (
+  MG: (443, 99), CU: (71, 94), AU: (259, 92), LK: (109, 85), JM: (25, 84), PH: (114, 83), PG: (435, 78),
+  JP: (49, 65), ID: (400, 59), PR: (26, 54), HT: (57, 49), DO: (50, 38), TW: (39, 36), TT: (40, 18),
+  SG: (28, 4), BO: (262, 29), BR: (1173, 71),
+)
+#for (code, (n, pct)) in printed {
+  let c = countries.find(c => c.code == code)
+  assert((c.n, calc.round(c.share * 100)) == (n, pct), message: "the printed numbers for " + code + " changed")
+}
+#assert(countries.find(c => c.code == "SG").only == 1, message: "Singapore no longer keeps one species")
+#assert(
+  calc.round(calc.max(..mainland-points.map(c => c.share)) * 100) == 73,
+  message: "the highest mainland share is no longer 73%",
+)
+
 #let ink = theme-minimal().at("ink", default: black)
 #let island-colour = rgb("#d4580f")
 #let near-colour = rgb("#2f74c0")
@@ -140,9 +157,9 @@
 )
 #let label-points = countries.filter(c => c.code in label-offsets)
 
-// Two labels sit in a clear patch of the plot, joined to their point by a line
-// that starts at the given (x, y) just under the label.
-#let moved-labels = (TT: (1.48, 0.28, 1.50, 0.265), SG: (1.25, 0.23, 1.40, 0.205))
+// Two labels sit in a clear patch of the plot, joined to their point by a
+// connector. The offsets are in log10 species (x) and share (y).
+#let moved-labels = (TT: (-0.12, 0.105), SG: (-0.197, 0.194))
 #let moved-points = countries.filter(c => c.code in moved-labels)
 
 // Scatter on log10(species). The two zoom panels sit to its right, in the same
@@ -274,25 +291,17 @@
     ),
     geom-typst(
       data: moved-points.map(c => (
-        x: moved-labels.at(c.code).at(0),
-        y: moved-labels.at(c.code).at(1),
+        x: c.x,
+        y: c.share,
         label: panel-text(names.at(c.code)),
+        nudge-x: moved-labels.at(c.code).first(),
+        nudge-y: moved-labels.at(c.code).last(),
       )),
-      mapping: aes(x: "x", y: "y", label: "label"),
+      mapping: aes(x: "x", y: "y", label: "label", nudge-x: "nudge-x", nudge-y: "nudge-y"),
       inherit-aes: false,
       anchor: "west",
-    ),
-    geom-segment(
-      data: moved-points.map(c => (
-        x: moved-labels.at(c.code).at(2),
-        y: moved-labels.at(c.code).at(3),
-        xend: c.x,
-        yend: c.share + 0.012,
-      )),
-      mapping: aes(x: "x", y: "y", xend: "xend", yend: "yend"),
-      inherit-aes: false,
-      colour: ink.transparentize(40%),
-      stroke: 0.4pt,
+      segment: true,
+      segment-colour: ink.transparentize(40%),
     ),
     ..label-offsets.values().map(o => o.first()).dedup().map(side => geom-typst(
       data: label-points
