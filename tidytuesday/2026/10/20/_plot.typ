@@ -11,9 +11,9 @@
 #let raw-majors = csv("data/ai_salary_majors.csv", row-type: dictionary)
 #assert(
   raw-majors.all(m => (
-    ("median_starting_salary", "ai_exposure_percentile").all(k => m.at(k, default: "") not in ("", "NA"))
+    ("median_starting_salary", "ai_exposure_percentile", "ai_exposure").all(k => m.at(k, default: "") not in ("", "NA"))
   )),
-  message: "a major in data/ai_salary_majors.csv has a missing median_starting_salary or ai_exposure_percentile; fix or drop the row",
+  message: "a major in data/ai_salary_majors.csv has a missing median_starting_salary, ai_exposure_percentile or ai_exposure; fix or drop the row",
 )
 #let majors = raw-majors.map(m => (
   field: m.broad_field_short,
@@ -115,7 +115,7 @@
 #assert(
   fields.filter(f => not (straddles(f, "salary", all-median))).map(f => f.name)
     == ("Engineering Tech", "Visual & Performing Arts", "Engineering"),
-  message: "the number of fields that straddle the all-majors median changed",
+  message: "the fields whose majors all sit on one side of the all-majors median changed",
 )
 
 // Salary spans of the strips, in dollars. Every strip shares them.
@@ -156,7 +156,6 @@
 #let x-scale = scale-continuous(
   limits: salary-limits,
   breaks: guides-at,
-  labels: guides-at.map(v => [\$#(v / 1000)k]),
   expand: (0%, 0%),
 )
 
