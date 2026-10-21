@@ -15,8 +15,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-url="https://codeload.github.com/mcanouil/keisen/tar.gz/refs/heads/main"
-api="https://api.github.com/repos/mcanouil/keisen/commits/main"
+repo="https://github.com/mcanouil/keisen"
 version="0.0.0"
 
 case "$(uname -s)" in
@@ -34,14 +33,19 @@ fi
 tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
 
-echo "Downloading keisen development build ..."
-curl -fLsS "${url}" -o "${tmp}/keisen.tar.gz"
+sha="$(git ls-remote "${repo}" refs/heads/main | cut -f1)"
+if [[ ! "${sha}" =~ ^[0-9a-f]{40}$ ]]; then
+	echo "Could not resolve refs/heads/main of ${repo} (got '${sha}'); check network access." >&2
+	exit 1
+fi
+build="${sha:0:7}"
+
+echo "Downloading keisen development build ${build} ..."
+curl -fLsS "https://codeload.github.com/mcanouil/keisen/tar.gz/${sha}" -o "${tmp}/keisen.tar.gz"
 mkdir -p "${tmp}/extract"
 tar -xzf "${tmp}/keisen.tar.gz" --strip-components=1 -C "${tmp}/extract"
 
-sha="$(curl -fLsS -H "Accept: application/vnd.github.sha" "${api}")"
-build="${sha:0:7}"
-keisen_version="main (build \`${build:-unknown}\`)"
+keisen_version="main (build \`${build}\`)"
 {
 	grep -vs '^keisen-version: ' "_variables.yml" || true
 	printf 'keisen-version: "%s"\n' "${keisen_version}"
@@ -55,4 +59,4 @@ rm -rf "${dest}"
 mkdir -p "${dest}"
 cp -R "${tmp}/extract/." "${dest}/"
 
-echo "keisen ${version} installed at ${dest} (build ${build:-unknown})."
+echo "keisen ${version} installed at ${dest} (build ${build})."
