@@ -8,7 +8,14 @@
 // occupations a major leads to, `ai_exposure_percentile` ranks it from 0 to 100
 // across the 285 majors, and `median_starting_salary` is in US dollars.
 // Source: data/ai_salary_majors.csv (TidyTuesday 2026-10-20).
-#let majors = csv("data/ai_salary_majors.csv", row-type: dictionary).map(m => (
+#let raw-majors = csv("data/ai_salary_majors.csv", row-type: dictionary)
+#assert(
+  raw-majors.all(m => (
+    ("median_starting_salary", "ai_exposure_percentile").all(k => m.at(k, default: "") not in ("", "NA"))
+  )),
+  message: "a major in data/ai_salary_majors.csv has a missing median_starting_salary or ai_exposure_percentile; fix or drop the row",
+)
+#let majors = raw-majors.map(m => (
   field: m.broad_field_short,
   salary: float(m.median_starting_salary),
   pct: float(m.ai_exposure_percentile),
@@ -51,10 +58,6 @@
 #let r = correlation(majors)
 
 #assert(majors.len() == 285, message: "the major count changed")
-#assert(
-  majors.all(m => m.salary != none and m.pct != none),
-  message: "a major lacks a salary or an exposure",
-)
 #assert(fields.len() == 14, message: "fields with 8 or more majors changed")
 #assert(all-median == 41189, message: "the all-majors median salary changed")
 #assert(calc.abs(r) < 0.02, message: "salary and exposure are now correlated")
@@ -91,6 +94,15 @@
   message: "the signs of the within-field correlations changed",
 )
 #assert(
+  fields.filter(f => not (f.majors.any(m => m.pct < 50) and f.majors.any(m => m.pct > 50))).map(f => f.name)
+    == ("Agriculture", "Visual & Performing Arts", "Foreign Languages"),
+  message: "the fields without majors on both sides of the 50th percentile changed",
+)
+#assert(
+  ("Visual & Performing Arts", "Architecture").map(f => calc.round(correlation(field(f).majors), digits: 2)) == (0.64, -0.63),
+  message: "the printed within-field correlations changed",
+)
+#assert(
   ("Engineering Tech", "Engineering").all(f => field(f).majors.all(m => m.salary > all-median)),
   message: "an Engineering Tech or Engineering major no longer starts above the all-majors median",
 )
@@ -100,7 +112,8 @@
 )
 
 #assert(
-  fields.filter(f => f.majors.any(m => m.salary > all-median) and f.majors.any(m => m.salary < all-median)).len() == 11,
+  fields.filter(f => not (f.majors.any(m => m.salary > all-median) and f.majors.any(m => m.salary < all-median))).map(f => f.name)
+    == ("Engineering Tech", "Visual & Performing Arts", "Engineering"),
   message: "the number of fields that straddle the all-majors median changed",
 )
 
