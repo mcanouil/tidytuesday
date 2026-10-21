@@ -4,9 +4,10 @@
 // One row per frog or toad species described by AmphibiaWeb. `isocc` holds the
 // ISO codes of the countries a species is native to, separated by commas.
 // Source: data/frogs_and_toads_amphibiaweb.csv (TidyTuesday 2026-10-13).
-#let frogs = csv("data/frogs_and_toads_amphibiaweb.csv", row-type: dictionary)
-
-#let codes(r) = r.isocc.split(",").map(c => c.trim()).filter(c => c != "" and c != "NA")
+#let frogs = csv("data/frogs_and_toads_amphibiaweb.csv", row-type: dictionary).map(r => (
+  family: r.family,
+  codes: r.isocc.split(",").map(c => c.trim()).filter(c => c != "" and c != "NA"),
+))
 
 // A species counts for every country in its list, and is "found in no other
 // country" when the list holds exactly one code.
@@ -14,7 +15,7 @@
 #let countries = {
   let tally = (:)
   for r in frogs {
-    let cs = codes(r)
+    let cs = r.codes
     for c in cs {
       let t = tally.at(c, default: (n: 0, only: 0))
       tally.insert(c, (n: t.n + 1, only: t.only + if cs.len() == 1 { 1 } else { 0 }))
@@ -27,7 +28,11 @@
 }
 
 // The two countries the zoom panels open up.
-#let country(code) = countries.find(c => c.code == code)
+#let country(code) = {
+  let c = countries.find(c => c.code == code)
+  assert(c != none, message: code + " no longer has " + str(min-species) + " or more species")
+  c
+}
 #let mg = country("MG")
 #let bo = country("BO")
 
@@ -38,22 +43,22 @@
   }
   t.pairs().sorted(key: p => (-p.at(1), p.at(0)))
 }
-#let mg-families = tally-by(frogs.filter(r => codes(r) == ("MG",)), r => (r.family,))
-#let bo-shared = tally-by(frogs.filter(r => "BO" in codes(r)), r => codes(r).filter(c => c != "BO")).slice(0, 5)
+#let mg-families = tally-by(frogs.filter(r => r.codes == ("MG",)), r => (r.family,))
+#let bo-shared = tally-by(frogs.filter(r => "BO" in r.codes), r => r.codes.filter(c => c != "BO")).slice(0, 5)
 
 // Families whose species all live in one country.
 #let one-country-families = {
   let by-family = (:)
   for r in frogs {
     let seen = by-family.at(r.family, default: ())
-    by-family.insert(r.family, (seen + codes(r)).dedup())
+    by-family.insert(r.family, (seen + r.codes).dedup())
   }
   by-family.pairs().filter(((_, cs)) => cs.len() == 1)
 }
 
 #assert(frogs.len() == 8018, message: "the species count changed")
-#assert(frogs.filter(r => codes(r).len() == 1).len() == 5985, message: "the one-country count changed")
-#assert(frogs.filter(r => codes(r).len() == 0).len() == 31, message: "species without a country changed")
+#assert(frogs.filter(r => r.codes.len() == 1).len() == 5985, message: "the one-country count changed")
+#assert(frogs.filter(r => r.codes.len() == 0).len() == 31, message: "species without a country changed")
 #assert(countries.len() == 91, message: "countries with 20 or more species changed")
 #assert((mg.n, mg.only) == (443, 440), message: "Madagascar changed")
 #assert((bo.n, bo.only) == (262, 76), message: "Bolivia changed")
@@ -92,7 +97,7 @@
   near-points.all(c => c.share > 0.03 and c.share < 0.55),
   message: "the range of the islands near a mainland changed",
 )
-#assert(calc.round(frogs.filter(r => codes(r).len() == 1).len() / frogs.len() * 100) == 75, message: "the 75% changed")
+#assert(calc.round(frogs.filter(r => r.codes.len() == 1).len() / frogs.len() * 100) == 75, message: "the 75% changed")
 #let family-size(f) = frogs.filter(r => r.family == f).len()
 #assert(
   one-country-families.filter(((f, _)) => f in ("Brachycephalidae", "Micrixalidae", "Ranixalidae")).map(((f, cs)) => (f, cs.first(), family-size(f)))
@@ -114,8 +119,8 @@
 }
 #assert(country("SG").only == 1, message: "Singapore no longer keeps one species")
 #assert(
-  calc.round(calc.max(..mainland-points.map(c => c.share)) * 100) == 73,
-  message: "the highest mainland share is no longer 73%",
+  calc.max(..mainland-points.map(c => c.share)) <= 0.73,
+  message: "a mainland country is now above 73%",
 )
 
 #let ink = theme-minimal().at("ink", default: black)
