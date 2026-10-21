@@ -82,8 +82,9 @@
   message: "the number of majors in a field changed",
 )
 #let field(name) = fields.find(f => f.name == name)
+#let straddles(f, key, cut) = f.majors.any(m => m.at(key) < cut) and f.majors.any(m => m.at(key) > cut)
 #assert(
-  fields.filter(f => f.majors.any(m => m.pct < 50) and f.majors.any(m => m.pct > 50)).len() == 11,
+  fields.filter(f => straddles(f, "pct", 50)).len() == 11,
   message: "the number of fields with majors on both sides of the 50th percentile changed",
 )
 #assert(
@@ -94,7 +95,7 @@
   message: "the signs of the within-field correlations changed",
 )
 #assert(
-  fields.filter(f => not (f.majors.any(m => m.pct < 50) and f.majors.any(m => m.pct > 50))).map(f => f.name)
+  fields.filter(f => not (straddles(f, "pct", 50))).map(f => f.name)
     == ("Agriculture", "Visual & Performing Arts", "Foreign Languages"),
   message: "the fields without majors on both sides of the 50th percentile changed",
 )
@@ -112,12 +113,12 @@
 )
 
 #assert(
-  fields.filter(f => not (f.majors.any(m => m.salary > all-median) and f.majors.any(m => m.salary < all-median))).map(f => f.name)
+  fields.filter(f => not (straddles(f, "salary", all-median))).map(f => f.name)
     == ("Engineering Tech", "Visual & Performing Arts", "Engineering"),
   message: "the number of fields that straddle the all-majors median changed",
 )
 
-// Salary spans of the strips, in thousands of dollars. Every strip shares them.
+// Salary spans of the strips, in dollars. Every strip shares them.
 #let salary-limits = (0, 115000)
 #let guides-at = (25000, 50000, 75000, 100000)
 #assert(
