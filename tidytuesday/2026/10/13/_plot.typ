@@ -123,7 +123,6 @@
 #let near-colour = rgb("#2f74c0")
 #let mainland-colour = rgb("#8b929c")
 #let highlight = rgb("#1a9a6a")
-#let group-colour = (remote: island-colour, near: near-colour, mainland: mainland-colour)
 
 // Alegreya for the words, Alegreya Sans for every label and reading. Both are
 // vendored in assets/fonts.
