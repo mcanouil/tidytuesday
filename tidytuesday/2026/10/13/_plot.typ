@@ -27,8 +27,9 @@
 }
 
 // The two countries the zoom panels open up.
-#let mg = countries.find(c => c.code == "MG")
-#let bo = countries.find(c => c.code == "BO")
+#let country(code) = countries.find(c => c.code == code)
+#let mg = country("MG")
+#let bo = country("BO")
 
 #let tally-by(rows, key) = {
   let t = (:)
@@ -84,7 +85,7 @@
   message: "the number of mainland countries that keep under a quarter changed",
 )
 #assert(
-  (countries.find(c => c.code == "BR").n, countries.find(c => c.code == "BR").only) == (1173, 837),
+  (country("BR").n, country("BR").only) == (1173, 837),
   message: "Brazil changed",
 )
 #assert(
@@ -108,10 +109,10 @@
   SG: (28, 4), BO: (262, 29), BR: (1173, 71),
 )
 #for (code, (n, pct)) in printed {
-  let c = countries.find(c => c.code == code)
+  let c = country(code)
   assert((c.n, calc.round(c.share * 100)) == (n, pct), message: "the printed numbers for " + code + " changed")
 }
-#assert(countries.find(c => c.code == "SG").only == 1, message: "Singapore no longer keeps one species")
+#assert(country("SG").only == 1, message: "Singapore no longer keeps one species")
 #assert(
   calc.round(calc.max(..mainland-points.map(c => c.share)) * 100) == 73,
   message: "the highest mainland share is no longer 73%",
@@ -207,7 +208,7 @@
 #let panel-bars = panels.map(p => p.bars.enumerate().map(((i, b)) => (..b, y: p.first-bar - i * bar-gap))).flatten()
 #let panel-rects = panels.map(p => (xmin: panel-x, xmax: x-limit, ymin: p.bottom, ymax: p.top))
 #let links = panels.map(p => {
-  let c = countries.find(c => c.code == p.code)
+  let c = country(p.code)
   (x: c.x + 0.045, y: c.share, xend: panel-x, yend: p.link-y)
 })
 
