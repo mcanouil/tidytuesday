@@ -344,7 +344,7 @@
     title: [Remote Islands Keep Their Frogs to Themselves],
     subtitle: [
       Share of each country's native frog and toad species found in no other country, for the #countries.len() countries with #min-species or more species. \
-      #text(fill: island-colour, weight: "semibold")[Remote islands] (circles) and #text(fill: near-colour, weight: "semibold")[islands near a mainland] (diamonds) against #text(fill: mainland-colour, weight: "semibold")[mainland countries].
+      #text(fill: island-colour, weight: "semibold")[Remote islands] (large circles) and #text(fill: near-colour, weight: "semibold")[islands near a mainland] (diamonds) against #text(fill: mainland-colour, weight: "semibold")[mainland countries] (small circles).
     ],
     caption: [
       Species count in each country, from the ISO codes AmphibiaWeb lists as native. Both panels use one bar scale. \
