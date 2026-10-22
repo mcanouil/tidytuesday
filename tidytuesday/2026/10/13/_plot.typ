@@ -23,7 +23,7 @@
   }
   tally
     .pairs()
-    .map(((code, t)) => (code: code, n: t.n, only: t.only, share: t.only / t.n, x: calc.log(t.n, base: 10)))
+    .map(((code, t)) => (code: code, n: t.n, only: t.only, share: t.only / t.n, x: calc.log(t.n)))
     .filter(c => c.n >= min-species)
 }
 
@@ -48,16 +48,19 @@
 
 // Families whose species all live in one country.
 #let one-country-families = {
-  let by-family = (:)
+  let codes-by-family = (:)
   for r in frogs {
-    let seen = by-family.at(r.family, default: ())
-    by-family.insert(r.family, (seen + r.codes).dedup())
+    let seen = codes-by-family.at(r.family, default: (:))
+    for c in r.codes { seen.insert(c, true) }
+    codes-by-family.insert(r.family, seen)
   }
-  by-family.pairs().filter(((_, cs)) => cs.len() == 1)
+  codes-by-family.pairs().filter(((_, seen)) => seen.len() == 1).map(((f, seen)) => (f, seen.keys().first()))
 }
+#let family-sizes = tally-by(frogs, r => (r.family,)).to-dict()
+#let one-country-species = frogs.filter(r => r.codes.len() == 1).len()
 
 #assert(frogs.len() == 8018, message: "the species count changed")
-#assert(frogs.filter(r => r.codes.len() == 1).len() == 5985, message: "the one-country count changed")
+#assert(one-country-species == 5985, message: "the one-country count changed")
 #assert(frogs.filter(r => r.codes.len() == 0).len() == 31, message: "species without a country changed")
 #assert(countries.len() == 91, message: "countries with 20 or more species changed")
 #assert((mg.n, mg.only) == (443, 440), message: "Madagascar changed")
@@ -74,11 +77,10 @@
 
 #let remote = ("MG", "AU", "PH", "LK", "CU", "JP", "JM", "PG", "ID")
 #let near = ("TT", "SG", "TW", "PR", "HT", "DO")
-#let group(code) = if code in remote { "remote" } else if code in near { "near" } else { "mainland" }
 
-#let remote-points = countries.filter(c => group(c.code) == "remote")
-#let near-points = countries.filter(c => group(c.code) == "near")
-#let mainland-points = countries.filter(c => group(c.code) == "mainland")
+#let remote-points = countries.filter(c => c.code in remote)
+#let near-points = countries.filter(c => c.code in near)
+#let mainland-points = countries.filter(c => c.code not in remote + near)
 #assert((remote-points.len(), near-points.len()) == (9, 6), message: "an island group lost a country below 20 species")
 #assert(
   remote-points.filter(c => c.share > 0.8).len() == 6,
@@ -90,34 +92,32 @@
   message: "the number of mainland countries that keep under a quarter changed",
 )
 #assert(
-  (country("BR").n, country("BR").only) == (1173, 837),
-  message: "Brazil changed",
-)
-#assert(
   near-points.all(c => c.share > 0.03 and c.share < 0.55),
   message: "the range of the islands near a mainland changed",
 )
-#assert(calc.round(frogs.filter(r => r.codes.len() == 1).len() / frogs.len() * 100) == 75, message: "the 75% changed")
-#let family-size(f) = frogs.filter(r => r.family == f).len()
+#assert(calc.round(one-country-species / frogs.len() * 100) == 75, message: "the 75% changed")
 #assert(
-  one-country-families.filter(((f, _)) => f in ("Brachycephalidae", "Micrixalidae", "Ranixalidae")).map(((f, cs)) => (f, cs.first(), family-size(f)))
+  one-country-families.filter(((f, _)) => f in ("Brachycephalidae", "Micrixalidae", "Ranixalidae")).map(((f, code)) => (f, code, family-sizes.at(f)))
     == (("Brachycephalidae", "BR", 84), ("Ranixalidae", "IN", 19), ("Micrixalidae", "IN", 24)),
   message: "the one-country families changed",
 )
-#assert((family-size("Mantellidae"), mg-families.first().last()) == (300, 296), message: "Mantellidae changed")
+#assert((family-sizes.at("Mantellidae"), mg-families.first().last()) == (300, 296), message: "Mantellidae changed")
 
 // Every country the alt text or prose prints: species count and whole-number
-// share of them found in no other country.
+// share of them found in no other country. Brazil and Singapore also print
+// their one-country species count, as a third value.
 #let printed = (
   MG: (443, 99), CU: (71, 94), AU: (259, 92), LK: (109, 85), JM: (25, 84), PH: (114, 83), PG: (435, 78),
   JP: (49, 65), ID: (400, 59), PR: (26, 54), HT: (57, 49), DO: (50, 38), TW: (39, 36), TT: (40, 18),
-  SG: (28, 4), BO: (262, 29), BR: (1173, 71),
+  SG: (28, 4, 1), BO: (262, 29), BR: (1173, 71, 837),
 )
-#for (code, (n, pct)) in printed {
+#for (code, (n, pct, ..only)) in printed {
   let c = country(code)
   assert((c.n, calc.round(c.share * 100)) == (n, pct), message: "the printed numbers for " + code + " changed")
+  if only.len() > 0 {
+    assert(c.only == only.first(), message: "the printed one-country count for " + code + " changed")
+  }
 }
-#assert(country("SG").only == 1, message: "Singapore no longer keeps one species")
 #assert(
   calc.max(..mainland-points.map(c => c.share)) <= 0.73,
   message: "a mainland country is now above 73%",
@@ -181,8 +181,9 @@
 
 #let breaks = (20, 50, 100, 200, 500, 1000)
 #let grid-colour = ink.transparentize(85%)
+#let log-breaks = breaks.map(b => calc.log(b))
 #let grid = (
-  breaks.map(b => (x: calc.log(b, base: 10), xend: calc.log(b, base: 10), y: 0, yend: 1))
+  log-breaks.map(b => (x: b, xend: b, y: 0, yend: 1))
     + range(0, 5).map(i => (x: scatter-x.at(0), xend: scatter-x.at(1), y: i / 4, yend: i / 4))
 )
 
@@ -269,20 +270,20 @@
       anchor: "north-west",
     ),
     geom-point(
-      data: d => d.filter(c => group(c.code) == "mainland"),
+      data: mainland-points,
       size: 2.2pt,
       colour: mainland-colour,
       fill: mainland-colour,
     ),
     geom-point(
-      data: d => d.filter(c => group(c.code) == "near"),
+      data: near-points,
       shape: "diamond",
       size: 3.8pt,
       colour: near-colour,
       fill: near-colour,
     ),
     geom-point(
-      data: d => d.filter(c => group(c.code) == "remote"),
+      data: remote-points,
       size: 3.6pt,
       colour: island-colour,
       fill: island-colour,
@@ -295,13 +296,10 @@
       stroke: 1pt,
     ),
     geom-typst(
-      data: moved-points.map(c => (
-        x: c.x,
-        y: c.share,
-        label: panel-text(names.at(c.code)),
-        nudge-x: moved-labels.at(c.code).first(),
-        nudge-y: moved-labels.at(c.code).last(),
-      )),
+      data: moved-points.map(c => {
+        let (nudge-x, nudge-y) = moved-labels.at(c.code)
+        (x: c.x, y: c.share, label: panel-text(names.at(c.code)), nudge-x: nudge-x, nudge-y: nudge-y)
+      }),
       mapping: aes(x: "x", y: "y", label: "label", nudge-x: "nudge-x", nudge-y: "nudge-y"),
       inherit-aes: false,
       anchor: "west",
@@ -311,11 +309,10 @@
     ..label-offsets.values().map(o => o.first()).dedup().map(side => geom-typst(
       data: label-points
         .filter(c => label-offsets.at(c.code).first() == side)
-        .map(c => (
-          x: c.x + label-offsets.at(c.code).at(1),
-          y: c.share + label-offsets.at(c.code).at(2),
-          label: panel-text(names.at(c.code)),
-        )),
+        .map(c => {
+          let (_, dx, dy) = label-offsets.at(c.code)
+          (x: c.x + dx, y: c.share + dy, label: panel-text(names.at(c.code)))
+        }),
       mapping: aes(x: "x", y: "y", label: "label"),
       inherit-aes: false,
       anchor: side,
@@ -330,7 +327,7 @@
   scales: scales(
     x: scale-continuous(
       limits: (scatter-x.at(0), x-limit),
-      breaks: breaks.map(b => calc.log(b, base: 10)),
+      breaks: log-breaks,
       labels: breaks.map(str),
       expand: (0%, 0%),
     ),
