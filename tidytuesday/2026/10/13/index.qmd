@@ -1,0 +1,65 @@
+---
+engine: markdown
+title: "Remote Islands Keep Their Frogs to Themselves"
+description: "A scatter of 91 countries by native frog and toad species and the share found in no other country, with two zoom panels on Madagascar and Bolivia."
+date: "2026-10-13"
+order: 20261013
+image: images/featured-light.png
+image-alt: "A scatter plot with 91 countries. The horizontal axis is the number of native frog and toad species in the country on a log scale from 20 to 1,000 and over, and the vertical axis is the share of those species found in no other country, from 0% to 100%. Nine remote islands are large orange circles and sit high on the plot: Madagascar at 443 species and 99%, Cuba at 71 species and 94%, Australia at 259 species and 92%, Sri Lanka at 109 species and 85%, Jamaica at 25 species and 84%, the Philippines at 114 species and 83%, Papua New Guinea at 435 species and 78%, Japan at 49 species and 65%, and Indonesia at 400 species and 59%. Six islands near a mainland are blue diamonds and sit lower and further left: Puerto Rico at 54%, Haiti at 49%, the Dominican Republic at 38%, Taiwan at 36%, Trinidad and Tobago at 18% and Singapore at 4%. The 76 mainland countries are small grey circles. None is above 73%. Brazil is the grey circle furthest right, at 1,173 species and 71%. Madagascar and Bolivia are ringed in green. Bolivia is at 262 species and 29%. A green line runs from each ring to a panel on the right. The top panel is titled Madagascar keeps 440 of its 443 species, and shows horizontal bars of its 440 species found in no other country, by family: Mantellidae 296, Microhylidae 133 and Hyperoliidae 11. The bottom panel is titled Bolivia keeps only 76 of its 262 species, and shows, for the five countries it shares the most species with, how many of its species also live there: Brazil 133, Peru 116, Colombia 67, Ecuador 59 and Argentina 55. Both panels use the same bar scale."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-10-13
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 9.45cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Remote Islands Keep Their Frogs to Themselves"
+```
+
+Data: [TidyTuesday 2026-10-13](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-10-13).
+
+AmphibiaWeb lists 8,018 frog and toad species, and for most of them it lists one country.
+That is true of 5,985 species, or 75%.
+
+Islands far from any mainland keep almost all of their frogs.
+Madagascar has 443 species, and 440 of them are found in no other country.
+Of those 440, 296 belong to one family, the Mantellidae.
+Six of the nine remote islands keep more than 80% of their species.
+Papua New Guinea and Indonesia sit lower, at 78% and 59%, and they share the island of New Guinea with each other.
+Islands close to a mainland look like the mainland instead: Singapore keeps one species out of 28.
+
+Large mainland countries mostly share.
+Bolivia has 262 species and keeps 76.
+The rest are shared with other countries, and the five it shares the most with are Brazil, Peru, Colombia, Ecuador and Argentina.
+Of the 76 mainland countries on the plot, 56 keep under a quarter of their species, and none keeps 75% or more.
+Brazil is the largest case, with 1,173 species, and it keeps 837 of them, which is 71%.
+
+The two bar panels count different things.
+Madagascar's bars split the 440 species it keeps by family.
+Bolivia's bars show, for each of five countries, how many Bolivian species also live there.
+A species that lives in several of those countries counts once in each bar, so the five bars add up to more than the 186 species Bolivia shares.
+
+Whole families can be local too.
+Eight families live in one country only, among them Brachycephalidae with 84 species in Brazil, Micrixalidae with 24 in India, and Ranixalidae with 19 in India.
+Mantellidae nearly joins them: 296 of its 300 species are found in Madagascar and in no other country.
+
+Some cautions.
+AmphibiaWeb's country lists can be incomplete, and a species that is missing from a list looks more local than it is.
+"Found in no other country" means one ISO code in the data, not an expert assessment of endemism.
+I set the island groups by hand.
