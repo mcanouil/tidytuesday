@@ -244,6 +244,7 @@
       ),
     ),
     keisen.columns-align(start, columns: "med"),
+    keisen.columns-align(center, columns: "n"),
     keisen.columns-width((field: width - n-width - med-width - strip-column, n: n-width, med: med-width, strip: strip-column)),
     keisen.format("med", bar),
     keisen.format("strip", strip),
