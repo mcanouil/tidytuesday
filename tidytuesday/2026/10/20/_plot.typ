@@ -19,28 +19,22 @@
   exposure: float(m.ai_exposure),
 ))
 
-#let median(values) = {
-  let v = values.sorted()
-  let n = v.len()
-  let h = calc.quo(n, 2)
-  if calc.odd(n) { v.at(h) } else { (v.at(h - 1) + v.at(h)) / 2 }
-}
-
 // Fields with 8 or more majors, lowest median exposure first. Ties keep the
 // alphabetical order of the field name.
 #let min-majors = 8
 #let fields = {
-  let names = majors.map(m => m.field).dedup()
-  names
+  majors
+    .map(m => m.field)
+    .dedup()
     .map(f => {
       let ms = majors.filter(m => m.field == f)
-      (name: f, n: ms.len(), med: median(ms.map(m => m.pct)), majors: ms.sorted(key: m => m.salary))
+      (name: f, n: ms.len(), med: median(ms.map(m => m.pct)).y, majors: ms.sorted(key: m => m.salary))
     })
     .filter(f => f.n >= min-majors)
     .sorted(key: f => (f.med, f.name))
 }
 
-#let all-median = median(majors.map(m => m.salary))
+#let all-median = median(majors.map(m => m.salary)).y
 
 // Pearson correlation of exposure and starting salary.
 #let correlation(ms) = {
@@ -57,7 +51,6 @@
 #assert(majors.len() == 285, message: "the major count changed")
 #assert(fields.len() == 14, message: "fields with 8 or more majors changed")
 #assert(all-median == 41189, message: "the all-majors median salary changed")
-#assert(calc.abs(r) < 0.02, message: "salary and exposure are now correlated")
 #assert(calc.round(r, digits: 3) == 0.005, message: "the printed correlation changed")
 #assert(
   fields.map(f => f.name)
@@ -69,7 +62,7 @@
   message: "the order of the fields changed",
 )
 #assert(
-  fields.map(f => calc.floor(f.med + 0.5))
+  fields.map(f => calc.round(f.med))
     == (14, 19, 20, 20, 45, 55, 56, 61, 71, 71, 71, 72, 79, 81),
   message: "the printed median exposure of a field changed",
 )
@@ -84,15 +77,13 @@
   fields.filter(f => straddles(f, "pct", 50)).len() == 11,
   message: "the number of fields with majors on both sides of the 50th percentile changed",
 )
+#let within-field-r = fields.map(f => correlation(f.majors))
 #assert(
-  (
-    fields.filter(f => correlation(f.majors) > 0).len(),
-    fields.filter(f => correlation(f.majors) < 0).len(),
-  ) == (9, 5),
+  (within-field-r.filter(r => r > 0).len(), within-field-r.filter(r => r < 0).len()) == (9, 5),
   message: "the signs of the within-field correlations changed",
 )
 #assert(
-  fields.filter(f => not (straddles(f, "pct", 50))).map(f => f.name)
+  fields.filter(f => not straddles(f, "pct", 50)).map(f => f.name)
     == ("Agriculture", "Visual & Performing Arts", "Foreign Languages"),
   message: "the fields without majors on both sides of the 50th percentile changed",
 )
@@ -110,7 +101,7 @@
 )
 
 #assert(
-  fields.filter(f => not (straddles(f, "salary", all-median))).map(f => f.name)
+  fields.filter(f => not straddles(f, "salary", all-median)).map(f => f.name)
     == ("Engineering Tech", "Visual & Performing Arts", "Engineering"),
   message: "the fields whose majors all sit on one side of the all-majors median changed",
 )
@@ -124,20 +115,19 @@
 )
 
 #let ink = theme-minimal().at("ink", default: black)
-#let dark = ink.oklab().components().first() > 50%
 
 // A diverging ramp centred on the 50th percentile: orange for low exposure, blue
 // for high, and a grey in the middle. On the light page the strong ends are the
 // dark ones, and on the dark page they are the pale ones. Each arm passes
 // validate_palette.js --ordinal against #fbfaf7 or #0d1626, and the grey clears
 // 3:1 on the dark page and 2:1 on the light page.
-#let ramp = if dark {
+#let ramp = if ink.oklab().components().first() > 50% {
   (rgb("#f6bb86"), rgb("#dd9250"), rgb("#b5703f"), rgb("#5c6575"), rgb("#4f7fc0"), rgb("#7aa6e0"), rgb("#b0cdf5"))
 } else {
   (rgb("#8f3305"), rgb("#d4580f"), rgb("#eda35f"), rgb("#aaa59b"), rgb("#8fb4e3"), rgb("#2f6bb8"), rgb("#0f2f5f"))
 }
 #let ramp-gradient = gradient.linear(..ramp, space: oklab)
-#let page-colour = rgb(sys.inputs.at("typst-render-background", default: "#fbfaf7"))
+#let page-colour = theme-minimal().at("paper", default: white)
 
 // IBM Plex Sans for the words, IBM Plex Mono for every reading. Both are
 // vendored in assets/fonts.
@@ -203,10 +193,14 @@
 )
 
 #let bar-width = 2.6cm
-#let bar(v) = box(width: bar-width + 0.7cm, height: 0.34cm)[
-  #place(horizon + left, rect(width: bar-width * v / 100, height: 0.34cm, fill: ramp-gradient.sample(v * 1%), stroke: none))
-  #place(horizon + left, dx: bar-width * v / 100 + 4pt, text(font: mono, size: 6.5pt, fill: ink)[#calc.floor(v + 0.5)])
-]
+#let bar-column-width = bar-width + 0.7cm
+#let bar(v) = {
+  let length = bar-width * v / 100
+  box(width: bar-column-width, height: 0.34cm)[
+    #place(horizon + left, rect(width: length, height: 0.34cm, fill: ramp-gradient.sample(v * 1%), stroke: none))
+    #place(horizon + left, dx: length + 4pt, text(font: mono, size: 6.5pt, fill: ink)[#calc.round(v)])
+  ]
+}
 
 #let legend = box(baseline: 1pt)[
   #text(font: mono, size: 6pt)[0]
@@ -218,7 +212,7 @@
 
 #let figure-table(width) = {
   let n-width = 1.2cm
-  let med-width = bar-width + 0.7cm + 2 * cell-inset
+  let med-width = bar-column-width + 2 * cell-inset
   let strip-column = strip-width + 2 * cell-inset
   keisen.display-table(
     rows,
