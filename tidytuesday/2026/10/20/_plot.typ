@@ -239,7 +239,7 @@
       med: [Median exposure percentile],
       strip: stack(
         spacing: 2pt,
-        text(font: sans, size: 6.5pt, weight: "bold")[Median starting salary],
+        align(center, text(font: sans, size: 6.5pt, weight: "bold")[Median starting salary]),
         axis,
       ),
     ),
