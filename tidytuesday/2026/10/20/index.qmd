@@ -38,17 +38,16 @@ The 285 majors in the data fall into broad fields, and 14 of those fields have 8
 The table puts them in order of AI exposure.
 Engineering Tech sits lowest, with a median exposure percentile of 14, and Interdisciplinary sits highest, at 81.
 
-Pay does not follow.
+Pay does not follow that order.
 Across all 285 majors, starting salary and AI exposure have a correlation of 0.005, which is close to none.
-The fields show it as well.
-Every one of the 17 Engineering Tech majors and the 38 Engineering majors starts above the all-majors median of $41,189, and their fields sit at 14 and 55.
-All 10 Visual & Performing Arts majors start below it, and their field sits at an exposure percentile of 20.
+Every one of the 17 Engineering Tech majors and the 38 Engineering majors starts above the all-majors median of $41,189, even though their fields sit at exposure percentiles of 14 and 55.
+All 10 Visual & Performing Arts majors start below it, and their field sits at 20.
 The other 11 fields have majors on both sides of the dashed line.
 
 Within a field, high and low exposure are mixed along the salary axis.
 In 11 of the 14 fields, the majors include some below and some above the 50th percentile of exposure, and they sit side by side in the strip.
-This is a different set of 11 from the one above: Agriculture, Visual & Performing Arts and Foreign Languages are the three fields without that mix.
-The link between the two has no fixed direction: inside a field it is positive in 9 fields and negative in 5.
+These are not the same 11 fields as above: Agriculture, Visual & Performing Arts and Foreign Languages are the three without that mix.
+Inside a field, the link between exposure and salary has no fixed direction: it is positive in 9 fields and negative in 5.
 It reaches 0.64 in Visual & Performing Arts and minus 0.63 in Architecture, but with 8 to 38 majors per field, each of these correlations is unreliable.
 
 Some cautions.
