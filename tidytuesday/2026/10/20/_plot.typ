@@ -1,5 +1,5 @@
 // Gribouille comes from the typst-render preamble (assets/typst/_preamble.typ),
-// so this file does not import it. keisen is imported as a module, because a
+// so this file does not import it. Keisen is imported as a module, because a
 // star import clashes with Gribouille (theme-minimal, format-number and
 // format-percent exist in both).
 #import "@local/keisen:0.0.0" as keisen
