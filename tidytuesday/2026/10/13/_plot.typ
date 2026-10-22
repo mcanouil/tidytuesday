@@ -118,6 +118,7 @@
     assert(c.only == only.first(), message: "the printed one-country count for " + code + " changed")
   }
 }
+#assert(bo.n - bo.only == 186, message: "the number of species Bolivia shares changed")
 #assert(
   calc.max(..mainland-points.map(c => c.share)) <= 0.73,
   message: "a mainland country is now above 73%",
@@ -193,7 +194,7 @@
     top: 1.05,
     bottom: 0.63,
     title: [#names.MG keeps #mg.only of its #mg.n species],
-    sub: [Its #mg.only one-country species, by family],
+    sub: [Its #mg.only species found in no other country, by family],
     bars: mg-families.map(((f, v)) => (label: text(style: "italic", f), v: v)),
     first-bar: 0.83,
     link-y: 0.93,
@@ -203,7 +204,7 @@
     top: 0.51,
     bottom: -0.04,
     title: [#names.BO keeps only #bo.only of its #bo.n species],
-    sub: [Species it shares with the five countries below],
+    sub: [How many of its species also live in each country],
     bars: bo-shared.map(((c, v)) => (label: names.at(c), v: v)),
     first-bar: 0.285,
     link-y: 0.30,
