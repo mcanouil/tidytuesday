@@ -11,7 +11,7 @@ It follows three rules:
 
 - Every figure is drawn in [Typst](https://typst.app), not R or Python.
 - Figures are built with [Gribouille](https://m.canouil.dev/gribouille) ({{< var gribouille-version >}}), my grammar-of-graphics package for Typst.
-- Tables are built with [keisen](https://m.canouil.dev/keisen) ({{< var keisen-version >}}), my table package for Typst.
+- Tables are built with [Keisen](https://m.canouil.dev/keisen) ({{< var keisen-version >}}), my table package for Typst.
 
 ## How it is organised
 

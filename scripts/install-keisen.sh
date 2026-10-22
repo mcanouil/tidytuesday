@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install the development build of keisen into Typst's `local` package
+# Install the development build of Keisen into Typst's `local` package
 # namespace under a constant version, so the import never has to change.
 #
 # Typst requires a semver version in `@local` imports, so the build is pinned
@@ -26,7 +26,7 @@ esac
 dest="${base}/keisen/${version}"
 
 if [[ "${KEISEN_FORCE_UPDATE:-0}" != "1" && -d "${dest}" ]] && grep -qs '^keisen-version: ' "_variables.yml"; then
-	echo "keisen ${version} already installed; skipping (set KEISEN_FORCE_UPDATE=1 to refresh)."
+	echo "Keisen ${version} already installed; skipping (set KEISEN_FORCE_UPDATE=1 to refresh)."
 	exit 0
 fi
 
@@ -40,7 +40,7 @@ if [[ ! "${sha}" =~ ^[0-9a-f]{40}$ ]]; then
 fi
 build="${sha:0:7}"
 
-echo "Downloading keisen development build ${build} ..."
+echo "Downloading Keisen development build ${build} ..."
 curl -fLsS "https://codeload.github.com/mcanouil/keisen/tar.gz/${sha}" -o "${tmp}/keisen.tar.gz"
 mkdir -p "${tmp}/extract"
 tar -xzf "${tmp}/keisen.tar.gz" --strip-components=1 -C "${tmp}/extract"
@@ -59,4 +59,4 @@ rm -rf "${dest}"
 mkdir -p "${dest}"
 cp -R "${tmp}/extract/." "${dest}/"
 
-echo "keisen ${version} installed at ${dest} (build ${build})."
+echo "Keisen ${version} installed at ${dest} (build ${build})."
