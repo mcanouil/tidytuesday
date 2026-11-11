@@ -27,7 +27,7 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| width: 18cm
-//| height: 16.5cm
+//| height: 16cm
 //| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand"
 ```

@@ -21,13 +21,6 @@
   found
 }
 
-#let middle(xs) = {
-  let s = xs.sorted()
-  let half = calc.div-euclid(s.len(), 2)
-  if calc.odd(s.len()) { s.at(half) } else { (s.at(half - 1) + s.at(half)) / 2 }
-}
-#let nearest-rank(xs, p) = xs.sorted().at(calc.min(xs.len() - 1, int(calc.floor(p * xs.len()))))
-
 // A price index: an item's price in a country divided by the median price of the
 // same item over all the countries that list it. Only items on sale in
 // `min-countries` countries or more are compared.
@@ -36,7 +29,7 @@
   let found = (:)
   for item in shared-items {
     let prices = price-of.at(item)
-    let typical = middle(prices.values())
+    let typical = median(prices.values()).y
     for (country, price) in prices {
       found.insert(country, found.at(country, default: ()) + (price / typical,))
     }
@@ -59,18 +52,19 @@
 #let countries = {
   index-of
     .pairs()
-    .map(((code, ratios)) => (
-      name: names.at(code),
-      n: ratios.len(),
-      mid: middle(ratios),
-      low: nearest-rank(ratios, 0.25),
-      high: nearest-rank(ratios, 0.75),
-    ))
+    .map(((code, ratios)) => {
+      let spread = quantiles(ratios)
+      (name: names.at(code), n: ratios.len(), mid: spread.y, low: spread.ymin, high: spread.ymax)
+    })
     .sorted(key: c => c.mid)
 }
 
 #assert(shared-items.len() == 111, message: "the number of items sold in 30 countries or more changed")
 #assert(countries.len() == 50, message: "the number of countries changed")
+#assert(
+  (calc.min(..countries.map(c => c.n)), calc.max(..countries.map(c => c.n))) == (32, 107),
+  message: "the number of products compared in a country changed",
+)
 #assert(
   (countries.first().name, countries.last().name) == ("Thailand", "Mexico"),
   message: "the cheapest or the dearest country changed",
@@ -86,7 +80,6 @@
 #let ink = theme-minimal().at("ink", default: black)
 #let dark = ink.oklab().components().first() > 50%
 #let muted = ink.transparentize(35%)
-#let guide-colour = ink.transparentize(82%)
 
 // Orange above the typical price, blue below it. Each pair passes
 // validate_palette.js against its own page, #fbfaf7 or #0d1626.
@@ -101,7 +94,8 @@
 #let ratio-label(v) = text(font: mono, size: 6pt, fill: muted)[#format-number(digits: 2)(v)\×]
 #let breaks = (0.6, 0.8, 1, 1.25, 1.6, 2)
 
-#let chart = plot(
+#set text(font: sans)
+#plot(
   data: rows,
   mapping: aes(y: "name"),
   layers: (
@@ -115,35 +109,22 @@
     colour: scale-identity(),
     fill: scale-identity(),
   ),
-  guides: guides(default: none),
-  theme: theme-minimal(),
-  labels: labels(x: none, y: none),
-  width: 17.6cm,
-  height: 14.4cm,
-)
-
-#set text(font: sans)
-// The figure keeps its natural height and is only scaled down when the page is
-// shorter, so the featured image shows the same figure as plot.svg.
-#layout(size => {
-  let body = block(width: size.width, grid(
-    row-gutter: 4pt,
-    text(size: 13pt, weight: "bold", fill: ink)[A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand],
-    text(size: 7pt, fill: ink)[
-      Each dot is the median price of a country, as a multiple of the median price of the same product over all countries.
-      The line spans the middle half of its products, with #calc.min(..countries.map(c => c.n)) to #calc.max(..countries.map(c => c.n)) products compared in each country.
-      The dashed line is the typical price, #dearer.len() countries sit above it.
+  labels: labels(
+    title: "A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand",
+    subtitle: [
+      Each dot is a country's median price as a multiple of the median price of the same product over all countries.\
+      The line spans the middle half of the #calc.min(..countries.map(c => c.n)) to #calc.max(..countries.map(c => c.n)) products compared in a country.\
+      The dashed line is the typical price, and #dearer.len() countries sit above it.
     ],
-    chart,
-    text(size: 5.5pt, fill: muted)[
-      Prices in US dollars on ikea.com, 28 September 2026, for the #shared-items.len() sofas and armchairs sold in #min-countries or more of the 50 countries.
+    caption: [
+      Prices in US dollars on ikea.com, 28 September 2026, for the #shared-items.len() sofas and armchairs sold in #min-countries or more of the 50 countries.\
       Source: TidyTuesday 2026-10-27. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
-  ))
-  let height = measure(width: size.width, body).height
-  if height > size.height {
-    align(center + horizon, scale(size.height / height * 95%, reflow: true, body))
-  } else {
-    align(horizon, body)
-  }
-})
+    x: none,
+    y: none,
+  ),
+  guides: guides(default: none),
+  theme: theme-minimal(),
+  width: auto,
+  height: auto,
+)
