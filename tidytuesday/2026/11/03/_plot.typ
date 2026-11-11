@@ -154,4 +154,5 @@
   height: height,
 )
 
+// Keep natural-height equal to the height of the plot.svg block in index.qmd.
 #fit-page(figure-plot, natural-height: 10.4cm)

@@ -18,6 +18,9 @@
 // `natural-height` for a plot that fills any height it gets, and leave it to
 // `auto` for content that has a height of its own, such as a table.
 #let fit-page(draw, natural-height: auto) = layout(size => {
+  if size.height.pt() == float.inf {
+    return draw(size.width, natural-height)
+  }
   let natural = if natural-height == auto {
     measure(width: size.width, draw(size.width, auto)).height
   } else {
