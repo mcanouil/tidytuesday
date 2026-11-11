@@ -202,14 +202,4 @@
   )
 }
 
-// The table keeps its natural height and is only scaled down when the page is
-// shorter, so the featured image shows the same figure as plot.svg.
-#layout(size => {
-  let table = figure-table(size.width)
-  let height = measure(width: size.width, table).height
-  if height > size.height {
-    align(center + horizon, scale(size.height / height * 100%, reflow: true, table))
-  } else {
-    table
-  }
-})
+#fit-page((width, height) => figure-table(width))

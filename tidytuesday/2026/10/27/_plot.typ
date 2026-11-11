@@ -137,15 +137,4 @@
   height: height,
 )
 
-// The plot keeps its natural height and is only scaled down when the page is
-// shorter, so the featured image shows the same figure as plot.svg with empty
-// bands left and right.
-#let natural-height = 16cm
-#layout(size => {
-  if natural-height > size.height {
-    let scaling = size.height / natural-height
-    align(center + horizon, scale(scaling * 100%, reflow: true, figure-plot(size.width, natural-height)))
-  } else {
-    figure-plot(size.width, size.height)
-  }
-})
+#fit-page(figure-plot, natural-height: 16cm)
