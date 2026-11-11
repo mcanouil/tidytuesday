@@ -27,7 +27,7 @@ categories: [2026]
 //| file: _plot.typ
 //| output-filename: plot.svg
 //| width: 18cm
-//| height: 14.6cm
+//| height: auto
 //| fig-alt: "{{< meta image-alt >}}"
 //| fig-cap: "Berserk Shows Its Feats, Dungeons & Dragons Only States Them"
 ```
