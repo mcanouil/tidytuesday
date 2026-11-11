@@ -55,6 +55,15 @@
   message: "the features that go most with verb-final order changed",
 )
 #assert(
+  order
+    == ("GB133", "GB075", "GB328", "GB422", "GB023", "GB262", "GB022", "GB131", "GB421", "GB327", "GB074"),
+  message: "the order of the features changed",
+)
+#assert(
+  calc.min(..order.map(a => calc.min(..order.map(b => answers.at(a).keys().filter(l => l in answers.at(b)).len())))) == 950,
+  message: "the smallest number of languages behind a cell changed",
+)
+#assert(
   order.last() == "GB074" and round2(phi("GB327", "GB328")) == -0.55,
   message: "the feature that goes least with verb-final order, or the printed relative clause correlation, changed",
 )
@@ -69,111 +78,70 @@
 // light page and the pale ones on the dark page, as in the other figures.
 #let positive = if dark { rgb("#5a8fd8") } else { rgb("#2f6bb8") }
 #let negative = if dark { rgb("#d07a2c") } else { rgb("#c2510e") }
-#let full-strength = 0.7
-#let cell-colour(v) = {
-  let strength = calc.min(calc.abs(v) / full-strength, 1) * 100%
-  color.mix((if v > 0 { positive } else { negative }, strength), (page-colour, 100% - strength), space: oklab)
-}
-// Text on a strong cell takes the page colour on the light page, where strong cells
-// are dark, and on the dark page only for the palest cells.
-#let text-colour(v) = if calc.abs(v) >= (if dark { 0.6 } else { 0.45 }) { page-colour } else { ink }
+// Text on a strong cell takes the page colour, because strong cells are the dark
+// ones on the light page and the saturated ones on the dark page.
+#let half(c) = color.mix((c, 50%), (page-colour, 50%), space: oklab)
+#let ramp = (negative, half(negative), page-colour, half(positive), positive)
+
+#let text-colour(v) = if calc.abs(v) >= 0.6 { page-colour } else { ink }
 
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
 #let cell = 0.6cm
 #let label-room = 7.4
+#let limit = 0.7
 
 // One tile for each pair of features up to the diagonal, with the name of a
 // feature placed just after its diagonal tile, so the upper right of the
 // figure stays free for the labels. Row i is drawn at y = -i, from the top.
-#let tiles = {
+#let pairs = {
   let found = ()
   for (i, a) in order.enumerate() {
-    for (j, b) in order.slice(0, i + 1).enumerate() {
-      let v = if i == j { none } else { phi(a, b) }
+    for (j, b) in order.slice(0, i).enumerate() {
+      let v = phi(a, b)
       found.push((
         x: j,
         y: -i,
-        fill: if v == none { ink.transparentize(88%) } else { cell-colour(v) },
-        label: if v != none and calc.abs(v) >= 0.3 {
-          text(font: mono, size: 5pt, fill: text-colour(v))[#calc.round(v, digits: 2)]
-        } else { none },
+        r: v,
+        label: if calc.abs(v) >= 0.3 { text(font: mono, size: 5pt, fill: text-colour(v))[#calc.round(v, digits: 2)] },
       ))
     }
   }
   found
 }
-#let names-at = order.enumerate().map(((i, a)) => (
-  x: i + 0.65,
+#let diagonal = order.enumerate().map(((i, a)) => (
+  x: i,
   y: -i,
-  label: text(font: sans, size: 7pt, fill: ink)[#features.at(a)],
+  name: text(font: sans, size: 7pt, fill: ink)[#features.at(a)],
 ))
 
-#let heatmap = plot(
-  data: tiles,
+#set text(font: sans)
+#plot(
+  data: pairs,
   mapping: aes(x: "x", y: "y"),
   layers: (
-    geom-tile(mapping: aes(fill: "fill"), width: 0.92, height: 0.92),
-    geom-typst(data: tiles.filter(t => t.label != none), mapping: aes(label: "label"), anchor: "center"),
-    geom-typst(data: names-at, mapping: aes(label: "label"), anchor: "west"),
+    geom-tile(data: diagonal, fill: ink.transparentize(88%), width: 0.92, height: 0.92),
+    geom-tile(mapping: aes(fill: "r"), width: 0.92, height: 0.92),
+    geom-typst(data: pairs.filter(t => t.label != none), mapping: aes(label: "label"), anchor: "center"),
+    geom-typst(data: diagonal, mapping: aes(x: "x", y: "y", label: "name"), anchor: "west", nudge-x: 0.65),
   ),
   scales: scales(
     x: scale-continuous(limits: (-0.5, order.len() - 0.5 + label-room), expand: (0%, 0%)),
     y: scale-continuous(limits: (-order.len() + 0.5, 0.5), expand: (0%, 0%)),
-    fill: scale-identity(),
+    fill: scale-gradientn(colours: ramp, limits: (-limit, limit), oob: "squish", name: "Correlation"),
   ),
-  guides: guides(default: none),
+  labels: labels(
+    title: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun",
+    subtitle: [
+      Each cell is the correlation between two of the #features.len() word-order features that Grambank flags, and cells between -0.3 and 0.3 carry no number.\
+      Verb-final order goes with postpositions (#calc.round(phi("GB133", "GB075"), digits: 2)) and a relative clause before the noun (#calc.round(phi("GB133", "GB328"), digits: 2)), and against prepositions (#calc.round(phi("GB133", "GB074"), digits: 2)).
+    ],
+    caption: [Source: TidyTuesday 2026-11-03, Grambank. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].],
+    x: none,
+    y: none,
+  ),
   theme: theme-void(),
-  width: cell * (order.len() + label-room),
-  height: cell * order.len(),
+  width: auto,
+  height: auto,
 )
-
-#let key-steps = (-0.7, -0.35, 0, 0.35, 0.7)
-#let scale-key = grid(
-  columns: key-steps.map(_ => 0.9cm),
-  rows: (0.3cm, auto),
-  row-gutter: 2pt,
-  ..key-steps.map(v => box(width: 100%, height: 0.3cm, fill: cell-colour(v), stroke: 0.4pt + ink.transparentize(80%))),
-  ..key-steps.map(v => align(center, text(font: mono, size: 5.5pt, fill: muted)[#v])),
-)
-
-#set text(font: sans)
-#layout(size => {
-  let body = block(width: size.width, align(left, {
-    v(5pt)
-    text(size: 13pt, weight: "bold", fill: ink)[Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun]
-    v(3pt)
-    text(size: 7pt, fill: ink)[
-      Each cell is the correlation, over the languages that have an answer to both, between two of the #features.len() word-order features that Grambank flags.
-      Orange cells are features that rarely go together, and blue cells are features that tend to.
-      Cells between -0.3 and 0.3 carry no number.
-    ]
-    v(4pt)
-    grid(
-      columns: (1fr, auto),
-      column-gutter: 10pt,
-      heatmap,
-      align(top + left, block(width: 5cm, {
-        text(size: 6.5pt, fill: ink)[Correlation]
-        v(2pt)
-        scale-key
-        v(10pt)
-        text(size: 7pt, fill: ink)[
-          Verb-final order goes with postpositions (#calc.round(phi("GB133", "GB075"), digits: 2)) and with a relative clause before the noun (#calc.round(phi("GB133", "GB328"), digits: 2)).
-          It goes against prepositions (#calc.round(phi("GB133", "GB074"), digits: 2)), which is its strongest link.
-        ]
-      })),
-    )
-    v(2pt)
-    text(size: 5.5pt, fill: muted)[
-      Source: TidyTuesday 2026-11-03, Grambank. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
-    ]
-  }))
-  let height = measure(width: size.width, body).height
-  if height > size.height {
-    align(center + horizon, scale(size.height / height * 95%, reflow: true, body))
-  } else {
-    align(horizon, body)
-  }
-})
