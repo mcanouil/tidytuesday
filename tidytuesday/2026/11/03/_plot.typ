@@ -74,12 +74,17 @@
 // light page and the pale ones on the dark page, as in the other figures.
 #let positive = if dark { rgb("#5a8fd8") } else { rgb("#2f6bb8") }
 #let negative = if dark { rgb("#d07a2c") } else { rgb("#c2510e") }
-// Text on a strong cell takes the page colour, because strong cells are the dark
-// ones on the light page and the saturated ones on the dark page.
 #let half(c) = color.mix((c, 50%), (page-colour, 50%), space: oklab)
 #let ramp = (negative, half(negative), page-colour, half(positive), positive)
 
-#let text-colour(v) = if calc.abs(v) >= 0.6 { page-colour } else { ink }
+// A number takes the ink or the page colour, whichever is further in lightness
+// from its cell, so it stays readable in both themes.
+#let lightness(c) = c.oklab().components().first()
+#let text-colour(v) = {
+  let cell = gradient.linear(..ramp, space: oklab).sample((v + 1) / 2 * 100%)
+  let l = lightness(cell)
+  if calc.abs(l - lightness(ink)) >= calc.abs(l - lightness(page-colour)) { ink } else { page-colour }
+}
 
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
@@ -140,6 +145,8 @@
     plot-caption: element-text(font: sans, size: 5.5pt, colour: muted),
     legend-text: element-text(font: mono, size: 5.5pt, colour: muted),
     legend-title: element-text(font: sans, size: 6.5pt, colour: ink),
+    // theme-void has no inset, and the page has no margin, so this keeps the
+    // title and caption off the edge.
     plot-background: element-rect(),
   ),
   width: width,

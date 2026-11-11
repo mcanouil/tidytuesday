@@ -23,9 +23,10 @@
   } else {
     natural-height
   }
+  let body = draw(size.width, natural)
   if natural <= size.height {
-    draw(size.width, size.height)
+    body
   } else {
-    align(center + horizon, scale(size.height / natural * 100%, reflow: true, draw(size.width, natural)))
+    align(center + horizon, scale(size.height / natural * 100%, reflow: true, body))
   }
 })
