@@ -51,10 +51,6 @@
   message: "the printed correlations with verb-final order changed",
 )
 #assert(
-  order.slice(0, 3) == ("GB133", "GB075", "GB328"),
-  message: "the features that go most with verb-final order changed",
-)
-#assert(
   order
     == ("GB133", "GB075", "GB328", "GB422", "GB023", "GB262", "GB022", "GB131", "GB421", "GB327", "GB074"),
   message: "the order of the features changed",
@@ -64,8 +60,8 @@
   message: "the smallest number of languages behind a cell changed",
 )
 #assert(
-  order.last() == "GB074" and round2(phi("GB327", "GB328")) == -0.55,
-  message: "the feature that goes least with verb-final order, or the printed relative clause correlation, changed",
+  round2(phi("GB327", "GB328")) == -0.55,
+  message: "the printed relative clause correlation changed",
 )
 
 #let ink = theme-minimal().at("ink", default: black)
@@ -88,7 +84,6 @@
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
-#let cell = 0.6cm
 #let label-room = 7.4
 #let limit = 0.7
 
@@ -116,7 +111,6 @@
   name: text(font: sans, size: 7pt, fill: ink)[#features.at(a)],
 ))
 
-#set text(font: sans)
 #plot(
   data: pairs,
   mapping: aes(x: "x", y: "y"),
@@ -132,7 +126,7 @@
     fill: scale-gradientn(colours: ramp, limits: (-limit, limit), oob: "squish", name: "Correlation"),
   ),
   labels: labels(
-    title: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun",
+    title: "Verb-Final Languages Put Adpositions After the Noun and Relative Clauses Before It",
     subtitle: [
       Each cell is the correlation between two of the #features.len() word-order features that Grambank flags, and cells between -0.3 and 0.3 carry no number.\
       Verb-final order goes with postpositions (#calc.round(phi("GB133", "GB075"), digits: 2)) and a relative clause before the noun (#calc.round(phi("GB133", "GB328"), digits: 2)), and against prepositions (#calc.round(phi("GB133", "GB074"), digits: 2)).
@@ -141,7 +135,13 @@
     x: none,
     y: none,
   ),
-  theme: theme-void(),
+  theme: theme-void(
+    plot-title: element-text(font: sans, size: 12pt, weight: "bold", colour: ink),
+    plot-subtitle: element-text(font: sans, size: 7pt, colour: ink),
+    plot-caption: element-text(font: sans, size: 5.5pt, colour: muted),
+    legend-text: element-text(font: mono, size: 5.5pt, colour: muted),
+    legend-title: element-text(font: sans, size: 6.5pt, colour: ink),
+  ),
   width: auto,
   height: auto,
 )

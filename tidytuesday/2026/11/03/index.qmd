@@ -1,6 +1,6 @@
 ---
 engine: markdown
-title: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun"
+title: "Verb-Final Languages Put Adpositions After the Noun and Relative Clauses Before It"
 description: "A triangular heatmap of the correlations between the 11 word-order features that Grambank flags, ordered by how much each goes with verb-final order."
 date: "2026-11-03"
 order: 20261103
@@ -29,7 +29,7 @@ categories: [2026]
 //| width: 18cm
 //| height: 10.4cm
 //| fig-alt: "{{< meta image-alt >}}"
-//| fig-cap: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun"
+//| fig-cap: "Verb-Final Languages Put Adpositions After the Noun and Relative Clauses Before It"
 ```
 
 Data: [TidyTuesday 2026-11-03](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-11-03).
@@ -40,7 +40,7 @@ Then I ordered the features by how much each goes with verb-final order, where t
 
 Verb-final languages tend to have postpositions, at 0.6, and a relative clause before the noun, at 0.49.
 They rarely have prepositions, at minus 0.7, and that is the strongest link of the row.
-The features line up on a single side: a language that puts the verb last tends to put the marker or the clause before the noun, and the head comes last.
+The features line up on a single side: a language that puts the verb last tends to put the adposition after the noun and the relative clause before it, so the head comes last.
 The relative clause shows it from the other side, because a clause before the noun and a clause after the noun have a correlation of minus 0.55.
 
 Some cautions.
