@@ -111,7 +111,7 @@
   name: text(font: sans, size: 7pt, fill: ink)[#features.at(a)],
 ))
 
-#plot(
+#let figure-plot(width, height) = plot(
   data: pairs,
   mapping: aes(x: "x", y: "y"),
   layers: (
@@ -141,7 +141,21 @@
     plot-caption: element-text(font: sans, size: 5.5pt, colour: muted),
     legend-text: element-text(font: mono, size: 5.5pt, colour: muted),
     legend-title: element-text(font: sans, size: 6.5pt, colour: ink),
+    plot-background: element-rect(),
   ),
-  width: auto,
-  height: auto,
+  width: width,
+  height: height,
 )
+
+// The plot keeps its natural height and is only scaled down when the page is
+// shorter, so the featured image shows the same figure as plot.svg with empty
+// bands left and right.
+#let natural-height = 10.4cm
+#layout(size => {
+  if natural-height > size.height {
+    let scaling = size.height / natural-height
+    align(center + horizon, scale(scaling * 100%, reflow: true, figure-plot(size.width, natural-height)))
+  } else {
+    figure-plot(size.width, size.height)
+  }
+})

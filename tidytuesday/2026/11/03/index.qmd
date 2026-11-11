@@ -16,7 +16,7 @@ categories: [2026]
 //| format: png
 //| dpi: 300
 //| width: 18cm
-//| height: 10.4cm
+//| height: 9.45cm
 ```
 
 ```{typst}

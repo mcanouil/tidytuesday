@@ -98,7 +98,7 @@
 #let ratio-label(v) = text(font: mono, size: 6pt, fill: muted)[#format-number(digits: 2)(v)\×]
 #let breaks = (0.6, 0.8, 1, 1.25, 1.6, 2)
 
-#plot(
+#let figure-plot(width, height) = plot(
   data: rows,
   mapping: aes(y: "name"),
   layers: (
@@ -133,6 +133,19 @@
     plot-caption: element-text(font: sans, size: 5.5pt, colour: muted),
     axis-text-y: element-text(font: sans, size: 6.5pt, colour: ink),
   ),
-  width: auto,
-  height: auto,
+  width: width,
+  height: height,
 )
+
+// The plot keeps its natural height and is only scaled down when the page is
+// shorter, so the featured image shows the same figure as plot.svg with empty
+// bands left and right.
+#let natural-height = 16cm
+#layout(size => {
+  if natural-height > size.height {
+    let scaling = size.height / natural-height
+    align(center + horizon, scale(scaling * 100%, reflow: true, figure-plot(size.width, natural-height)))
+  } else {
+    figure-plot(size.width, size.height)
+  }
+})
