@@ -92,63 +92,77 @@
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
+#let page-colour = theme-minimal().at("paper", default: white)
+#let row-height = 0.34cm
+
+// A bar of the evidence behind a franchise's ranking: one stacked column
+// turned on its side.
 #let bar-width = 2.9cm
-#let bar-column-width = bar-width + 1.9cm
 #let bar(name) = {
   let f = franchise(name)
-  let gap = 0.6pt
-  box(width: bar-column-width, height: 0.34cm)[
-    #place(horizon + left, stack(
-      dir: ltr,
-      spacing: gap,
-      ..kinds.filter(k => f.at(k) > 0).map(k => rect(width: bar-width * f.at(k) - gap, height: 0.34cm, fill: colours.at(k), stroke: none)),
-    ))
-    #place(horizon + left, dx: bar-width + 5pt, text(font: mono, size: 6.5pt, fill: ink)[#calc.round(f.shown * 100)%])
-    #place(horizon + left, dx: bar-width + 1.05cm, text(font: mono, size: 5.5pt, fill: muted)[of #f.n])
-  ]
+  plot(
+    data: kinds.map(k => (row: name, kind: k, share: f.at(k))),
+    mapping: aes(x: "row", y: "share", fill: "kind"),
+    layers: (geom-col(width: 1, position: "stack", colour: page-colour, stroke: 0.6pt),),
+    scales: scales(
+      x: scale-discrete(),
+      y: scale-continuous(expand: (0%, 0%)),
+      fill: scale-manual(values: kinds.map(k => colours.at(k)), limits: kinds),
+    ),
+    coord: coord-flip(),
+    guides: guides(default: none),
+    theme: theme-void(),
+    width: bar-width,
+    height: row-height,
+  )
 }
 
-#let mark-size = 2.3pt
-#let mark-step = 2.7pt
-#let marks-width = 67 * mark-step + 9pt
+#let shown-share(name) = text(font: mono, size: 6.5pt, fill: ink)[#calc.round(franchise(name).shown * 100)%]
+#let citations(name) = text(font: mono, size: 5.5pt, fill: muted)[#franchise(name).n]
+
+// A strip with one dot for each recorded death, the undone ones last. Every
+// strip shares one scale, so a dot has the same width in every row.
+#let most-deaths = calc.max(..franchises.map(f => f.fallen))
+#let deaths-width = 5.6cm
 #let fallen(name) = {
   let f = franchise(name)
   if f.fallen == 0 {
     text(font: sans, size: 6pt, fill: muted)[none recorded]
   } else {
-    box(width: marks-width, height: 0.34cm)[
-      #place(horizon + left, stack(
-        dir: ltr,
-        spacing: mark-step - mark-size,
-        ..range(f.fallen).map(i => circle(
-          radius: mark-size / 2,
-          fill: if i >= f.fallen - f.undone { colours.undone } else { stands-colour },
-          stroke: none,
-        )),
-      ))
-    ]
+    plot(
+      data: range(f.fallen).map(i => (x: i, y: 0, kind: if i >= f.fallen - f.undone { "undone" } else { "stands" })),
+      mapping: aes(x: "x", y: "y", fill: "kind"),
+      layers: (geom-point(size: 1.8pt, stroke: none),),
+      scales: scales(
+        x: scale-continuous(limits: (-0.5, most-deaths - 0.5), expand: (0%, 0%)),
+        y: scale-continuous(limits: (-1, 1), expand: (0%, 0%)),
+        fill: scale-manual(values: (colours.undone, stands-colour), limits: ("undone", "stands")),
+      ),
+      guides: guides(default: none),
+      theme: theme-void(),
+      width: deaths-width,
+      height: row-height,
+    )
   }
 }
 
-#let key(fill, label) = box(baseline: 1pt)[
-  #box(rect(width: 7pt, height: 7pt, fill: fill, stroke: none), baseline: 0.5pt)
-  #text(size: 6.5pt)[ #label#h(9pt)]
-]
+#let key(fill, label) = [#text(fill: fill)[■] #label#h(9pt)]
 
-#let rows = franchises.map(f => (franchise: f.name, medium: f.medium, evidence: f.name, deaths: f.name))
+#let rows = franchises.map(f => (franchise: f.name, medium: f.medium, evidence: f.name, shown: f.name, n: f.name, deaths: f.name))
 
 #let figure-table(width) = {
-  let medium-width = 2.3cm
-  let evidence-width = bar-column-width + 6pt
-  let deaths-width = marks-width + 6pt
+  let medium-width = 2.5cm
+  let evidence-width = bar-width + 6pt
+  let shown-width = 0.95cm
+  let n-width = 1.3cm
+  let deaths-column = deaths-width + 6pt
   keisen.display-table(
     rows,
     keisen.table-header(
       title: text(font: sans, size: 14pt, weight: "bold")[Berserk Shows Its Feats, Dungeons & Dragons Only States Them],
       subtitle: text(font: sans, size: 7pt)[
         The bar splits the citations behind a franchise's ranking by the evidence they give: shown on page or screen, stated by a character or a guidebook, or scaled against another feat.
-        The number after the bar is the count of citations.
-        Each dot is a death recorded against a ranked character.\
+        Each dot is a death that a ranked character caused.\
         Evidence: #key(colours.shown, "shown")#key(colours.stated, "stated")#key(colours.scaled, "scaled")\
         Deaths: #key(colours.undone, "undone later")#key(stands-colour, "left standing")
       ],
@@ -156,16 +170,21 @@
     keisen.table-stub(rowname: "franchise", label: [Franchise]),
     keisen.columns-label(
       medium: [Main medium],
-      evidence: [Evidence behind the ranking],
+      evidence: [Evidence],
+      shown: [Shown],
+      n: [Citations],
       deaths: [Recorded deaths],
     ),
     keisen.columns-align(start, columns: ("evidence", "deaths")),
-    keisen.columns-width((franchise: width - medium-width - evidence-width - deaths-width, medium: medium-width, evidence: evidence-width, deaths: deaths-width)),
+    keisen.columns-align(end, columns: ("shown", "n")),
+    keisen.columns-width((franchise: width - medium-width - evidence-width - shown-width - n-width - deaths-column, medium: medium-width, evidence: evidence-width, shown: shown-width, n: n-width, deaths: deaths-column)),
     keisen.format("evidence", bar),
+    keisen.format("shown", shown-share),
+    keisen.format("n", citations),
     keisen.format("deaths", fallen),
     keisen.table-source-note(text(font: sans, size: 5.5pt)[
       Franchises run from the lowest share of shown citations at the top to the highest at the bottom. Across all #total-of(characters, "citations") citations, #calc.round(all-shown * 100)% are shown.
-      The ranks and grades are the editorial judgements of Cited Feats, and the deaths are only those recorded against ranked characters.
+      The ranks and grades are the editorial judgements of Cited Feats, and the deaths are only those that ranked characters caused.
       Source: TidyTuesday 2026-11-10. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ]),
     keisen.table-options(
