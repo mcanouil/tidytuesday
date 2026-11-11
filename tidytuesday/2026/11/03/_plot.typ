@@ -85,7 +85,6 @@
 #let mono = "IBM Plex Mono"
 
 #let label-room = 7.4
-#let limit = 0.7
 
 // One tile for each pair of features up to the diagonal, with the name of a
 // feature placed just after its diagonal tile, so the upper right of the
@@ -123,7 +122,7 @@
   scales: scales(
     x: scale-continuous(limits: (-0.5, order.len() - 0.5 + label-room), expand: (0%, 0%)),
     y: scale-continuous(limits: (-order.len() + 0.5, 0.5), expand: (0%, 0%)),
-    fill: scale-gradientn(colours: ramp, limits: (-limit, limit), oob: "squish", name: "Correlation"),
+    fill: scale-gradientn(colours: ramp, limits: (-1, 1), breaks: (-1, -0.5, 0, 0.5, 1), name: "Correlation"),
   ),
   labels: labels(
     title: "Verb-Final Languages Put Adpositions After the Noun and Relative Clauses Before It",
