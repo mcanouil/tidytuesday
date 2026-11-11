@@ -76,12 +76,13 @@
 #let negative = if dark { rgb("#d07a2c") } else { rgb("#c2510e") }
 #let half(c) = color.mix((c, 50%), (page-colour, 50%), space: oklab)
 #let ramp = (negative, half(negative), page-colour, half(positive), positive)
+#let fill-limits = (-1, 1)
 
 // A number takes the ink or the page colour, whichever is further in lightness
 // from its cell, so it stays readable in both themes.
 #let lightness(c) = c.oklab().components().first()
 #let text-colour(v) = {
-  let cell = gradient.linear(..ramp, space: oklab).sample((v + 1) / 2 * 100%)
+  let cell = gradient.linear(..ramp, space: oklab).sample((v - fill-limits.first()) / (fill-limits.last() - fill-limits.first()) * 100%)
   let l = lightness(cell)
   if calc.abs(l - lightness(ink)) >= calc.abs(l - lightness(page-colour)) { ink } else { page-colour }
 }
@@ -127,7 +128,7 @@
   scales: scales(
     x: scale-continuous(limits: (-0.5, order.len() - 0.5 + label-room), expand: (0%, 0%)),
     y: scale-continuous(limits: (-order.len() + 0.5, 0.5), expand: (0%, 0%)),
-    fill: scale-gradientn(colours: ramp, limits: (-1, 1), breaks: (-1, -0.5, 0, 0.5, 1), name: "Correlation"),
+    fill: scale-gradientn(colours: ramp, limits: fill-limits, breaks: (-1, -0.5, 0, 0.5, 1), name: "Correlation"),
   ),
   labels: labels(
     title: "Verb-Final Languages Put Adpositions After the Noun and Relative Clauses Before It",
