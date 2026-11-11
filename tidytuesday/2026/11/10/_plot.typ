@@ -74,6 +74,7 @@
   message: "a death belongs to a franchise that has no ranking",
 )
 #let all-shown = total-of(characters, "shown") / total-of(characters, "citations")
+#assert(calc.round(all-shown * 100) == 59, message: "the printed overall share of shown citations changed")
 
 #let ink = theme-minimal().at("ink", default: black)
 #let dark = ink.oklab().components().first() > 50%
@@ -101,7 +102,7 @@
 #let bar(name) = {
   let f = franchise(name)
   plot(
-    data: kinds.map(k => (row: name, kind: k, share: f.at(k))),
+    data: kinds.filter(k => f.at(k) > 0).map(k => (row: name, kind: k, share: f.at(k))),
     mapping: aes(x: "row", y: "share", fill: "kind"),
     layers: (geom-col(width: 1, position: "stack", colour: page-colour, stroke: 0.6pt),),
     scales: scales(
@@ -132,7 +133,7 @@
     plot(
       data: range(f.fallen).map(i => (x: i, y: 0, kind: if i >= f.fallen - f.undone { "undone" } else { "stands" })),
       mapping: aes(x: "x", y: "y", fill: "kind"),
-      layers: (geom-point(size: 1.8pt, stroke: none),),
+      layers: (geom-point(size: 1.0pt, stroke: none),),
       scales: scales(
         x: scale-continuous(limits: (-0.5, most-deaths - 0.5), expand: (0%, 0%)),
         y: scale-continuous(limits: (-1, 1), expand: (0%, 0%)),
@@ -163,7 +164,7 @@
       subtitle: text(font: sans, size: 7pt)[
         The bar splits the citations behind a franchise's ranking by the evidence they give: shown on page or screen, stated by a character or a guidebook, or scaled against another feat.
         Each dot is a death that a ranked character caused.\
-        Evidence: #key(colours.shown, "shown")#key(colours.stated, "stated")#key(colours.scaled, "scaled")\
+        Evidence: #key(colours.stated, "stated")#key(colours.shown, "shown")#key(colours.scaled, "scaled")\
         Deaths: #key(colours.undone, "undone later")#key(stands-colour, "left standing")
       ],
     ),
