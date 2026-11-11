@@ -1,0 +1,49 @@
+---
+engine: markdown
+title: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun"
+description: "A triangular heatmap of the correlations between the 11 word-order features that Grambank flags, ordered by how much each goes with verb-final order."
+date: "2026-11-03"
+order: 20261103
+image: images/featured-light.png
+image-alt: "A triangular heatmap of the correlations between 11 word-order features, with one row for each feature and its name just after the diagonal. Cells are orange for features that rarely go together and blue for features that tend to, and cells between minus 0.3 and 0.3 have no number. Rows run from verb-final order at the top, then postpositions, relative clause before the noun, complementiser after the verb, articles after the noun, question particle at the start, articles before the noun, verb-initial order, complementiser before the verb, relative clause after the noun, to prepositions at the bottom. Verb-final order is correlated 0.6 with postpositions and 0.49 with a relative clause before the noun, and minus 0.7 with prepositions, its strongest link. The relative clause before and after the noun have a correlation of minus 0.55."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-11-03
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 8.4cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "Verb-Final Languages Put Adpositions and Relative Clauses Before the Noun"
+```
+
+Data: [TidyTuesday 2026-11-03](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-11-03).
+
+Grambank records 195 grammatical features for more than 2,400 languages, and the data flags 11 of them as word-order features.
+For each pair, I took the correlation of the two yes or no answers over the languages that have an answer to both.
+Then I ordered the features by how much each goes with verb-final order, where the verb comes last in a transitive clause.
+
+Verb-final languages tend to have postpositions, at 0.6, and a relative clause before the noun, at 0.49.
+They rarely have prepositions, at minus 0.7, and that is the strongest link of the row.
+The features line up on a single side: a language that puts the verb last tends to put the marker or the clause before the noun, and the head comes last.
+The relative clause shows it from the other side, because a clause before the noun and a clause after the noun have a correlation of minus 0.55.
+
+Some cautions.
+A correlation says that two features tend to go together, not that one causes the other.
+Languages of one family often share a grammar, so many of the languages are not independent cases.
+A language with no recorded answer for one of two features is left out of that pair, so each cell rests on its own set of languages, and the smallest has 950.
