@@ -1,0 +1,51 @@
+---
+engine: markdown
+title: "A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand"
+description: "A dot plot of the price level of 50 countries for 111 IKEA sofas and armchairs, each as a multiple of the product's median price over all countries."
+date: "2026-10-27"
+order: 20261027
+image: images/featured-light.png
+image-alt: "A dot plot with one row for each of the 50 countries in the data. Each dot is the median, over the products compared in that country, of the price of a product divided by the median price of the same product over all countries, from 0.6 times to 2 times on a logarithmic axis. A thick line behind each dot spans the middle half of the products, and a dashed vertical line marks a ratio of 1. Countries run from the dearest at the top to the cheapest at the bottom, and dots are orange above 1 and blue at or below it. From the top: Mexico 1.65, Morocco 1.45, Israel 1.42, Colombia 1.35 and Jordan 1.34. The 22 orange countries end with Portugal, just above 1. Netherlands and Austria sit at 1.00. The cheapest are South Korea 0.83, Philippines 0.79, Japan 0.78 and Thailand 0.76 at the bottom. Mexico is more than twice as dear as Thailand."
+categories: [2026]
+---
+
+```{typst}
+//| include: false
+//| file: _plot.typ
+//| output-filename: featured.png
+//| format: png
+//| dpi: 300
+//| width: 18cm
+//| height: 9.45cm
+```
+
+```{typst}
+//| label: fig-2026-10-27
+//| echo: true
+//| code-fold: true
+//| code-summary: "See the code that generated this plot."
+//| file: _plot.typ
+//| output-filename: plot.svg
+//| width: 18cm
+//| height: 16.5cm
+//| fig-alt: "{{< meta image-alt >}}"
+//| fig-cap: "A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand"
+```
+
+Data: [TidyTuesday 2026-10-27](https://github.com/rfordatascience/tidytuesday/tree/main/data/2026/2026-10-27).
+
+The data lists every sofa and armchair on ikea.com in 50 countries, with prices converted to US dollars.
+To compare countries, I kept the 111 products that are on sale in at least 30 countries.
+For each product, I divided its price in a country by its median price over all the countries that sell it.
+A country's dot is the median of those ratios.
+
+Prices differ a lot.
+A typical product costs 1.65 times its median price in Mexico and 0.76 times in Thailand, which makes Mexico more than twice as dear.
+Morocco, Israel, Colombia and Jordan follow Mexico, while Japan, the Philippines and South Korea sit with Thailand at the cheap end.
+Most of western Europe lands close to 1.
+The Netherlands and Austria sit at 1.00, and Italy, Sweden and Belgium are within a point of it.
+
+Some cautions.
+The prices were converted at one day's exchange rates, so a swing in a currency moves its country.
+The prices are not adjusted for local taxes or for the cost of living, and IKEA does not stock every product everywhere.
+The number of products compared goes from 32 to 107 across countries, so the countries at the low end of that range rest on fewer products.
