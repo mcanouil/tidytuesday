@@ -74,6 +74,10 @@
   message: "the printed price index of the cheapest or the dearest country changed",
 )
 #assert(countries.last().mid / countries.first().mid > 2, message: "Mexico is no longer more than twice as dear as Thailand")
+#assert(
+  countries.all(c => c.low > 0.55 and c.high < 2.1),
+  message: "an interval now falls outside the limits of the price axis",
+)
 #let dearer = countries.filter(c => c.mid > 1)
 #assert(dearer.len() == 22, message: "the number of countries above the typical price changed")
 
@@ -94,7 +98,6 @@
 #let ratio-label(v) = text(font: mono, size: 6pt, fill: muted)[#format-number(digits: 2)(v)\×]
 #let breaks = (0.6, 0.8, 1, 1.25, 1.6, 2)
 
-#set text(font: sans)
 #plot(
   data: rows,
   mapping: aes(y: "name"),
@@ -124,7 +127,12 @@
     y: none,
   ),
   guides: guides(default: none),
-  theme: theme-minimal(),
+  theme: theme-minimal(
+    plot-title: element-text(font: sans, size: 13pt, weight: "bold", colour: ink),
+    plot-subtitle: element-text(font: sans, size: 7pt, colour: ink),
+    plot-caption: element-text(font: sans, size: 5.5pt, colour: muted),
+    axis-text-y: element-text(font: sans, size: 6.5pt, colour: ink),
+  ),
   width: auto,
   height: auto,
 )
