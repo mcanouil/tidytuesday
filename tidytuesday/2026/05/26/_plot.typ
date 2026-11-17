@@ -139,7 +139,7 @@
     // Each key carries a two-line definition, so four in one row stand wider than
     // the panels. Two columns keep the legend inside the figure.
     guides: guides(default: guide-legend(position: "bottom", ncolumn: 2)),
-    gutter: 1cm,
+    gutter: 2.2cm,
     width: auto,
     height: auto,
     labels: labels(
@@ -151,7 +151,10 @@
       ])
     ),
   )
-  #place(top + center, dx: 10pt, dy: 2cm)[
+  // Raw Typst: an annotation in the gutter between compose panels would widen the
+  // scale domain of its panel. The pair is centred on the gutter, which `gutter`
+  // above sizes so that the text clears both panels.
+  #place(top + center, dy: 2cm)[
     #set align(center)
     #set text(size: 8pt, style: "italic", fill: accent)
     As incomes rise, \ two roads diverge
