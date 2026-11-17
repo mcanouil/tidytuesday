@@ -56,94 +56,59 @@
 #let share-label = format-number(digits: 0, suffix: "%")
 #let highlighted = ("Lille", "Paris")
 
-// Rows are numbered from the bottom, so the best-mapped city sits at the top.
-#let rows = cities.enumerate().map(((i, c)) => (..c, row: i + 1))
-#let half = 0.2
-
-#let stems = rows.map(c => (x: 0, xend: c.rate, y: c.row, yend: c.row))
-#let gaps = rows.map(c => (
-  xmin: c.rate,
-  xmax: national-rate,
-  ymin: c.row - half,
-  ymax: c.row + half,
+// The first level of a discrete y axis sits at the bottom, and `cities` runs
+// from the lowest rate up, so the best-mapped city sits at the top.
+#let near-x = national-rate + 5.5
+#let rows = cities.map(c => (
+  ..c,
+  zero: 0,
+  national: national-rate,
+  value: rate-label(c.rate),
+  value-x: c.rate + 0.6,
+  near-label: share-label(c.near),
+  near-x: near-x,
+  pill: "💊",
 ))
 
-#let emphasise(c, body) = if c.city in highlighted { text(weight: "bold", body) } else { body }
-#let names = rows.map(c => (
-  x: -0.6,
-  y: c.row,
-  content: text(font: body-font, size: 6.5pt, fill: ink)[#emphasise(c, c.city)],
-))
-#let values = rows.map(c => (
-  x: c.rate + 1,
-  y: c.row,
-  content: box(fill: paper, inset: 1pt, text(font: body-font, size: 5.5pt, fill: cross)[#emphasise(c, rate-label(c.rate))]),
-))
-
-// The second fact, in a column of its own: how many people live within 1 km of
-// a mapped pharmacy. It reads the same bias as the count.
-#let near-x = national-rate + 4.5
-#let nears = rows.map(c => (
-  x: near-x,
-  y: c.row,
-  content: text(font: body-font, size: 6pt, fill: ink.transparentize(25%))[#emphasise(c, share-label(c.near))],
-))
-
-#let top-y = rows.len() + 1.1
-#let headers = (
-  (
-    x: national-rate,
-    y: top-y,
-    content: text(font: body-font, size: 6pt, fill: ink)[France: #rate-label(national-rate)],
+#let plot-layers = (
+  geom-vline(xintercept: national-rate, colour: ink, stroke: 0.6pt, linetype: "dashed"),
+  // The gap to the national rate, drawn as a hatched segment.
+  geom-segment(mapping: aes(x: "rate", xend: "national"), colour: hatch, stroke: 5pt),
+  geom-segment(colour: cross, stroke: 1.2pt),
+  geom-text(mapping: aes(x: "rate", label: "pill"), font: emoji-font, size: 9pt),
+  geom-label(
+    mapping: aes(x: "value-x", label: "value"),
+    font: body-font,
+    size: 5.5pt,
+    colour: cross,
+    fill: paper,
+    stroke: none,
+    inset: 1pt,
+    anchor: "west",
   ),
-  (
-    x: near-x,
-    y: top-y,
-    content: align(center, text(font: body-font, size: 6pt, fill: ink)[within 1 km \ of a pharmacy]),
+  geom-text(
+    mapping: aes(x: "near-x", label: "near-label"),
+    font: body-font,
+    size: 6pt,
+    colour: ink.transparentize(25%),
   ),
 )
 
 #plot(
   data: rows,
-  mapping: aes(x: "x", y: "y"),
-  layers: (
-    geom-rect(
-      data: gaps,
-      mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
-      inherit-aes: false,
-      fill: hatch,
-    ),
-    geom-segment(
-      data: ((x: national-rate, xend: national-rate, y: 0.5, yend: top-y),),
-      mapping: aes(xend: "xend", yend: "yend"),
-      colour: ink,
-      stroke: 0.6pt,
-      linetype: "dashed",
-    ),
-    geom-segment(
-      data: stems,
-      mapping: aes(xend: "xend", yend: "yend"),
-      colour: cross,
-      stroke: 1.2pt,
-    ),
-    geom-typst(
-      data: rows,
-      mapping: aes(x: "rate", y: "row"),
-      label: text(font: emoji-font)[💊],
-      size: 9pt,
-    ),
-    geom-typst(data: names, mapping: aes(label: "content"), anchor: "east"),
-    geom-typst(data: values, mapping: aes(label: "content"), anchor: "west"),
-    geom-typst(data: nears, mapping: aes(label: "content"), anchor: "center"),
-    geom-typst(data: headers, mapping: aes(label: "content"), anchor: "south"),
-  ),
+  mapping: aes(x: "zero", xend: "rate", y: "city", yend: "city"),
+  layers: plot-layers,
   scales: scales(
     x: scale-continuous(
-      limits: (-6.5, near-x + 2.5),
+      limits: (0, near-x + 2.5),
       breaks: (0, 10, 20),
+      secondary: sec-axis(
+        breaks: (national-rate, near-x),
+        labels: ([France: #rate-label(national-rate)], align(center)[within 1 km \ of a pharmacy]),
+      ),
       expand: (0%, 0%),
     ),
-    y: scale-continuous(limits: (0.4, top-y + 1.6), breaks: (), expand: (0%, 0%)),
+    y: scale-discrete(limits: cities.map(c => c.city), labels: l => if l in highlighted { text(weight: "bold")[#l] } else { l }),
   ),
   guides: guides(default: none),
   labels: labels(
