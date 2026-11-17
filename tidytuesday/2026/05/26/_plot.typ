@@ -31,9 +31,11 @@
   )[#body]
 }
 
-// One row per year and category, carrying the band bounds. geom-area draws every
-// band from y = 0, so stacked areas would paint over each other. geom-ribbon
-// with explicit bounds stacks them honestly.
+// One row per year and category, carrying the share. geom-area stacks the
+// categories. The stack follows the alphabetical order of the fill column, with
+// the first level on top, and the fill limits do not change it. The bands are
+// therefore keyed by their rank from the top (`order`), so that traditional
+// biomass sits at the foot, and the limits run from the foot up to keep the legend in the order of `cats`.
 #let panel(country, annotations) = defer(
   plot,
   data: csv("data/energy_cleaned.csv", row-type: dictionary)
@@ -52,24 +54,16 @@
           + num(row.geothermal_energy_consumption_tfec_pct)
           + num(row.marine_energy_consumption_tfec_pct),
       )
-      cats
-        .fold((acc: 0.0, out: ()), (st, c) => {
-          let hi = st.acc + shares.at(c)
-          (
-            acc: hi,
-            out: st.out + ((year: y, category: c, ymin: st.acc, ymax: hi),),
-          )
-        })
-        .out
+      cats.enumerate().map(((i, c)) => (year: y, order: str(cats.len() - 1 - i), share: shares.at(c)))
     })
     .flatten(),
-  mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
-  layers: (geom-ribbon(alpha: 1),) + annotations,
+  mapping: aes(x: "year", y: "share", fill: "order"),
+  layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
     x: scale-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
     y: scale-continuous(expand: (0%, auto)),
     fill: scale-discrete(
-      limits: cats,
+      limits: range(cats.len()).map(str).rev(),
       palette: cat-colours.values(),
       // One definition per category, in the order of `cats`. Each names the raw
       // columns summed above, so the legend says what every band holds.
