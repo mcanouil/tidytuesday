@@ -76,7 +76,8 @@
         n: t.n,
         share: t.n / totals.at(k),
         rank: finish-limits.len() - finish-limits.position(c => c == finish-names.at(t.finish)),
-        text: if t.finish == "sub" { "" } else { label },
+        half: -t.n / totals.at(k) / 2,
+        text: if t.finish == "ko" { "*" + label + "*" } else if t.finish == "sub" { "" } else { label },
       )
     })
 )
@@ -122,9 +123,8 @@
     // decision share closes each bar in dark ink on the quiet grey. The
     // submission share carries no label. One layer stacks them like the bars.
     geom-text(
-      mapping: aes(label: "text", colour: "cat", size: "cat"),
+      mapping: aes(label: typst("text"), colour: "cat", size: "cat", nudge-y: "half"),
       position: position-stack(),
-      anchor: "east",
       font: chart-font,
     ),
     // An accent ring traces the men's heavyweight knockout wedge, tying its
