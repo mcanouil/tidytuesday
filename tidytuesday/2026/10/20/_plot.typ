@@ -137,70 +137,44 @@
 #let muted = ink.transparentize(35%)
 #let guide-colour = ink.transparentize(82%)
 
-// The strips and the axis in the column label share one x scale and one width.
+// Every strip shares one width, and Keisen gives the column one salary domain and its axis.
 #let strip-width = 9.2cm
 #let cell-inset = 3pt
-#let x-scale = scale-continuous(
-  limits: salary-limits,
-  breaks: guides-at,
-  expand: (0%, 0%),
-)
 
 // Points are offset vertically by salary rank, so neighbours in salary do not
-// overlap. The order of the levels is interleaved so that neighbours never form a
-// rising or falling run that would read as a slope.
+// overlap. The levels are interleaved so that neighbours never form a rising or
+// falling run that would read as a slope. geom-beeswarm swarms only across a
+// discrete x axis, and a nanoplot cell fixes a horizontal continuous axis, so
+// the offsets stay in the data.
 #let level-order = (0, 3, 1, 4, 2, 5)
 #let levels = level-order.len()
 
-#let strip(name) = {
-  let f = field(name)
-  plot(
-    data: f.majors.enumerate().map(((i, m)) => (..m, y: level-order.at(calc.rem(i, levels)) - (levels - 1) / 2)),
-    mapping: aes(x: "salary", y: "y", fill: "pct"),
-    layers: (
-      geom-vline(
-        data: guides-at.map(v => (v: v)),
-        mapping: aes(xintercept: "v"),
-        colour: guide-colour,
-        stroke: 0.4pt,
-      ),
-      geom-vline(xintercept: all-median, colour: muted, stroke: 0.6pt, linetype: "dashed"),
-      geom-point(size: 2.6pt, colour: page-colour, stroke: 0.4pt),
-    ),
-    scales: scales(
-      x: x-scale,
-      y: scale-continuous(limits: (-levels / 2 - 0.5, levels / 2 + 0.5), expand: (0%, 0%)),
-      fill: scale-gradientn(colours: ramp, limits: (0, 100)),
-    ),
-    guides: guides(default: none),
-    theme: theme-void(),
-    width: strip-width,
-    height: 0.62cm,
-  )
-}
-
-#let axis = plot(
-  data: guides-at.map(v => (salary: v, y: 0, label: text(font: mono, size: 5.5pt, fill: muted)[\$#(v / 1000)k])),
-  mapping: aes(x: "salary", y: "y"),
+#let strip-renderer = nanoplot(
+  mapping: aes(x: "salary", y: "y", fill: "pct"),
   layers: (
-    geom-typst(mapping: aes(label: "label"), anchor: "center"),
+    geom-vline(
+      data: guides-at.map(v => (salary: v)),
+      mapping: aes(xintercept: "salary"),
+      colour: guide-colour,
+      stroke: 0.4pt,
+    ),
+    geom-vline(xintercept: all-median, colour: muted, stroke: 0.6pt, linetype: "dashed"),
+    geom-point(size: 2.6pt, colour: page-colour, stroke: 0.4pt),
   ),
-  scales: scales(x: x-scale, y: scale-continuous(limits: (-2, 2), expand: (0%, 0%))),
-  guides: guides(default: none),
-  theme: theme-void(),
-  width: strip-width,
-  height: 0.3cm,
+  scales: scales(
+    x: scale-continuous(breaks: guides-at, labels: v => text(font: mono, size: 5.5pt, fill: muted)[\$#(v / 1000)k], expand: (0%, 0%)),
+    y: scale-continuous(limits: (-levels / 2 - 0.5, levels / 2 + 0.5), expand: (0%, 0%)),
+    fill: scale-gradientn(colours: ramp, limits: (0, 100)),
+  ),
+  domain-field: "salary",
 )
 
 #let bar-width = 2.6cm
 #let bar-column-width = bar-width + 0.7cm
-#let bar(v) = {
-  let length = bar-width * v / 100
-  box(width: bar-column-width, height: 0.34cm)[
-    #place(horizon + left, rect(width: length, height: 0.34cm, fill: ramp-gradient.sample(v * 1%), stroke: none))
-    #place(horizon + left, dx: length + 4pt, text(font: mono, size: 6.5pt, fill: ink)[#calc.round(v)])
-  ]
-}
+#let bar-renderer = keisen.nanoplot-value-bar(
+  fill: v => ramp-gradient.sample(v * 1%),
+  label: v => text(font: mono, size: 6.5pt, fill: ink)[#calc.round(v)],
+)
 
 #let legend = box(baseline: 1pt)[
   #text(font: mono, size: 6pt)[0]
@@ -208,7 +182,16 @@
   #text(font: mono, size: 6pt)[100]
 ]
 
-#let rows = fields.map(f => (field: f.name, n: f.n, med: f.med, strip: f.name))
+#let rows = fields.map(f => (
+  field: f.name,
+  n: f.n,
+  med: f.med,
+  strip: f.majors.enumerate().map(((i, m)) => (
+    salary: m.salary,
+    pct: m.pct,
+    y: level-order.at(calc.rem(i, levels)) - (levels - 1) / 2,
+  )),
+))
 
 #let figure-table(width) = {
   let n-width = 1.2cm
@@ -228,18 +211,13 @@
     keisen.columns-label(
       n: [Majors],
       med: [Median exposure percentile],
-      strip: stack(
-        spacing: 2pt,
-        align(center, text(font: sans, size: 6.5pt, weight: "bold")[Median starting salary]),
-        axis,
-      ),
+      strip: text(font: sans, size: 6.5pt, weight: "bold")[Median starting salary],
     ),
     keisen.columns-align(start, columns: "med"),
-    keisen.columns-align(center, columns: "n"),
+    keisen.columns-align(center, columns: ("n", "strip")),
     keisen.columns-width((field: width - n-width - med-width - strip-column, n: n-width, med: med-width, strip: strip-column)),
-    keisen.format("med", bar),
-    keisen.format("strip", strip),
-    keisen.grand-summary-rows(functions: ("": col => axis), columns: "strip", format: v => v),
+    keisen.format-nanoplot("med", plot: bar-renderer, width: bar-column-width, height: 0.34cm, domain: (0, 100)),
+    keisen.format-nanoplot("strip", plot: strip-renderer, width: strip-width, height: 0.62cm, domain: salary-limits),
     keisen.table-source-note(text(font: sans, size: 5.5pt)[
       Salaries are pooled medians one year after graduation, and the exposure of a major is the mean over the occupations it leads to.
       Source: TidyTuesday 2026-10-20. Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
