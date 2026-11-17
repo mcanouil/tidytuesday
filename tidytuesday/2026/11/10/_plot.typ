@@ -127,8 +127,7 @@
 #let citations(n) = text(font: mono, size: 5.5pt, fill: muted)[#n]
 
 // A strip with one dot for each recorded death, the undone ones last. Every
-// strip shares one scale, so a dot has the same width in every row, and the
-// axis counts the deaths. A franchise with no death gets a label in place of a dot.
+// strip shares one scale, so a dot has the same width in every row. A franchise with no death gets a label in place of a dot.
 #let most-deaths = calc.max(..franchises.map(f => f.fallen))
 #let deaths-width = 5.6cm
 #let death-cells(f) = if f.fallen == 0 {
@@ -143,7 +142,7 @@
     geom-text(anchor: "west", nudge-x: 0.3, font: sans, size: 6pt, colour: muted),
   ),
   scales: scales(
-    x: scale-continuous(expand: (0%, 0%), breaks: (10, 20, 30, 40, 50, 60)),
+    x: scale-continuous(expand: (0%, 0%)),
     y: scale-continuous(limits: (-1, 1), expand: (0%, 0%)),
     fill: scale-manual(
       values: (colours.undone, stands-colour, none-colour),
@@ -151,7 +150,8 @@
     ),
   ),
   domain-field: "x",
-  theme: theme-void(axis-text: element-text(font: sans, size: 5.5pt, colour: muted)),
+  axis: false,
+  
 )
 
 #let key(fill, label) = [#text(fill: fill)[■] #label#h(9pt)]
