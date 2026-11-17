@@ -123,45 +123,16 @@
 
 #plot(
   // Castles stack up from the waterline, fortresses and palaces hang down from
-  // it. Each segment carries the running edge it starts at, so the two walls are
-  // built in one pass.
-  data: {
-    let out = ()
-    for bin in bins {
-      let edge = 0
-      for category in above {
-        let n = tally-at(bin, category)
-        out.push((
-          category: category,
-          xmin: bin + pad,
-          xmax: bin + pad + merlon,
-          ymin: edge,
-          ymax: edge + n,
-        ))
-        edge += n
-      }
-      edge = 0
-      for category in below {
-        let n = tally-at(bin, category)
-        out.push((
-          category: category,
-          xmin: bin + pad,
-          xmax: bin + pad + merlon,
-          ymin: edge - n,
-          ymax: edge,
-        ))
-        edge -= n
-      }
-    }
-    out.filter(r => r.ymin != r.ymax)
-  },
-  mapping: aes(
-    xmin: "xmin",
-    xmax: "xmax",
-    ymin: "ymin",
-    ymax: "ymax",
-    fill: "category",
-  ),
+  // it as negative counts. Each bar is centred on its half-century.
+  data: bins
+    .map(bin => (..above, ..below).map(category => (
+      category: category,
+      x: bin + bin-width / 2,
+      n: if category in above { tally-at(bin, category) } else { -tally-at(bin, category) },
+    )))
+    .flatten()
+    .filter(row => row.n != 0),
+  mapping: aes(x: "x", y: "n", fill: "category"),
   layers: (
     // The moat. A wash under the waterline, so the lower wall reads as the
     // reflection of the upper one rather than as a second chart. It is drawn as
@@ -182,7 +153,15 @@
       stroke: 0.7pt,
       linetype: "dashed",
     ),
-    geom-rect(stroke: 0.4pt, colour: paper-colour),
+    // One stack for each wall: a single stack would pile the negative counts onto
+    // the positive ones.
+    ..(above, below).map(group => geom-col(
+      data: rows => rows.filter(row => row.category in group),
+      position: "stack",
+      width: merlon / bin-width,
+      stroke: 0.4pt,
+      colour: paper-colour,
+    )),
     geom-path(
       // The crest: the top edge of the upper wall, drawn as one path that climbs
       // each merlon and drops back to the waterline between them. It traces the
@@ -227,15 +206,16 @@
       anchor: "north-east",
       clip: false,
     ),
-    // The tags stand in the order the bars stack: ruins over castles above the
-    // waterline, fortresses over palaces below it. One row per tag, so the four
-    // stand as a single layer rather than as four single-row annotations.
+    // The tags stand in the order the bars stack, which follows the alphabet of
+    // the levels: castles over ruins above the waterline, palaces over fortresses
+    // below it. One row per tag, so the four stand as a single layer rather than
+    // as four single-row annotations.
     geom-typst(
       data: (
-        (category: "ruin", y: 130),
-        (category: "castle", y: 96),
-        (category: "fortress", y: -42),
-        (category: "palace", y: -78),
+        (category: "castle", y: 130),
+        (category: "ruin", y: 96),
+        (category: "palace", y: -42),
+        (category: "fortress", y: -78),
       ).map(row => (
         x: 812,
         y: row.y,
