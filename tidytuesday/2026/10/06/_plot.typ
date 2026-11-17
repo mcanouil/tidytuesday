@@ -77,30 +77,38 @@
 
 #let money(v) = "$" + format-number(digits: 2)(v)
 #let grade(b) = if b.grade == "unspecified" { "no grade" } else { b.grade }
-#let reading(b) = text(font: mono-font, size: 5.5pt, fill: ink)[
-  *#b.code* #grade(b), #money(b.price)/fl oz
-]
+// Typst markup: the code is bold, and the dollar sign is escaped.
+#let reading(b) = "*" + b.code + "* " + grade(b) + ", \\" + money(b.price) + "/fl oz"
 
 // One column of labels just right of the rightmost bean.
 #let soybean-label-x = calc.max(..soybean.map(b => b.linoleic)) + 1.4
-#let soybean-labels = {
+#let soybean-labels = (
   marks
     .filter(b => b.purity == "adulterated")
-    .map(b => (x: soybean-label-x, y: b.y, content: reading(b)))
-}
+    .map(b => (x: soybean-label-x, y: b.y, label: reading(b)))
+)
 
-// R1 sits just below and left of U4, so its label goes on its left.
-#let left-labels = ("R1",)
-#let suspected-labels = suspected.map(b => {
-  let left = b.code in left-labels
-  (
-    x: b.linoleic + if left { -1.2 } else { 1.2 },
-    y: b.palmitoleic,
-    content: reading(b),
-    side: if left { "east" } else { "west" },
-  )
-})
+// The labels of the suspected bottles sit beside their mark. R1 sits just below
+// and left of U4, so its label goes on its left, in a layer of its own with the
+// opposite anchor.
+#let suspected-labels(left) = (
+  suspected
+    .filter(b => (b.code == "R1") == left)
+    .map(b => (x: b.linoleic, y: b.palmitoleic, label: reading(b)))
+)
 
+// One layer of bottle readings. `label` holds Typst markup, so the code is bold.
+#let reading-layer(data, anchor, nudge) = geom-text(
+  data: data,
+  mapping: aes(label: typst("label"), nudge-x: nudge),
+  font: mono-font,
+  size: 5.5pt,
+  colour: ink,
+  anchor: anchor,
+)
+
+// The notes stay `geom-typst`: each mixes an emoji glyph, bold text and a colour,
+// which `geom-text` cannot draw.
 #let notes = (
   (
     x: soybean-line + 0.6,
@@ -139,12 +147,9 @@
     ),
     geom-vline(xintercept: soybean-line, colour: bean, stroke: 0.6pt, linetype: "dashed"),
     geom-typst(mapping: aes(label: "content"), size: 10pt),
-    geom-typst(data: soybean-labels, mapping: aes(label: "content"), anchor: "west"),
-    ..("west", "east").map(side => geom-typst(
-      data: suspected-labels.filter(l => l.side == side),
-      mapping: aes(label: "content"),
-      anchor: side,
-    )),
+    reading-layer(soybean-labels, "west", 0),
+    reading-layer(suspected-labels(false), "west", 1.2),
+    reading-layer(suspected-labels(true), "east", -1.2),
     geom-typst(data: notes, mapping: aes(label: "content"), anchor: "north-west"),
   ),
   scales: scales(
