@@ -90,7 +90,8 @@
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
-// The share of the x range that the names after the diagonal need.
+// The share of the span between the first and last feature that the names after
+// the diagonal need: 75% of 10 slots leaves 7.5 slots of room.
 #let label-room = 75%
 
 // One tile for each pair of features up to the diagonal, with the name of a
@@ -116,7 +117,7 @@
   data: pairs,
   mapping: aes(x: "col", y: "row"),
   layers: (
-    geom-tile(data: diagonal, mapping: aes(x: "col", y: "row"), fill: ink.transparentize(88%), width: 0.92, height: 0.92),
+    geom-tile(data: diagonal, fill: ink.transparentize(88%), width: 0.92, height: 0.92),
     geom-tile(mapping: aes(fill: "r"), width: 0.92, height: 0.92),
     geom-typst(data: pairs.filter(t => t.label != none), mapping: aes(label: "label"), anchor: "center"),
     geom-typst(data: diagonal, mapping: aes(x: "col", y: "row", label: "name"), anchor: "west", nudge-x: 0.65),
