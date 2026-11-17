@@ -134,7 +134,7 @@
 #let death-cells(f) = if f.fallen == 0 {
   ((x: 1, y: 0, kind: "none", label: "none recorded"),)
 } else {
-  range(f.fallen).map(i => (x: i + 1, y: 0, label: "", kind: if i >= f.fallen - f.undone { "undone" } else { "stands" }))
+  range(f.fallen).map(i => (x: i + 1, y: 0, label: none, kind: if i >= f.fallen - f.undone { "undone" } else { "stands" }))
 }
 #let deaths-plot = nanoplot(
   mapping: aes(x: "x", y: "y", fill: "kind", label: "label"),
