@@ -77,7 +77,8 @@
 
 #let money(v) = "$" + format-number(digits: 2)(v)
 #let grade(b) = if b.grade == "unspecified" { "no grade" } else { b.grade }
-#let reading(b) = b.code + " " + grade(b) + ", " + money(b.price) + "/fl oz"
+// Typst markup: the code is bold, and the dollar sign is escaped.
+#let reading(b) = "*" + b.code + "* " + grade(b) + ", \\" + money(b.price) + "/fl oz"
 
 // One column of labels just right of the rightmost bean.
 #let soybean-label-x = calc.max(..soybean.map(b => b.linoleic)) + 1.4
@@ -93,7 +94,17 @@
 #let suspected-labels(left) = (
   suspected
     .filter(b => (b.code == "R1") == left)
-    .map(b => (x: b.linoleic, y: b.palmitoleic, label: reading(b), shift: if left { -1.2 } else { 1.2 }))
+    .map(b => (x: b.linoleic, y: b.palmitoleic, label: reading(b)))
+)
+
+// One layer of bottle readings. `label` holds Typst markup, so the code is bold.
+#let reading-layer(data, anchor, nudge) = geom-text(
+  data: data,
+  mapping: aes(label: typst("label"), nudge-x: nudge),
+  font: mono-font,
+  size: 5.5pt,
+  colour: ink,
+  anchor: anchor,
 )
 
 // The notes stay `geom-typst`: each mixes an emoji glyph, bold text and a colour,
@@ -136,30 +147,9 @@
     ),
     geom-vline(xintercept: soybean-line, colour: bean, stroke: 0.6pt, linetype: "dashed"),
     geom-typst(mapping: aes(label: "content"), size: 10pt),
-    geom-text(
-      data: soybean-labels,
-      mapping: aes(label: "label"),
-      font: mono-font,
-      size: 5.5pt,
-      colour: ink,
-      anchor: "west",
-    ),
-    geom-text(
-      data: suspected-labels(false),
-      mapping: aes(label: "label", nudge-x: "shift"),
-      font: mono-font,
-      size: 5.5pt,
-      colour: ink,
-      anchor: "west",
-    ),
-    geom-text(
-      data: suspected-labels(true),
-      mapping: aes(label: "label", nudge-x: "shift"),
-      font: mono-font,
-      size: 5.5pt,
-      colour: ink,
-      anchor: "east",
-    ),
+    reading-layer(soybean-labels, "west", 0),
+    reading-layer(suspected-labels(false), "west", 1.2),
+    reading-layer(suspected-labels(true), "east", -1.2),
     geom-typst(data: notes, mapping: aes(label: "content"), anchor: "north-west"),
   ),
   scales: scales(
