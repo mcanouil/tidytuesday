@@ -76,7 +76,7 @@
 #assert(countries.last().mid / countries.first().mid > 2, message: "Mexico is no longer more than twice as dear as Thailand")
 #assert(
   countries.all(c => c.low > 0.55 and c.high < 2.1),
-  message: "an interval now falls outside the limits of the price axis",
+  message: "an interval now falls outside the range the price axis was drawn for",
 )
 #let dearer = countries.filter(c => c.mid > 1)
 #assert(dearer.len() == 22, message: "the number of countries above the typical price changed")
@@ -89,28 +89,60 @@
 // validate_palette.js against its own page, #fbfaf7 or #0d1626.
 #let cheaper = if dark { rgb("#5a8fd8") } else { rgb("#2f6bb8") }
 #let dearer-colour = if dark { rgb("#d07a2c") } else { rgb("#c2510e") }
-#let colour-of(c) = if c.mid > 1 { dearer-colour } else { cheaper }
 
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
-#let rows = countries.map(c => (..c, colour: colour-of(c)))
+// One row per product and country, so Gribouille summarises each country itself.
+#let rows = {
+  index-of
+    .pairs()
+    .map(((code, ratios)) => {
+      let name = names.at(code)
+      let side = if countries.find(c => c.name == name).mid > 1 { "dearer" } else { "cheaper" }
+      ratios.map(r => (name: name, ratio: r, side: side))
+    })
+    .flatten()
+}
 #let ratio-label(v) = text(font: mono, size: 6pt, fill: muted)[#format-number(digits: 2)(v)\×]
 #let breaks = (0.6, 0.8, 1, 1.25, 1.6, 2)
 
 #let figure-plot(width, height) = plot(
   data: rows,
-  mapping: aes(y: "name"),
+  mapping: aes(x: "name", y: "ratio", colour: "side"),
   layers: (
-    geom-vline(xintercept: 1, colour: muted, stroke: 0.6pt, linetype: "dashed"),
-    geom-segment(mapping: aes(x: "low", xend: "high", y: "name", yend: "name", colour: "colour"), linewidth: 2.4pt, alpha: 0.5),
-    geom-point(mapping: aes(x: "mid", fill: "colour"), size: 3pt, stroke: none),
+    // The typical price, as a segment across every row. geom-hline and geom-vline
+    // widen the price axis under coord-flip.
+    geom-segment(
+      data: ((x: 0.4, xend: countries.len() + 0.6, y: 1, yend: 1),),
+      mapping: aes(x: "x", xend: "xend", y: "y", yend: "yend"),
+      inherit-aes: false,
+      colour: muted, stroke: 0.6pt, linetype: "dashed",
+    ),
+    // The price axis spans 0.55 to 2.1 as before. A y limit cannot do it: under
+    // coord-flip it removes the layers that summarise the products.
+    geom-blank(
+      data: (0.55, 2.1).map(v => (name: countries.first().name, ratio: v)),
+      mapping: aes(x: "name", y: "ratio"),
+      inherit-aes: false,
+    ),
+    // The line spans the middle half of the products, and the dot is the median.
+    geom-linerange(
+      stat: stat-summary(fun: "median-hilow", fun-args: (conf: 0.5)),
+      stroke: 2.4pt,
+      alpha: 0.7,
+    ),
+    geom-pointrange(
+      stat: stat-summary(fun: "median-hilow", fun-args: (conf: 0.5)),
+      size: 3pt,
+      stroke: 0pt,
+    ),
   ),
+  coord: coord-flip(),
   scales: scales(
-    y: scale-discrete(limits: countries.map(c => c.name)),
-    x: scale-log10(breaks: breaks, limits: (0.55, 2.1), labels: ratio-label),
-    colour: scale-identity(),
-    fill: scale-identity(),
+    x: scale-discrete(limits: countries.rev().map(c => c.name)),
+    y: scale-log10(breaks: breaks, labels: ratio-label),
+    colour: scale-manual(values: (dearer-colour, cheaper), limits: ("dearer", "cheaper")),
   ),
   labels: labels(
     title: "A Typical IKEA Sofa Costs More Than Twice as Much in Mexico as in Thailand",
