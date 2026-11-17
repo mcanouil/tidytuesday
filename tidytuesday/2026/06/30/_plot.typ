@@ -9,10 +9,6 @@
 #let famine = 1850
 #let pivot = 1910
 
-// Group a whole number with thousands separators, e.g. 1382 -> "1,382".
-#let thousands = format-comma(digits: 0)
-#let pct(part, whole) = format-percent()(part / whole)
-
 // One palette, one source of truth. The cool depths read on both surfaces, and
 // one vermillion accent is reserved for the WWI pivot.
 #let found-col = rgb("#16b6c8") // surface: located wrecks, crisp near the light
@@ -39,13 +35,34 @@
     .filter(r => r.year >= d-min and r.year <= 2019)
 }
 
-#let counts = count(wrecks, "decade", "fate")
-#let decades = range(d-min, d-max + 1, step: 10)
-#let tally-of(d, fate) = {
-  let hit = counts.find(c => c.decade == d and c.fate == fate)
-  if hit == none { 0 } else { hit.n }
+// One row per decade with a column for each fate. A fate with no wreck in a
+// decade is none, which reads as zero.
+#let by-decade = (
+  pivot-wider(
+    count(wrecks, "decade", "fate"),
+    names-from: "fate",
+    values-from: "n",
+  )
+    .map(r => (str(r.decade), r))
+    .to-dict()
+)
+#let or-zero(n) = if n == none { 0 } else { n }
+#let cell(d) = {
+  let r = by-decade.at(str(d))
+  (found: or-zero(r.found), lost: or-zero(r.lost))
 }
-#let cell(d) = (found: tally-of(d, "found"), lost: tally-of(d, "lost"))
+
+// Found rise above the waterline and lost sink below it, so the lost counts
+// carry a minus sign.
+#let bars = (
+  by-decade
+    .values()
+    .map(r => (
+      (decade: r.decade, fate: "found", n: or-zero(r.found)),
+      (decade: r.decade, fate: "lost", n: -or-zero(r.lost)),
+    ))
+    .flatten()
+)
 // Annotation helper: a quiet serif on the murk, so callouts read without a
 // legend.
 #let note(body, fill: rgb("#eef4f9"), size: 7.5pt, weight: "regular") = text(
@@ -56,15 +73,12 @@
 )[#body]
 
 #plot(
-  // Found rise above the waterline and lost sink below it. Two layers rather than
-  // one stacked column, so each fate keeps its own colour and haze.
-  data: decades.map(d => (decade: d, n: cell(d).found)),
-  mapping: aes(x: "decade", y: "n"),
+  data: bars,
+  mapping: aes(x: "decade", y: "n", fill: "fate"),
   layers: (
     geom-hline(yintercept: 0, stroke: 0.8pt, colour: rgb("#eaf4f8"), alpha: 0.9),
     // Lost below, found above. Both carry a thin edge, so they read at any depth.
-    geom-col(fill: found-col, stroke: 0.4pt, colour: bar-edge),
-    geom-col(data: decades.map(d => (decade: d, n: -cell(d).lost)), fill: lost-col, stroke: 0.4pt, colour: bar-edge),
+    geom-col(stroke: 0.4pt, colour: bar-edge),
     // An accent ring traces the WWI pivot column and ties its callout to the
     // data. The bar half-width is 4.5: the 10-year slot times the 0.9 default.
     geom-rect(
@@ -81,14 +95,14 @@
     ),
     annotate("typst", x: 1745, y: 550, label: note(fill: rgb("#0d3450"), weight: "bold")[▲ found · mapped], anchor: "west", clip: false),
     annotate("typst", x: 1745, y: -750, label: note(fill: rgb("#eaf4f8"), weight: "bold")[▼ lost · no position], anchor: "west", clip: false),
-    annotate("typst", x: famine - 3, y: -1180, label: box(width: 4.4cm)[#note(size: 8pt)[*#(str(famine) + "s") famine-era exodus:* #thousands(cell(famine).lost) wrecks lost, #pct(cell(famine).lost, cell(famine).found + cell(famine).lost) never located.]], anchor: "east", clip: false),
+    annotate("typst", x: famine - 3, y: -1180, label: box(width: 4.4cm)[#note(size: 8pt)[*#(str(famine) + "s") famine-era exodus:* #format-comma(digits: 0)(cell(famine).lost) wrecks lost, #format-percent()(cell(famine).lost / (cell(famine).found + cell(famine).lost)) never located.]], anchor: "east", clip: false),
     // A darker orange than the accent keeps the pivot callout text legible on pale
     // surface water.
-    annotate("typst", x: pivot, y: 665, label: box(width: 3.4cm)[#set align(center); #note(fill: rgb("#9c3f00"), size: 8pt, weight: "bold")[WWI turning point \ #(str(pivot) + "s"): #pct(cell(pivot).found, cell(pivot).found + cell(pivot).lost) found (#thousands(cell(pivot).found))]], anchor: "south", clip: false),
+    annotate("typst", x: pivot, y: 665, label: box(width: 3.4cm)[#set align(center); #note(fill: rgb("#9c3f00"), size: 8pt, weight: "bold")[WWI turning point \ #(str(pivot) + "s"): #format-percent()(cell(pivot).found / (cell(pivot).found + cell(pivot).lost)) found (#format-comma(digits: 0)(cell(pivot).found))]], anchor: "south", clip: false),
     annotate("typst", x: 1978, y: 470, label: box(width: 3cm)[#set align(center); #note(fill: rgb("#0d3450"), size: 7.5pt)[Since 1950, nearly every wreck is charted]], anchor: "south", clip: false),
     // A wreck on the seabed, in the deep bottom-right corner. Its steel tint is
     // set in wreck.svg.
-    annotate("typst", x: 2024, y: -1520, label: image("assets/wreck.svg", width: 2.7cm), anchor: "south-east", clip: false),
+    annotate("typst", x: 2018, y: -1480, label: image("assets/wreck.svg", width: 2.7cm), anchor: "south-east", clip: false),
   ),
   scales: scales(
     x: scale-continuous(
@@ -97,6 +111,7 @@
       limits: (1743, 2018),
       expand: (0%, 0%),
     ),
+    fill: scale-manual(values: (found-col, lost-col), limits: ("found", "lost")),
     y: scale-continuous(
       name: "Wrecks per Decade · Found Above, Lost Below",
       breaks: (-1000, -500, 0, 500),
@@ -109,12 +124,12 @@
   labels: labels(
     title: "The Older the Wreck, the Deeper It Stays Lost",
     subtitle: [
-      Of #thousands(n-total) recorded Irish shipwrecks, only one in five has ever been given coordinates.
+      Of #format-comma(digits: 0)(n-total) recorded Irish shipwrecks, only one in five has ever been given coordinates.
       Decade by decade the share #text(fill: found-col, weight: "bold")[found] (above the waterline) climbs from almost none before 1840 to nearly all after 1950;
       the #text(fill: lost-col, weight: "bold")[rest] sink unlocated into the deep.
     ],
     caption: typst([
-      Dated wrecks only (#thousands(n-dated) of #thousands(n-total)); the rising found-share partly reflects steel hulls and modern sonar, not recency alone. \
+      Dated wrecks only (#format-comma(digits: 0)(n-dated) of #format-comma(digits: 0)(n-total)); the rising found-share partly reflects steel hulls and modern sonar, not recency alone. \
       Source: Wreck Inventory of Ireland (TidyTuesday 2026-06-30). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL]. Ship-wreck icon: Delapouite, #link("https://game-icons.net")[game-icons.net].
     ]),
   ),
