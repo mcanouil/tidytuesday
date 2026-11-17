@@ -40,12 +40,15 @@
 #let rows = ranked.map(row => (
   ..row,
   x0: 0,
+  // Data-unit gap between a stem head and its count.
+  pad: 2,
   // Two groups, the record holder against everyone else, mapped through colour
   // and fill so one segment layer and one point layer carry the highlight.
   group: if row.pope == leo-name { leo-name } else { "Other" },
 ))
 
-// Inset: a small column chart of Leo XIII's encyclicals per year of reign, in the
+// Inset: raw Typst by design. The funnel below joins the Leo XIII point to this
+// inset, and `compose` panels cannot be joined by a shape. A small column chart of Leo XIII's encyclicals per year of reign, in the
 // empty bottom-right. The box reads `page.fill`, so the inset follows the light
 // and dark toggle, as the 06/09 inset does.
 #let inset = context {
@@ -114,20 +117,11 @@
     ),
     geom-point(mapping: aes(fill: "group"), size: 3.4pt),
     // The count sits at the head of each stem, so no reader hunts an axis tick
-    // for "86". The record holder's count is bold, to match its stem and tick.
-    // `lx` places the label past the point head. Mapping `nudge-x` instead trips
-    // the discrete-scale trainer.
-    geom-typst(
-      data: d => d.map(r => (
-        ..r,
-        lx: r.count + 2,
-        lab: text(
-          size: 8pt,
-          fill: if r.pope == leo-name { accent } else { muted },
-          weight: "bold",
-        )[#str(r.count)],
-      )),
-      mapping: aes(x: "lx", label: "lab"),
+    // for "86". `colour` follows the group scale, so the record holder's count
+    // matches its stem.
+    geom-text(
+      mapping: aes(x: "count", label: "count", colour: "group", nudge-x: "pad"),
+      size: 8pt,
       anchor: "west",
     ),
     // The inset sits in the empty right-hand space, clear of the stems and the
