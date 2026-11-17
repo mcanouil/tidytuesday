@@ -90,44 +90,40 @@
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
 
-#let label-room = 7.4
+// The share of the x range that the names after the diagonal need.
+#let label-room = 75%
 
 // One tile for each pair of features up to the diagonal, with the name of a
 // feature placed just after its diagonal tile, so the upper right of the
-// figure stays free for the labels. Row i is drawn at y = -i, from the top.
-#let pairs = {
-  let found = ()
-  for (i, a) in order.enumerate() {
-    for (j, b) in order.slice(0, i).enumerate() {
-      let v = phi(a, b)
-      found.push((
-        x: j,
-        y: -i,
-        r: v,
-        label: if calc.abs(v) >= 0.3 { text(font: mono, size: 5pt, fill: text-colour(v))[#calc.round(v, digits: 2)] },
-      ))
-    }
-  }
-  found
-}
-#let diagonal = order.enumerate().map(((i, a)) => (
-  x: i,
-  y: -i,
+// figure stays free for the labels. Both axes are discrete, in `order`, and the
+// first level of the y axis sits at the bottom, so y runs in the reverse order.
+#let pairs = order.enumerate().map(((i, a)) => order.slice(0, i).map(b => {
+  let v = phi(a, b)
+  (
+    row: a,
+    col: b,
+    r: v,
+    label: if calc.abs(v) >= 0.3 { text(font: mono, size: 5pt, fill: text-colour(v))[#calc.round(v, digits: 2)] },
+  )
+})).flatten()
+#let diagonal = order.map(a => (
+  row: a,
+  col: a,
   name: text(font: sans, size: 7pt, fill: ink)[#features.at(a)],
 ))
 
 #let figure-plot(width, height) = plot(
   data: pairs,
-  mapping: aes(x: "x", y: "y"),
+  mapping: aes(x: "col", y: "row"),
   layers: (
-    geom-tile(data: diagonal, fill: ink.transparentize(88%), width: 0.92, height: 0.92),
+    geom-tile(data: diagonal, mapping: aes(x: "col", y: "row"), fill: ink.transparentize(88%), width: 0.92, height: 0.92),
     geom-tile(mapping: aes(fill: "r"), width: 0.92, height: 0.92),
     geom-typst(data: pairs.filter(t => t.label != none), mapping: aes(label: "label"), anchor: "center"),
-    geom-typst(data: diagonal, mapping: aes(x: "x", y: "y", label: "name"), anchor: "west", nudge-x: 0.65),
+    geom-typst(data: diagonal, mapping: aes(x: "col", y: "row", label: "name"), anchor: "west", nudge-x: 0.65),
   ),
   scales: scales(
-    x: scale-continuous(limits: (-0.5, order.len() - 0.5 + label-room), expand: (0%, 0%)),
-    y: scale-continuous(limits: (-order.len() + 0.5, 0.5), expand: (0%, 0%)),
+    x: scale-discrete(limits: order, expand: (5%, label-room)),
+    y: scale-discrete(limits: order.rev(), expand: 5%),
     fill: scale-gradientn(colours: ramp, limits: fill-limits, breaks: (-1, -0.5, 0, 0.5, 1), name: "Correlation"),
   ),
   labels: labels(
