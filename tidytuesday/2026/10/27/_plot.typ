@@ -96,13 +96,13 @@
 // One row per product and country, so Gribouille summarises each country itself.
 #let rows = {
   index-of
-  .pairs()
-  .map(((code, ratios)) => ratios.map(r => (
-    name: names.at(code),
-    ratio: r,
-    side: if countries.find(c => c.name == names.at(code)).mid > 1 { "dearer" } else { "cheaper" },
-  )))
-  .flatten()
+    .pairs()
+    .map(((code, ratios)) => {
+      let name = names.at(code)
+      let side = if countries.find(c => c.name == name).mid > 1 { "dearer" } else { "cheaper" }
+      ratios.map(r => (name: name, ratio: r, side: side))
+    })
+    .flatten()
 }
 #let ratio-label(v) = text(font: mono, size: 6pt, fill: muted)[#format-number(digits: 2)(v)\×]
 #let breaks = (0.6, 0.8, 1, 1.25, 1.6, 2)
@@ -111,8 +111,8 @@
   data: rows,
   mapping: aes(x: "name", y: "ratio", colour: "side"),
   layers: (
-    // The typical price. geom-hline and geom-vline widen the price axis under
-    // coord-flip, so a segment across every row draws it.
+    // The typical price, as a segment across every row. geom-hline and geom-vline
+    // widen the price axis under coord-flip.
     geom-segment(
       data: ((x: 0.4, xend: countries.len() + 0.6, y: 1, yend: 1),),
       mapping: aes(x: "x", xend: "xend", y: "y", yend: "yend"),
