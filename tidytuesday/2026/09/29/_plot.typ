@@ -101,8 +101,11 @@
   scales: scales(
     x: scale-continuous(
       limits: (0, near-x + 2.5),
-      breaks: (0, 10, 20, national-rate, near-x),
-      labels: ("0", "10", "20", [France: #rate-label(national-rate)], align(center)[within 1 km \ of a pharmacy]),
+      breaks: (0, 10, 20),
+      secondary: sec-axis(
+        breaks: (national-rate, near-x),
+        labels: ([France: #rate-label(national-rate)], align(center)[within 1 km \ of a pharmacy]),
+      ),
       expand: (0%, 0%),
     ),
     y: scale-discrete(limits: cities.map(c => c.city), labels: l => if l in highlighted { text(weight: "bold")[#l] } else { l }),
