@@ -23,7 +23,7 @@
   }
   tally
     .pairs()
-    .map(((code, t)) => (code: code, n: t.n, only: t.only, share: t.only / t.n, x: calc.log(t.n)))
+    .map(((code, t)) => (code: code, n: t.n, only: t.only, share: t.only / t.n))
     .filter(c => c.n >= min-species)
 }
 
@@ -142,203 +142,126 @@
   CO: "Colombia", EC: "Ecuador", AR: "Argentina",
 )
 
-// Hand-placed labels: the edge of the text that sits on the point, and the
-// offset from it in log10 species (x) and share (y).
-#let label-offsets = (
-  MG: ("east", -0.09, 0),
-  AU: ("east", -0.04, 0),
-  PG: ("west", 0.04, 0),
-  ID: ("west", 0.04, 0),
-  BR: ("east", -0.04, 0),
-  BO: ("south", 0, 0.065),
-  LK: ("east", -0.03, 0.025),
-  PH: ("west", 0.03, -0.025),
-  CU: ("east", -0.04, 0),
-  JP: ("west", 0.04, 0),
-  JM: ("west", 0.04, 0),
-  PR: ("west", 0.04, 0),
-  HT: ("west", 0.04, 0),
-  DO: ("west", 0.04, 0.03),
-  TW: ("east", -0.04, 0),
-)
-#let label-points = countries.filter(c => c.code in label-offsets)
-
-// Two labels sit in a clear patch of the plot, joined to their point by a
-// connector. The offsets are in log10 species (x) and share (y).
-#let moved-labels = (TT: (-0.12, 0.105), SG: (-0.197, 0.194))
-#let moved-points = countries.filter(c => c.code in moved-labels)
-
-// Scatter on log10(species). The two zoom panels sit to its right, in the same
-// data space, so the leader lines end exactly on them.
-#let scatter-x = (1.2, 3.12)
-#let panel-x = 3.36
-#let bar-label-x = panel-x + 0.4
-#let bar-start = panel-x + 0.44
-#let bar-full = 0.78
-#let bar-scale = 300
-#let x-limit = 4.7
-#let bar-length(v) = bar-full * v / bar-scale
-#let panel-text(body, size: 6.5pt, weight: "regular") = text(font: sans, size: size, weight: weight, fill: ink, body)
-
+#let kinds = ("Remote island", "Island near a mainland", "Mainland")
+#let points = countries.map(c => (
+  ..c,
+  kind: if c.code in remote { kinds.at(0) } else if c.code in near { kinds.at(1) } else { kinds.at(2) },
+  name: names.at(c.code, default: none),
+))
 #let breaks = (20, 50, 100, 200, 500, 1000)
-#let grid-colour = ink.transparentize(85%)
-#let log-breaks = breaks.map(b => calc.log(b))
-#let grid = (
-  log-breaks.map(b => (x: b, xend: b, y: 0, yend: 1))
-    + range(0, 5).map(i => (x: scatter-x.at(0), xend: scatter-x.at(1), y: i / 4, yend: i / 4))
-)
 
-#let panels = (
-  (
-    code: "MG",
-    top: 1.05,
-    bottom: 0.63,
-    title: [#names.MG keeps #mg.only of its #mg.n species],
-    sub: [Its #mg.only species found in no other country, by family],
-    bars: mg-families.map(((f, v)) => (label: text(style: "italic", f), v: v)),
-    first-bar: 0.83,
-    link-y: 0.93,
-  ),
-  (
-    code: "BO",
-    top: 0.51,
-    bottom: -0.04,
-    title: [#names.BO keeps only #bo.only of its #bo.n species],
-    sub: [How many of its species also live in each country],
-    bars: bo-shared.map(((c, v)) => (label: names.at(c), v: v)),
-    first-bar: 0.285,
-    link-y: 0.30,
-  ),
-)
-#let bar-gap = 0.07
-#let panel-bars = panels.map(p => p.bars.enumerate().map(((i, b)) => (..b, y: p.first-bar - i * bar-gap))).flatten()
-#let panel-rects = panels.map(p => (xmin: panel-x, xmax: x-limit, ymin: p.bottom, ymax: p.top))
-#let links = panels.map(p => {
-  let c = country(p.code)
-  (x: c.x + 0.045, y: c.share, xend: panel-x, yend: p.link-y)
+#let kind-scale = scale-manual(values: (island-colour, near-colour, mainland-colour), limits: kinds)
+#let labelled = remote + near + ("BR", "BO")
+
+// Zoom links: from just right of each ringed point to the left edge of its panel.
+// `link-end-x` sits one gutter past the right limit of the scatter, in species.
+#let link-end-x = 2100
+#let links = (
+  (code: "MG", yend: 0.93),
+  (code: "BO", yend: 0.30),
+).map(l => {
+  let c = country(l.code)
+  (x: c.n * 1.12, y: c.share, yend: l.yend)
 })
 
-#plot(
-  data: countries,
-  mapping: aes(x: "x", y: "share"),
+#let scatter = defer(
+  plot,
+  data: points,
+  mapping: aes(x: "n", y: "share", colour: "kind", fill: "kind", shape: "kind", size: "kind"),
   layers: (
-    geom-segment(
-      data: grid,
-      mapping: aes(x: "x", y: "y", xend: "xend", yend: "yend"),
-      inherit-aes: false,
-      colour: grid-colour,
-      stroke: 0.4pt,
-    ),
-    geom-rect(
-      data: panel-rects,
-      mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
-      inherit-aes: false,
-      fill: ink.transparentize(95%),
-    ),
-    geom-segment(
-      data: links,
-      mapping: aes(x: "x", y: "y", xend: "xend", yend: "yend"),
-      inherit-aes: false,
-      colour: highlight,
-      stroke: 0.7pt,
-    ),
-    geom-rect(
-      data: panel-bars.map(b => (xmin: bar-start, xmax: bar-start + bar-length(b.v), ymin: b.y - 0.025, ymax: b.y + 0.025)),
-      mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
-      inherit-aes: false,
-      fill: highlight,
-    ),
-    geom-typst(
-      data: panel-bars.map(b => (x: bar-label-x, y: b.y, label: panel-text(b.label))),
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
-      anchor: "east",
-    ),
-    geom-typst(
-      data: panel-bars.map(b => (x: bar-start + bar-length(b.v) + 0.02, y: b.y, label: panel-text(weight: "bold")[#b.v])),
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
-      anchor: "west",
-    ),
-    geom-typst(
-      data: panels.map(p => (
-        x: panel-x + 0.04,
-        y: p.top - 0.015,
-        label: [#panel-text(size: 7.5pt, weight: "bold")[#p.title] \ #panel-text(size: 6pt)[#p.sub]],
-      )),
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
-      anchor: "north-west",
-    ),
-    geom-point(
-      data: mainland-points,
-      size: 2.2pt,
-      colour: mainland-colour,
-      fill: mainland-colour,
-    ),
-    geom-point(
-      data: near-points,
-      shape: "diamond",
-      size: 3.8pt,
-      colour: near-colour,
-      fill: near-colour,
-    ),
-    geom-point(
-      data: remote-points,
-      size: 3.6pt,
-      colour: island-colour,
-      fill: island-colour,
-    ),
+    geom-point(),
     geom-point(
       data: d => d.filter(c => c.code in ("MG", "BO")),
       size: 7.5pt,
+      shape: "circle",
       fill: none,
       colour: highlight,
       stroke: 1pt,
     ),
-    geom-typst(
-      data: moved-points.map(c => {
-        let (nudge-x, nudge-y) = moved-labels.at(c.code)
-        (x: c.x, y: c.share, label: panel-text(names.at(c.code)), nudge-x: nudge-x, nudge-y: nudge-y)
-      }),
-      mapping: aes(x: "x", y: "y", label: "label", nudge-x: "nudge-x", nudge-y: "nudge-y"),
-      inherit-aes: false,
-      anchor: "west",
+    // Connectors from each ringed country to its zoom panel. They run past the
+    // scatter panel (`clip: false`) into the gutter that holds the panels.
+    ..links.map(l => annotate(
+      "segment",
+      x: l.x, y: l.y, xend: link-end-x, yend: l.yend,
+      stroke: 0.7pt + highlight, clip: false,
+    )),
+    geom-text(
+      data: d => d.filter(c => c.code in labelled),
+      mapping: aes(label: "name"),
+      font: sans,
+      size: 6.5pt,
+      colour: ink,
+      repel: true,
+      point-padding: 0.15,
+      box-padding: 0.1,
       segment: true,
       segment-colour: ink.transparentize(40%),
     ),
-    ..label-offsets.values().map(o => o.first()).dedup().map(side => geom-typst(
-      data: label-points
-        .filter(c => label-offsets.at(c.code).first() == side)
-        .map(c => {
-          let (_, dx, dy) = label-offsets.at(c.code)
-          (x: c.x + dx, y: c.share + dy, label: panel-text(names.at(c.code)))
-        }),
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
-      anchor: side,
-    )),
-    geom-typst(
-      data: ((x: scatter-x.at(1), y: 0.02, label: panel-text(size: 6pt)[Native species in the country, log scale]),),
-      mapping: aes(x: "x", y: "y", label: "label"),
-      inherit-aes: false,
-      anchor: "south-east",
-    ),
   ),
   scales: scales(
-    x: scale-continuous(
-      limits: (scatter-x.at(0), x-limit),
-      breaks: log-breaks,
-      labels: breaks.map(str),
-      expand: (0%, 0%),
-    ),
-    y: scale-continuous(
-      limits: (-0.04, 1.06),
-      breaks: range(0, 5).map(i => i / 4),
-      labels: format-percent(),
-      expand: (0%, 0%),
-    ),
+    x: scale-continuous(transform: "log10", limits: (18, 1400), breaks: breaks, labels: breaks.map(str)),
+    y: scale-continuous(limits: (0, 1), breaks: (0, 0.25, 0.5, 0.75, 1), labels: format-percent()),
+    colour: kind-scale,
+    fill: kind-scale,
+    shape: scale-manual(values: ("circle", "diamond", "circle"), limits: kinds),
+    size: scale-manual(values: (3.6pt, 3.8pt, 2.2pt), limits: kinds),
   ),
+  guides: guides(default: none),
+  labels: labels(x: "Native species in the country, log scale", y: "Found in no other country"),
+)
+
+#let bar-max = 340
+#let bar-panel(title, sub, pairs, label-style: l => l) = {
+  let rows = pairs.map(((k, v)) => (label: k, v: v))
+  defer(
+    plot,
+    data: rows,
+    mapping: aes(x: "label", y: "v"),
+    layers: (
+      // An invisible bar to the shared maximum: `limits` on a continuous y
+      // with coord-flip() makes geom-col draw nothing, so this row trains the
+      // scale instead and both panels keep one bar scale.
+      geom-col(data: ((label: pairs.first().first(), v: bar-max),), fill: none, width: 0.8),
+      geom-col(fill: highlight, width: 0.8),
+      geom-text(mapping: aes(label: "v", nudge-y: 6), anchor: "west", font: sans, size: 6.5pt, colour: ink),
+    ),
+    scales: scales(
+      x: scale-discrete(limits: rows.map(r => r.label), labels: label-style),
+      y: scale-continuous(breaks: (), expand: (0%, 0%)),
+    ),
+    coord: coord-flip(),
+    labels: labels(title: title, subtitle: sub, x: none, y: none),
+  )
+}
+
+#let panel-theme = theme-minimal(
+  plot-title: element-text(font: sans, size: 7.5pt, weight: "bold", colour: ink),
+  plot-subtitle: element-text(font: sans, size: 6pt, colour: ink),
+  plot-background: element-rect(fill: ink.transparentize(95%)),
+  axis-text: element-text(font: sans, size: 6.5pt, colour: ink),
+  panel-grid: element-blank(),
+)
+
+#compose(
+  scatter,
+  defer(
+    compose,
+    bar-panel(
+      [#names.MG keeps #mg.only of its #mg.n species],
+      [Its #mg.only species found in no other country, by family],
+      mg-families,
+      label-style: l => text(style: "italic", l),
+    ),
+    bar-panel(
+      [#names.BO keeps only #bo.only of its #bo.n species],
+      [How many of its species also live in each country],
+      bo-shared.map(((c, v)) => (names.at(c), v)),
+    ),
+    columns: 1,
+    theme: panel-theme,
+  ),
+  columns: 2,
+  widths: (2.2, 1),
   guides: guides(default: none),
   labels: labels(
     title: [Remote Islands Keep Their Frogs to Themselves],
@@ -347,11 +270,9 @@
       #text(fill: island-colour, weight: "semibold")[Remote islands] (large circles) and #text(fill: near-colour, weight: "semibold")[islands near a mainland] (diamonds) against #text(fill: mainland-colour, weight: "semibold")[mainland countries] (small circles).
     ],
     caption: [
-      Species count in each country, from the ISO codes AmphibiaWeb lists as native. Both panels use one bar scale. \
+      Species count in each country, from the ISO codes AmphibiaWeb lists as native. \
       Source: AmphibiaWeb (TidyTuesday 2026-10-13). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
-    x: none,
-    y: "Found in no other country",
   ),
   theme: theme-minimal(
     plot-title: element-text(font: serif, size: 16pt, weight: "bold", colour: ink),
@@ -359,8 +280,8 @@
     plot-caption: element-text(font: serif, size: 5.5pt, colour: ink.transparentize(30%)),
     axis-text: element-text(font: sans, size: 6pt, colour: ink.transparentize(25%)),
     axis-title: element-text(font: sans, size: 6.5pt, colour: ink),
-    panel-grid: element-blank(),
+    legend-text: element-text(font: sans, size: 6pt, colour: ink),
+    legend-title: element-blank(),
+    panel-grid-minor: element-blank(),
   ),
-  width: auto,
-  height: auto,
 )
