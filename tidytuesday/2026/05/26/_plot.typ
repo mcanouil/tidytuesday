@@ -31,12 +31,16 @@
   )[#body]
 }
 
-// One row per year and category, carrying the band bounds. geom-area draws every
-// band from y = 0, so stacked areas would paint over each other. geom-ribbon
-// with explicit bounds stacks them honestly.
-#let panel(country, annotations) = defer(
-  plot,
-  data: csv("data/energy_cleaned.csv", row-type: dictionary)
+// One row per year and category, carrying the share. geom-area stacks the
+// categories. The stack follows the alphabetical order of the fill column, with
+// the first level on top, and the fill limits do not change it. The bands are
+// therefore keyed by their rank from the top (`order`), so that traditional
+// biomass sits at the foot, and the limits run from the foot up to keep the legend in the order of `cats`.
+//
+// A source that is zero in every year of a country has no band to draw, and a
+// band of zero height would still paint a hairline along the stack.
+#let band-rows(country) = {
+  let rows = csv("data/energy_cleaned.csv", row-type: dictionary)
     .filter(row => row.country_name == country)
     .map(row => {
       let y = float(row.yr)
@@ -52,24 +56,22 @@
           + num(row.geothermal_energy_consumption_tfec_pct)
           + num(row.marine_energy_consumption_tfec_pct),
       )
-      cats
-        .fold((acc: 0.0, out: ()), (st, c) => {
-          let hi = st.acc + shares.at(c)
-          (
-            acc: hi,
-            out: st.out + ((year: y, category: c, ymin: st.acc, ymax: hi),),
-          )
-        })
-        .out
+      cats.enumerate().map(((i, c)) => (year: y, order: str(cats.len() - 1 - i), share: shares.at(c)))
     })
-    .flatten(),
-  mapping: aes(x: "year", ymin: "ymin", ymax: "ymax", fill: "category"),
-  layers: (geom-ribbon(alpha: 1),) + annotations,
+    .flatten()
+  rows.filter(r => rows.any(o => o.order == r.order and o.share > 0))
+}
+
+#let panel(country, annotations) = defer(
+  plot,
+  data: band-rows(country),
+  mapping: aes(x: "year", y: "share", fill: "order"),
+  layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
     x: scale-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
     y: scale-continuous(expand: (0%, auto)),
     fill: scale-discrete(
-      limits: cats,
+      limits: range(cats.len()).map(str).rev(),
       palette: cat-colours.values(),
       // One definition per category, in the order of `cats`. Each names the raw
       // columns summed above, so the legend says what every band holds.
@@ -137,7 +139,7 @@
     // Each key carries a two-line definition, so four in one row stand wider than
     // the panels. Two columns keep the legend inside the figure.
     guides: guides(default: guide-legend(position: "bottom", ncolumn: 2)),
-    gutter: 1cm,
+    gutter: 2.2cm,
     width: auto,
     height: auto,
     labels: labels(
@@ -149,7 +151,10 @@
       ])
     ),
   )
-  #place(top + center, dx: 10pt, dy: 2cm)[
+  // Raw Typst: an annotation in the gutter between compose panels would widen the
+  // scale domain of its panel. The pair is centred on the gutter, which `gutter`
+  // above sizes so that the text clears both panels.
+  #place(top + center, dy: 2cm)[
     #set align(center)
     #set text(size: 8pt, style: "italic", fill: accent)
     As incomes rise, \ two roads diverge
