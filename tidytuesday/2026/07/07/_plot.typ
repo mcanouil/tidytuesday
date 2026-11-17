@@ -32,13 +32,6 @@
     .filter(r => r.division != none and r.finish != none)
 }
 
-#let tally = count(fights, "gender", "division", "finish")
-#let finishes(gender, division, finish) = {
-  let hit = tally.find(t => (
-    t.gender == gender and t.division == division and t.finish == finish
-  ))
-  if hit == none { 0 } else { hit.n }
-}
 
 // The divisions to draw, lightest to heaviest within each gender, each with its
 // weight limit in pounds. The order is stated once here.
@@ -56,22 +49,57 @@
   (gender: "Women", class: "Bantamweight", lb: 135),
   (gender: "Women", class: "Featherweight", lb: 145),
 )
-#let rows = spec.enumerate().map(((i, s)) => {
-  let ko = finishes(s.gender, s.class, "ko")
-  let sub = finishes(s.gender, s.class, "sub")
-  let dec = finishes(s.gender, s.class, "dec")
-  (
-    gender: s.gender, class: s.class, lb: s.lb, order: i + 1,
-    ko: ko, sub: sub, dec: dec, n: ko + sub + dec,
-  )
-})
 
-#let n-total = rows.map(r => r.n).sum()
-// The divisions the callouts name, found by gender and weight rather than by row
-// position.
-#let find-row(gender, cls) = rows.find(r => r.gender == gender and r.class == cls)
-#let m-light = find-row("Men", "Flyweight")
-#let m-heavy = find-row("Men", "Heavyweight")
+#let key(gender, division) = gender + "|" + division
+#let totals = {
+  let t = (:)
+  for r in count(fights, "gender", "division") { t.insert(key(r.gender, r.division), r.n) }
+  t
+}
+#let finish-names = (ko: "KO/TKO", sub: "Submission", dec: "Decision")
+#let finish-limits = ("KO/TKO", "Submission", "Decision")
+
+// One row per division and finish, straight from the tally of raw fights.
+// `rank` fixes the stacking order: the stack puts the first level of `group` at
+// the top of the bar, which is the right end once the axes flip, so the
+// knockout (rank 3) sits at the left edge.
+#let bars = (
+  count(fights, "gender", "division", "finish")
+    .filter(t => spec.any(s => key(s.gender, s.class) == key(t.gender, t.division)))
+    .map(t => {
+      let k = key(t.gender, t.division)
+      let label = pct(t.n, totals.at(k))
+      (
+        key: k,
+        cat: finish-names.at(t.finish),
+        n: t.n,
+        share: t.n / totals.at(k),
+        rank: finish-limits.len() - finish-limits.position(c => c == finish-names.at(t.finish)),
+        text: if t.finish == "ko" { "*" + label + "*" } else { label },
+      )
+    })
+)
+
+// Label rows: the knockout label sits in the middle of its segment at the left
+// edge, and the decision label in the middle of the segment at the right edge.
+// The submission share carries no label.
+#let label-rows(finish) = (
+  bars
+    .filter(b => b.cat == finish-names.at(finish))
+    .map(b => (
+      key: b.key,
+      text: b.text,
+      mid: if finish == "ko" { b.share / 2 } else { 1 - b.share / 2 },
+    ))
+)
+
+#let n-total = spec.map(s => totals.at(key(s.gender, s.class))).sum()
+#let share(gender, division, finish) = {
+  let hit = bars.find(b => b.key == key(gender, division) and b.cat == finish-names.at(finish))
+  hit.n / totals.at(key(gender, division))
+}
+#let m-light-ko = share("Men", "Flyweight", "ko")
+#let m-heavy-ko = share("Men", "Heavyweight", "ko")
 
 // One palette, one source of truth. Vermillion is the knockout, blue the
 // submission, and a warm grey the fight that goes to the judges. The three stay
@@ -83,95 +111,92 @@
 #let chart-font = "Oswald" // condensed scoreboard face
 
 // Men on top, women below, lightest to heaviest in each group, so the knockout
-// wedge widens downward. A one-row gap separates the two genders.
-#let gap = 1
-#let n-slots = spec.len() + gap
-#let ypos(r) = n-slots - (if r.gender == "Men" { r.order } else { r.order + gap }) + 1
-#let half = 0.38
+// wedge widens downward. An empty level separates the two genders.
+#let gap-key = "gap"
+#let division-keys = (
+  spec.filter(s => s.gender == "Men").map(s => key(s.gender, s.class))
+    + (gap-key,)
+    + spec.filter(s => s.gender == "Women").map(s => key(s.gender, s.class))
+)
+#let heavy-slot = division-keys.position(k => k == key("Men", "Heavyweight")) + 1
 
 #plot(
-  // Each bar is three segments from 0 to 100 percent: knockout at the left edge,
-  // then submission, then decision.
-  data: rows.map(r => {
-    let y = ypos(r)
-    let ko-p = 100 * r.ko / r.n
-    let sub-p = 100 * r.sub / r.n
-    (
-      (xmin: 0, xmax: ko-p, ymin: y - half, ymax: y + half, cat: "KO/TKO"),
-      (xmin: ko-p, xmax: ko-p + sub-p, ymin: y - half, ymax: y + half, cat: "Submission"),
-      (xmin: ko-p + sub-p, xmax: 100, ymin: y - half, ymax: y + half, cat: "Decision"),
-    )
-  }).join(),
-  mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax", fill: "cat"),
+  data: bars,
+  mapping: aes(x: "key", y: "share", fill: "cat", group: "rank"),
   layers: (
     // Thin edge so segments split on light or dark paper.
-    geom-rect(stroke: 0.4pt, colour: rgb("#3333334d")),
+    geom-col(position: "stack", width: 0.76, colour: rgb("#3333334d"), stroke: 0.4pt),
     // A dashed line at the halfway mark, which only the men's heavyweight
     // knockout wedge passes. Dark neutral, so it holds across all three
     // segment colours.
-    geom-vline(xintercept: 50, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
-    // Per-row value labels, one mark per division. The knockout share sits in
-    // warm off-white on the vermillion wedge, and the decision share closes each
-    // bar in dark ink on the quiet grey at 100%.
-    geom-typst(
-      data: rows.map(r => (
-        x: (100 * r.ko / r.n) / 2,
-        y: ypos(r),
-        label: text(font: chart-font, fill: rgb("#faf6f0"), weight: "bold", size: 9.5pt)[#pct(r.ko, r.n)],
-      )) + rows.map(r => (
-        x: 100 - (100 * r.dec / r.n) / 2,
-        y: ypos(r),
-        label: text(font: chart-font, fill: rgb("#3a352f"), size: 8pt)[#pct(r.dec, r.n)],
-      )),
-      mapping: aes(x: "x", y: "y", label: "label"),
+    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
+    // The knockout share sits in warm off-white on the vermillion wedge, and the
+    // decision share closes each bar in dark ink on the quiet grey. Both are
+    // Typst markup labels, so the knockout share is bold.
+    geom-text(
+      data: label-rows("ko"),
+      mapping: aes(x: "key", y: "mid", label: typst("text")),
       inherit-aes: false,
+      font: chart-font,
+      size: 9.5pt,
+      colour: rgb("#faf6f0"),
+    ),
+    geom-text(
+      data: label-rows("dec"),
+      mapping: aes(x: "key", y: "mid", label: typst("text")),
+      inherit-aes: false,
+      font: chart-font,
+      size: 8pt,
+      colour: rgb("#3a352f"),
     ),
     // An accent ring traces the men's heavyweight knockout wedge, tying its
     // callout to the data without recolouring the segment. Burnt vermillion reads
     // on the pale and the dark paper.
     annotate(
       "rect",
-      xmin: 0, xmax: 100 * m-heavy.ko / m-heavy.n, ymin: ypos(m-heavy) - half, ymax: ypos(m-heavy) + half,
-      fill: none, stroke: 1.3pt, colour: rgb("#7a3300"), clip: false,
+      xmin: heavy-slot - 0.38, xmax: heavy-slot + 0.38, ymin: 0, ymax: m-heavy-ko,
+      fill: none, stroke: 1.3pt + rgb("#7a3300"), clip: false,
     ),
-    // One callout, in the gutter the x-scale expansion opens, aligned to the
-    // heavyweight bar so it never lands on the data. Vermillion reads on both
-    // surfaces.
-    annotate("typst", x: 0, y: ypos(m-heavy) - 0.9, label: box(width: 9cm)[#text(size: 7.5pt, fill: ko-col, font: body-font, weight: "bold")[Over half of men's heavyweight bouts (#pct(m-heavy.ko, m-heavy.n)) end in a knockout.]], anchor: "west", clip: false),
+    // One callout, in the gap row under the heavyweight bar, so it never lands on
+    // the data. Vermillion reads on both surfaces.
+    annotate(
+      "typst",
+      x: heavy-slot + 1, y: 0,
+      label: box(width: 9cm)[#text(size: 7.5pt, fill: ko-col, font: body-font, weight: "bold")[Over half of men's heavyweight bouts (#pct(m-heavy-ko, 1)) end in a knockout.]],
+      anchor: "west", clip: false,
+    ),
   ),
   scales: scales(
-    x: scale-continuous(
-      name: "Share of Fights, by How They Ended",
-      breaks: (0, 25, 50, 75, 100),
-      labels: ("0", "25", "50", "75", "100%"),
-      limits: (0, 100),
-      expand: (0.5%, 2%),
-    ),
-    y: scale-continuous(
-      name: none,
-      breaks: rows.map(ypos),
+    x: scale-discrete(
+      limits: division-keys,
       // Two-line tick label: the division name over its gender and weight limit
       // (converted from pounds to whole kilograms), so the axis states the gender
       // and the ordering itself.
-      labels: rows.map(r => box(inset: (right: 2pt))[
-        #set align(right)
-        #text(font: chart-font, size: 9pt, weight: "bold")[#upper(r.class)] #text(font: body-font, size: 6.5pt, fill: dec-col.darken(20%))[#r.gender · #r.lb lb (#calc.round(r.lb * 0.45359237) kg)]
-      ]),
-      limits: (0.4, n-slots + 1),
-      expand: (0%, 0%),
+      labels: k => if k == gap-key { [] } else {
+        let r = spec.find(s => key(s.gender, s.class) == k)
+        box(inset: (right: 2pt))[
+          #set align(right)
+          #text(font: chart-font, size: 9pt, weight: "bold")[#upper(r.class)] #text(font: body-font, size: 6.5pt, fill: dec-col.darken(20%))[#r.gender · #r.lb lb (#calc.round(r.lb * 0.45359237) kg)]
+        ]
+      },
     ),
-    fill: scale-manual(
-      values: (ko-col, sub-col, dec-col),
-      limits: ("KO/TKO", "Submission", "Decision"),
+    y: scale-continuous(
+      name: "Share of Fights, by How They Ended",
+      breaks: (0, 0.25, 0.5, 0.75, 1),
+      labels: ("0", "25", "50", "75", "100%"),
+      expand: (0.5%, 2%),
     ),
+    fill: scale-manual(values: (ko-col, sub-col, dec-col), limits: finish-limits),
   ),
+  coord: coord-flip(),
   guides: guides(default: none),
   labels: labels(
+    x: none,
     title: "The Heavier the Division, the More Fights End in a Knockout",
     subtitle: [
       Across #thousands(n-total) UFC bouts, the share ending in a
       #text(fill: ko-col, weight: "bold")[knockout] climbs with the weight limit in both men's and women's divisions,
-      from #pct(m-light.ko, m-light.n) of men's flyweight bouts to #pct(m-heavy.ko, m-heavy.n) of heavyweight,
+      from #pct(m-light-ko, 1) of men's flyweight bouts to #pct(m-heavy-ko, 1) of heavyweight,
       while the #text(fill: dec-col.darken(25%), weight: "bold")[decision] share falls the same way.
       #text(fill: sub-col.darken(20%), weight: "bold")[Submissions] stay near one in five throughout.
     ],
