@@ -104,8 +104,9 @@
 // in assets/fonts.
 #let body-font = "Alegreya Sans"
 
-#let ink-of(w) = if w.canonical { ink } else { rubric }
+#let status-ink = (canon: ink, outside: rubric)
 #let status-of(w) = if w.canonical { "canon" } else { "outside" }
+#let ink-of(w) = status-ink.at(status-of(w))
 
 // The two rows the title compares are marked once here. The first level of a
 // discrete y axis sits at the bottom, so the levels run from the least copied
@@ -192,8 +193,8 @@
   scales: scales(
     x: scale-continuous(limits: (-4.2, calc.max(..works.map(w => w.sure + w.doubtful)) + 3.6), expand: (0%, 0%)),
     y: scale-discrete(limits: work-levels),
-    fill: scale-manual(values: (ink, rubric), limits: ("canon", "outside")),
-    colour: scale-manual(values: (ink, rubric), limits: ("canon", "outside")),
+    fill: scale-manual(values: status-ink.values(), limits: status-ink.keys()),
+    colour: scale-manual(values: status-ink.values(), limits: status-ink.keys()),
     alpha: scale-identity(),
   ),
   guides: guides(default: none),
