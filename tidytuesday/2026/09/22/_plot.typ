@@ -15,12 +15,16 @@
 #let cities = {
   let found = (:)
   for row in records {
-    if row.cityCode == "NA" or row.year not in (first-year, last-year) { continue }
+    if row.cityCode == "NA" or row.year not in (first-year, last-year) {
+      continue
+    }
     let city = found.at(row.cityCode, default: (
       city: row.cityName,
       region: row.sdgRegion,
     ))
-    city.insert("y" + row.year, float(row.averageShareOfGreenAreaInCityUrbanAreaPct))
+    city.insert("y" + row.year, float(
+      row.averageShareOfGreenAreaInCityUrbanAreaPct,
+    ))
     found.insert(row.cityCode, city)
   }
   found
@@ -93,89 +97,46 @@
 }
 #let share-label = format-number(digits: 0, suffix: "%")
 
-// Rows are numbered from the bottom, so the region that lost most sits at the
-// foot and North America and Europe at the top.
-#let row-of = (:)
-#for (i, r) in regions.enumerate() { row-of.insert(r.region, i + 1) }
-
-// Each region is a swarm along its row, stacked here rather than with
-// geom-beeswarm, which on a flipped or discrete axis draws each swarm under the
-// wrong row label in this version of gribouille. Cities are binned by change, one
-// percentage point to a bin, and the cities in a bin stack outwards from the
-// row's centre line, alternately above and below, at the bin's centre. One step
-// is shared by every row, so a taller stack means more cities, whichever region
-// it is in.
-#let bin-of(c) = calc.floor(c.change)
-
-#let stacks = {
-  let found = (:)
-  for c in drawn {
-    let key = c.region + "|" + str(bin-of(c))
-    found.insert(key, found.at(key, default: ()) + (c,))
-  }
-  found
-}
-#let step = 0.8 / calc.max(..stacks.values().map(s => s.len()))
-
-// A city is sand when it lost green area and green when it gained, in the same
-// two colours the subtitle names. How much it changed is already its position.
-#let points = {
-  stacks
-    .values()
-    .map(stack => {
-      stack
-        .sorted(key: c => c.change)
-        .enumerate()
-        .map(((k, c)) => {
-          let side = if calc.even(k) { 1 } else { -1 }
-          (
-            ..c,
-            x: bin-of(c) + 0.5,
-            y: row-of.at(c.region) + side * calc.quo(k + 1, 2) * step,
-            paint: if c.change < 0 { soil } else { canopy },
-          )
-        })
-    })
-    .flatten()
-}
-
-// The median city of each region, as a bar across its row. The bar sits at the
-// exact median, while each dot sits at the centre of its one-point bin.
-#let bar-half = 0.46
-#let medians = regions.map(r => (
-  x: r.median,
-  xend: r.median,
-  y: row-of.at(r.region) - bar-half,
-  yend: row-of.at(r.region) + bar-half,
+// One dot per city, one row per region. The rows follow the order of the
+// regions' medians, so the region that lost most sits at the foot and North
+// America and Europe at the top.
+#let points = drawn.map(c => (
+  ..c,
+  outcome: if c.change < 0 { "lost" } else { "gained" },
 ))
 
-// The panel reaches past the data on both sides: on the left for the row
-// labels and on the right for the callout on the city that gained most. Both
-// margins are a share of the data's span, so they keep their width in the
-// figure if the data changes.
+// The y scale pads the right side by more than the left, to make room for the
+// callout on the city that gained most.
 #let changes = drawn.map(c => c.change)
 #let lo = calc.min(..changes)
 #let hi = calc.max(..changes)
-#let span = hi - lo
-#let breaks = range(int(calc.ceil(lo / 20)) * 20, int(calc.ceil(hi)) + 20, step: 20)
+#let breaks = range(
+  int(calc.ceil(lo / 20)) * 20,
+  int(calc.ceil(hi)) + 20,
+  step: 20,
+)
 
-// Each region is named on the left with its median and the share of its cities
-// that lost ground, so the row reads without the axis.
-#let names = regions.map(r => (
-  x: lo - 0.045 * span,
-  y: row-of.at(r.region),
-  content: align(right, text(font: body-font, size: 7pt, fill: ink)[
+// Each region is named with its median and the share of its cities that lost
+// ground, so the row reads without the axis.
+#let row-label(name) = {
+  let r = regions.find(r => r.region == name)
+  align(right, text(font: body-font, size: 7pt, fill: ink)[
     #text(weight: "semibold")[#display.at(r.region, default: r.region)] \
-    #text(size: 6pt, fill: ink.transparentize(30%))[median #signed(r.median, digits: 1), #format-percent()(r.lost) of #r.n lost]
-  ]),
-))
+    #text(
+      size: 6pt,
+      fill: ink.transparentize(30%),
+    )[median #signed(r.median, digits: 1), #format-percent()(r.lost) of #r.n lost]
+  ])
+}
 
 // The two cities at either end of the range, named where they sit.
 #let by-change = points.sorted(key: c => c.change)
 #let callout(c, dx, dy) = (
-  x: c.x + dx,
-  y: c.y + dy,
-  content: text(font: body-font, size: 6pt, fill: ink.transparentize(15%))[
+  dx: dx,
+  dy: dy,
+  region: c.region,
+  change: c.change,
+  label: text(font: body-font, size: 6pt, fill: ink.transparentize(15%))[
     #text(weight: "semibold")[#c.city.split(" (").first()]
     #share-label(c.at("y" + first-year)) to #share-label(c.at("y" + last-year))
   ],
@@ -183,56 +144,43 @@
 
 #plot(
   data: points,
-  mapping: aes(x: "x", y: "y"),
+  mapping: aes(x: "region", y: "change"),
   layers: (
-    geom-vline(
-      data: breaks.filter(b => b != 0).map(b => (b: b)),
-      mapping: aes(xintercept: "b"),
-      inherit-aes: false,
-      colour: ink,
-      alpha: 0.1,
-      stroke: 0.4pt,
-    ),
-    geom-vline(xintercept: 0, colour: ink, alpha: 0.4, stroke: 0.6pt),
-    geom-point(
-      mapping: aes(colour: "paint", fill: "paint"),
-      shape: "circle",
+    geom-hline(yintercept: 0, colour: ink, alpha: 0.4, stroke: 0.6pt),
+    geom-beeswarm(
+      mapping: aes(fill: "outcome"),
       size: 1.3pt,
       stroke: 0pt,
     ),
-    geom-segment(
-      data: medians,
-      mapping: aes(xend: "xend", yend: "yend"),
+    geom-crossbar(
+      stat: stat-summary(fun: "median"),
+      width: 0.8,
       colour: ink,
       stroke: 1.4pt,
     ),
     geom-typst(
-      data: names,
-      mapping: aes(label: "content"),
-      anchor: "east",
-    ),
-    geom-typst(
-      data: (callout(by-change.first(), -0.6, 0.1),),
-      mapping: aes(label: "content"),
+      data: (callout(by-change.first(), -0.3, 0),),
+      mapping: aes(x: "region", y: "change", label: "label", nudge-x: "dx", nudge-y: "dy"),
+      inherit-aes: false,
       anchor: "south-west",
     ),
     geom-typst(
-      data: (callout(by-change.last(), 0.8, 0),),
-      mapping: aes(label: "content"),
+      data: (callout(by-change.last(), 0, 1.5),),
+      mapping: aes(x: "region", y: "change", label: "label", nudge-x: "dx", nudge-y: "dy"),
+      inherit-aes: false,
       anchor: "west",
     ),
   ),
   scales: scales(
-    x: scale-continuous(
-      limits: (lo - 0.4 * span, hi + 0.27 * span),
+    x: scale-discrete(limits: kept.rev(), labels: row-label),
+    y: scale-continuous(
+      expand: (auto, 27%),
       breaks: breaks,
       labels: signed,
-      expand: (0%, 0%),
     ),
-    y: scale-continuous(limits: (0.45, regions.len() + 0.55), breaks: (), expand: (0%, 0%)),
-    colour: scale-identity(),
-    fill: scale-identity(),
+    fill: scale-manual(values: (soil, canopy), limits: ("lost", "gained")),
   ),
+  coord: coord-flip(),
   guides: guides(default: none),
   labels: labels(
     title: "Only the North Held Its Green",
@@ -251,11 +199,25 @@
   theme: theme-minimal(
     ink: ink,
     paper: night,
-    plot-title: element-text(font: body-font, size: 16pt, weight: "bold", colour: ink),
+    plot-title: element-text(
+      font: body-font,
+      size: 16pt,
+      weight: "bold",
+      colour: ink,
+    ),
     plot-subtitle: element-text(font: body-font, size: 8pt, colour: ink),
-    plot-caption: element-text(font: body-font, size: 6pt, colour: ink.transparentize(30%)),
-    axis-text: element-text(font: body-font, size: 7pt, colour: ink.transparentize(20%)),
+    plot-caption: element-text(
+      font: body-font,
+      size: 6pt,
+      colour: ink.transparentize(30%),
+    ),
+    axis-text: element-text(
+      font: body-font,
+      size: 7pt,
+      colour: ink.transparentize(20%),
+    ),
     panel-grid: element-blank(),
+    panel-grid-major-x: element-line(colour: ink.transparentize(90%), stroke: 0.4pt),
   ),
   width: auto,
   height: auto,
