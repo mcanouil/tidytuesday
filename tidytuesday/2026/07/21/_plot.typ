@@ -28,7 +28,7 @@
 
 // One pass per theme, collecting the scores of the accounts that carry it. An
 // account can carry several themes, so it appears in several rows. Commonest
-// first: the panel is built upright and flipped, so the first level lands at the bottom.
+// first: coord-flip reverses a discrete row axis, so the first level sits at the top.
 //
 // The eight coded themes, each with the gloss the axis carries beside its column
 // name. This order is the source order. The rows sort by how many accounts carry
