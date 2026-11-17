@@ -42,6 +42,8 @@
   x0: 0,
   // Data-unit gap between a stem head and its count.
   pad: 2,
+  // The count in Typst markup, bold like its stem.
+  tag: "*" + str(row.count) + "*",
   // Two groups, the record holder against everyone else, mapped through colour
   // and fill so one segment layer and one point layer carry the highlight.
   group: if row.pope == leo-name { leo-name } else { "Other" },
@@ -119,9 +121,9 @@
     geom-point(mapping: aes(fill: "group"), size: 3.4pt),
     // The count sits at the head of each stem, so no reader hunts an axis tick
     // for "86". `colour` follows the group scale, so the record holder's count
-    // matches its stem.
+    // matches its stem, and the markup label makes it bold.
     geom-text(
-      mapping: aes(x: "count", label: "count", colour: "group", nudge-x: "pad"),
+      mapping: aes(x: "count", label: typst("tag"), colour: "group", nudge-x: "pad"),
       size: 8pt,
       anchor: "west",
     ),
