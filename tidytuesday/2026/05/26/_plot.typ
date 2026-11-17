@@ -36,9 +36,11 @@
 // the first level on top, and the fill limits do not change it. The bands are
 // therefore keyed by their rank from the top (`order`), so that traditional
 // biomass sits at the foot, and the limits run from the foot up to keep the legend in the order of `cats`.
-#let panel(country, annotations) = defer(
-  plot,
-  data: csv("data/energy_cleaned.csv", row-type: dictionary)
+//
+// A source that is zero in every year of a country has no band to draw, and a
+// band of zero height would still paint a hairline along the stack.
+#let band-rows(country) = {
+  let rows = csv("data/energy_cleaned.csv", row-type: dictionary)
     .filter(row => row.country_name == country)
     .map(row => {
       let y = float(row.yr)
@@ -56,7 +58,13 @@
       )
       cats.enumerate().map(((i, c)) => (year: y, order: str(cats.len() - 1 - i), share: shares.at(c)))
     })
-    .flatten(),
+    .flatten()
+  rows.filter(r => rows.any(o => o.order == r.order and o.share > 0))
+}
+
+#let panel(country, annotations) = defer(
+  plot,
+  data: band-rows(country),
   mapping: aes(x: "year", y: "share", fill: "order"),
   layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
