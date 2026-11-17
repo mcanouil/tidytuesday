@@ -190,7 +190,7 @@
     ],
     caption: [
       Green means vegetation that stays green most of the year in Landsat and Sentinel imagery; water is not counted. City boundaries follow the Degree of Urbanisation, not the municipality. \
-      The white bar is each region's median city. 2025 is published for too few cities to compare. Regions with fewer than #min-cities cities are not drawn. \
+      The white bar is each region's median city. Swarm width shows spread, not count. 2025 is published for too few cities. Regions with fewer than #min-cities cities are not drawn. \
       Source: UN-Habitat Urban Indicators Database (TidyTuesday 2026-09-22). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
     x: none,
