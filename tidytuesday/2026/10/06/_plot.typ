@@ -77,30 +77,27 @@
 
 #let money(v) = "$" + format-number(digits: 2)(v)
 #let grade(b) = if b.grade == "unspecified" { "no grade" } else { b.grade }
-#let reading(b) = text(font: mono-font, size: 5.5pt, fill: ink)[
-  *#b.code* #grade(b), #money(b.price)/fl oz
-]
+#let reading(b) = b.code + " " + grade(b) + ", " + money(b.price) + "/fl oz"
 
 // One column of labels just right of the rightmost bean.
 #let soybean-label-x = calc.max(..soybean.map(b => b.linoleic)) + 1.4
-#let soybean-labels = {
+#let soybean-labels = (
   marks
     .filter(b => b.purity == "adulterated")
-    .map(b => (x: soybean-label-x, y: b.y, content: reading(b)))
-}
+    .map(b => (x: soybean-label-x, y: b.y, label: reading(b)))
+)
 
-// R1 sits just below and left of U4, so its label goes on its left.
-#let left-labels = ("R1",)
-#let suspected-labels = suspected.map(b => {
-  let left = b.code in left-labels
-  (
-    x: b.linoleic + if left { -1.2 } else { 1.2 },
-    y: b.palmitoleic,
-    content: reading(b),
-    side: if left { "east" } else { "west" },
-  )
-})
+// The labels of the suspected bottles sit beside their mark. R1 sits just below
+// and left of U4, so its label goes on its left, in a layer of its own with the
+// opposite anchor.
+#let suspected-labels(left) = (
+  suspected
+    .filter(b => (b.code == "R1") == left)
+    .map(b => (x: b.linoleic, y: b.palmitoleic, label: reading(b), shift: if left { -1.2 } else { 1.2 }))
+)
 
+// The notes stay `geom-typst`: each mixes an emoji glyph, bold text and a colour,
+// which `geom-text` cannot draw.
 #let notes = (
   (
     x: soybean-line + 0.6,
@@ -139,12 +136,30 @@
     ),
     geom-vline(xintercept: soybean-line, colour: bean, stroke: 0.6pt, linetype: "dashed"),
     geom-typst(mapping: aes(label: "content"), size: 10pt),
-    geom-typst(data: soybean-labels, mapping: aes(label: "content"), anchor: "west"),
-    ..("west", "east").map(side => geom-typst(
-      data: suspected-labels.filter(l => l.side == side),
-      mapping: aes(label: "content"),
-      anchor: side,
-    )),
+    geom-text(
+      data: soybean-labels,
+      mapping: aes(label: "label"),
+      font: mono-font,
+      size: 5.5pt,
+      colour: ink,
+      anchor: "west",
+    ),
+    geom-text(
+      data: suspected-labels(false),
+      mapping: aes(label: "label", nudge-x: "shift"),
+      font: mono-font,
+      size: 5.5pt,
+      colour: ink,
+      anchor: "west",
+    ),
+    geom-text(
+      data: suspected-labels(true),
+      mapping: aes(label: "label", nudge-x: "shift"),
+      font: mono-font,
+      size: 5.5pt,
+      colour: ink,
+      anchor: "east",
+    ),
     geom-typst(data: notes, mapping: aes(label: "content"), anchor: "north-west"),
   ),
   scales: scales(
