@@ -212,7 +212,7 @@
 
 #let bar-max = 340
 #let bar-panel(title, sub, pairs, label-style: l => l) = {
-  let rows = pairs.map(((k, v)) => (label: k, v: v))
+  let rows = pairs.map(((k, v)) => (label: k, v: v, tag: "*" + str(v) + "*"))
   defer(
     plot,
     data: rows,
@@ -223,7 +223,7 @@
       // scale instead and both panels keep one bar scale.
       geom-col(data: ((label: pairs.first().first(), v: bar-max),), fill: none, width: 0.8),
       geom-col(fill: highlight, width: 0.8),
-      geom-text(mapping: aes(label: "v", nudge-y: 6), anchor: "west", font: sans, size: 6.5pt, colour: ink),
+      geom-text(mapping: aes(label: typst("tag"), nudge-y: 6), anchor: "west", font: sans, size: 6.5pt, colour: ink),
     ),
     scales: scales(
       x: scale-discrete(limits: rows.map(r => r.label), labels: label-style),
