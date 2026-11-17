@@ -62,8 +62,7 @@
 // One row per division and finish, straight from the tally of raw fights.
 // `rank` fixes the stacking order: the stack puts the first level of `group` at
 // the top of the bar, which is the right end once the axes flip, so the
-// knockout (rank 3) sits at the left edge. The submission share carries no
-// label.
+// knockout (rank 3) sits at the left edge.
 #let bars = (
   count(fights, "gender", "division", "finish")
     .filter(t => spec.any(s => key(s.gender, s.class) == key(t.gender, t.division)))
@@ -76,10 +75,22 @@
         n: t.n,
         share: t.n / totals.at(k),
         rank: finish-limits.len() - finish-limits.position(c => c == finish-names.at(t.finish)),
-        half: -t.n / totals.at(k) / 2,
-        text: if t.finish == "ko" { "*" + label + "*" } else if t.finish == "sub" { "" } else { label },
+        text: if t.finish == "ko" { "*" + label + "*" } else { label },
       )
     })
+)
+
+// Label rows: the knockout label sits in the middle of its segment at the left
+// edge, and the decision label in the middle of the segment at the right edge.
+// The submission share carries no label.
+#let label-rows(finish) = (
+  bars
+    .filter(b => b.cat == finish-names.at(finish))
+    .map(b => (
+      key: b.key,
+      text: b.text,
+      mid: if finish == "ko" { b.share / 2 } else { 1 - b.share / 2 },
+    ))
 )
 
 #let n-total = spec.map(s => totals.at(key(s.gender, s.class))).sum()
@@ -114,18 +125,29 @@
   mapping: aes(x: "key", y: "share", fill: "cat", group: "rank"),
   layers: (
     // Thin edge so segments split on light or dark paper.
-    geom-col(position: "stack", width: 0.76, stroke: 0.4pt + rgb("#3333334d")),
+    geom-col(position: "stack", width: 0.76, colour: rgb("#3333334d"), stroke: 0.4pt),
     // A dashed line at the halfway mark, which only the men's heavyweight
     // knockout wedge passes. Dark neutral, so it holds across all three
     // segment colours.
-    geom-hline(yintercept: 0.5, stroke: 0.8pt + rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
+    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
     // The knockout share sits in warm off-white on the vermillion wedge, and the
-    // decision share closes each bar in dark ink on the quiet grey. The
-    // submission share carries no label. One layer stacks them like the bars.
+    // decision share closes each bar in dark ink on the quiet grey. Both are
+    // Typst markup labels, so the knockout share is bold.
     geom-text(
-      mapping: aes(label: typst("text"), colour: "cat", size: "cat", nudge-y: "half"),
-      position: position-stack(),
+      data: label-rows("ko"),
+      mapping: aes(x: "key", y: "mid", label: typst("text")),
+      inherit-aes: false,
       font: chart-font,
+      size: 9.5pt,
+      colour: rgb("#faf6f0"),
+    ),
+    geom-text(
+      data: label-rows("dec"),
+      mapping: aes(x: "key", y: "mid", label: typst("text")),
+      inherit-aes: false,
+      font: chart-font,
+      size: 8pt,
+      colour: rgb("#3a352f"),
     ),
     // An accent ring traces the men's heavyweight knockout wedge, tying its
     // callout to the data without recolouring the segment. Burnt vermillion reads
@@ -165,8 +187,6 @@
       expand: (0.5%, 2%),
     ),
     fill: scale-manual(values: (ko-col, sub-col, dec-col), limits: finish-limits),
-    colour: scale-manual(values: (rgb("#faf6f0"), black, rgb("#3a352f")), limits: finish-limits),
-    size: scale-manual(values: (9.5pt, 8pt, 8pt), limits: finish-limits),
   ),
   coord: coord-flip(),
   guides: guides(default: none),
