@@ -125,14 +125,15 @@
     ),
     // The scale runs the full 0 to 32 of the Greyson scale, which the data
     // alone does not reach. A y limit cannot do it: under coord-flip it
-    // removes the median rules.
-    // Each row's median, as a rule across its own swarm, in a neutral that
-    // reads as a mark rather than a category.
+    // removes the median rules. The frame starts a little below 0, so the dots
+    // at score 0 sit whole inside the panel.
     geom-blank(
-      data: (0, scale-max).map(v => (theme: rows.first().col, score: v)),
+      data: (-0.8, scale-max).map(v => (theme: rows.first().col, score: v)),
       mapping: aes(x: "theme", y: "score"),
       inherit-aes: false,
     ),
+    // Each row's median, as a rule across its own swarm, in a neutral that
+    // reads as a mark rather than a category.
     geom-errorbar(
       stat: stat-summary(fun: "median"),
       width: 2 * swarm-width, stroke: 2.5pt, colour: median-col,
@@ -225,6 +226,7 @@
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text-y: element-text(font: mono-font, size: 7.5pt),
     panel-grid-major-x: element-blank(),
+    panel-grid-major-y: element-line(),
     panel-grid-minor: element-blank(),
   ),
   width: auto,
