@@ -89,6 +89,7 @@
   (shown: rgb("#2f6bb8"), stated: rgb("#c2510e"), scaled: ink.transparentize(55%), undone: rgb("#1f8a70"))
 }
 #let stands-colour = ink.transparentize(65%)
+#let none-colour = ink.transparentize(100%)
 
 #let sans = "IBM Plex Sans"
 #let mono = "IBM Plex Mono"
@@ -96,60 +97,66 @@
 #let page-colour = theme-minimal().at("paper", default: white)
 #let row-height = 0.34cm
 
-// A bar of the evidence behind a franchise's ranking: one stacked column
-// turned on its side.
+// A bar of the evidence behind a franchise's ranking, one stacked segment for
+// each kind. Gribouille's `nanoplot` takes no `coord`, so `geom-col` cannot be
+// turned on its side here, and the segments are rects on the share scale.
 #let bar-width = 2.9cm
-#let bar(name) = {
-  let f = franchise(name)
-  plot(
-    data: kinds.filter(k => f.at(k) > 0).map(k => (row: name, kind: k, share: f.at(k))),
-    mapping: aes(x: "row", y: "share", fill: "kind"),
-    layers: (geom-col(width: 1, position: "stack", colour: page-colour, stroke: 0.6pt),),
-    scales: scales(
-      x: scale-discrete(),
-      y: scale-continuous(expand: (0%, 0%)),
-      fill: scale-manual(values: kinds.map(k => colours.at(k)), limits: kinds),
-    ),
-    coord: coord-flip(),
-    guides: guides(default: none),
-    theme: theme-void(),
-    width: bar-width,
-    height: row-height,
-  )
-}
+#let stack-order = ("stated", "shown", "scaled")
+#let bar-cells(f) = (
+  stack-order
+  .enumerate()
+  .filter(((i, k)) => f.at(k) > 0)
+  .map(((i, k)) => {
+    let start = stack-order.slice(0, i).map(before => f.at(before)).sum(default: 0)
+    (kind: k, xmin: start, xmax: start + f.at(k), ymin: 0, ymax: 1)
+  })
+)
+#let bar-plot = nanoplot(
+  mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax", fill: "kind"),
+  layers: (geom-rect(colour: page-colour, stroke: 0.6pt),),
+  scales: scales(
+    x: scale-continuous(expand: (0%, 0%)),
+    y: scale-continuous(limits: (0, 1), expand: (0%, 0%)),
+    fill: scale-manual(values: kinds.map(k => colours.at(k)), limits: kinds),
+  ),
+  domain-field: "xmax",
+  axis: false,
+)
 
-#let shown-share(name) = text(font: mono, size: 6.5pt, fill: ink)[#calc.round(franchise(name).shown * 100)%]
-#let citations(name) = text(font: mono, size: 5.5pt, fill: muted)[#franchise(name).n]
+#let shown-share(share) = text(font: mono, size: 6.5pt, fill: ink)[#calc.round(share * 100)%]
+#let citations(n) = text(font: mono, size: 5.5pt, fill: muted)[#n]
 
 // A strip with one dot for each recorded death, the undone ones last. Every
-// strip shares one scale, so a dot has the same width in every row.
+// strip shares one scale, so a dot has the same width in every row. A franchise with no death gets a label in place of a dot.
 #let most-deaths = calc.max(..franchises.map(f => f.fallen))
 #let deaths-width = 5.6cm
-#let fallen(name) = {
-  let f = franchise(name)
-  if f.fallen == 0 {
-    text(font: sans, size: 6pt, fill: muted)[none recorded]
-  } else {
-    plot(
-      data: range(f.fallen).map(i => (x: i, y: 0, kind: if i >= f.fallen - f.undone { "undone" } else { "stands" })),
-      mapping: aes(x: "x", y: "y", fill: "kind"),
-      layers: (geom-point(size: 1.0pt, stroke: none),),
-      scales: scales(
-        x: scale-continuous(limits: (-0.5, most-deaths - 0.5), expand: (0%, 0%)),
-        y: scale-continuous(limits: (-1, 1), expand: (0%, 0%)),
-        fill: scale-manual(values: (colours.undone, stands-colour), limits: ("undone", "stands")),
-      ),
-      guides: guides(default: none),
-      theme: theme-void(),
-      width: deaths-width,
-      height: row-height,
-    )
-  }
+#let death-cells(f) = if f.fallen == 0 {
+  ((x: 1, y: 0, kind: "none", label: "none recorded"),)
+} else {
+  range(f.fallen).map(i => (x: i + 1, y: 0, label: none, kind: if i >= f.fallen - f.undone { "undone" } else { "stands" }))
 }
+#let deaths-plot = nanoplot(
+  mapping: aes(x: "x", y: "y", fill: "kind", label: "label"),
+  layers: (
+    geom-point(size: 1.0pt, stroke: none),
+    geom-text(anchor: "west", nudge-x: 0.3, font: sans, size: 6pt, colour: muted),
+  ),
+  scales: scales(
+    x: scale-continuous(expand: (0%, 0%)),
+    y: scale-continuous(limits: (-1, 1), expand: (0%, 0%)),
+    fill: scale-manual(
+      values: (colours.undone, stands-colour, none-colour),
+      limits: ("undone", "stands", "none"),
+    ),
+  ),
+  domain-field: "x",
+  axis: false,
+  
+)
 
 #let key(fill, label) = [#text(fill: fill)[■] #label#h(9pt)]
 
-#let rows = franchises.map(f => (franchise: f.name, medium: f.medium, evidence: f.name, shown: f.name, n: f.name, deaths: f.name))
+#let rows = franchises.map(f => (franchise: f.name, medium: f.medium, evidence: bar-cells(f), shown: f.shown, n: f.n, deaths: death-cells(f)))
 
 #let figure-table(width) = {
   let medium-width = 2.5cm
@@ -179,10 +186,10 @@
     keisen.columns-align(start, columns: ("evidence", "deaths")),
     keisen.columns-align(end, columns: ("shown", "n")),
     keisen.columns-width((franchise: width - medium-width - evidence-width - shown-width - n-width - deaths-column, medium: medium-width, evidence: evidence-width, shown: shown-width, n: n-width, deaths: deaths-column)),
-    keisen.format("evidence", bar),
+    keisen.format-nanoplot("evidence", plot: bar-plot, width: bar-width, height: row-height, domain: (0, 1)),
     keisen.format("shown", shown-share),
     keisen.format("n", citations),
-    keisen.format("deaths", fallen),
+    keisen.format-nanoplot("deaths", plot: deaths-plot, width: deaths-width, height: row-height, domain: (0.5, most-deaths + 2.5)),
     keisen.table-source-note(text(font: sans, size: 5.5pt)[
       Franchises run from the lowest share of shown citations at the top to the highest at the bottom. Across all #total-of(characters, "citations") citations, #calc.round(all-shown * 100)% are shown.
       The ranks and grades are the editorial judgements of Cited Feats, and the deaths are only those that ranked characters caused.
