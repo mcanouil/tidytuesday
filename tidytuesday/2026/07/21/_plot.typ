@@ -28,7 +28,7 @@
 
 // One pass per theme, collecting the scores of the accounts that carry it. An
 // account can carry several themes, so it appears in several rows. Commonest
-// first: the panel is built upright and flipped, so slot 1 lands at the bottom.
+// first: coord-flip reverses a discrete row axis, so the first level sits at the top.
 //
 // The eight coded themes, each with the gloss the axis carries beside its column
 // name. This order is the source order. The rows sort by how many accounts carry
@@ -54,8 +54,7 @@
     scores: s,
   )
 }).sorted(key: t => t.n).rev()
-#let n-rows = rows.len()
-#let slot-of(i) = n-rows - i
+#let theme-of(col) = rows.find(t => t.col == col)
 
 // The row whose tail clears the threshold most often, found by share, and the
 // row too small to say anything about. Rows under twenty accounts are left out
@@ -100,16 +99,17 @@
 #let col-name(name, size) = text(font: mono-font, size: size, weight: "medium")[#name]
 
 #let swarm-width = 0.32
+#let median-col = theme-minimal().at("ink", default: black)
 
 #plot(
   // One point per account per theme it carries. Colour encodes one thing:
   // whether the account reaches the threshold.
-  data: rows.enumerate().map(((i, t)) => t.scores.map(s => (
-    slot: slot-of(i),
+  data: rows.map(t => t.scores.map(s => (
+    theme: t.col,
     score: s,
     band: if s >= threshold { bands.last() } else { bands.first() },
   ))).join(),
-  mapping: aes(x: "slot", y: "score", fill: "band", alpha: "band"),
+  mapping: aes(x: "theme", y: "score", fill: "band", alpha: "band"),
   layers: (
     // The threshold: the line almost nothing crosses. Drawn half a point below 7,
     // so it separates the integer scores.
@@ -123,31 +123,39 @@
       size: 1.6pt, stroke: 0pt,
       position: position-beeswarm(width: swarm-width),
     ),
+    // The scale runs the full 0 to 32 of the Greyson scale, which the data
+    // alone does not reach. A y limit cannot do it: under coord-flip it
+    // removes the median rules. The frame starts a little below 0, so the dots
+    // at score 0 sit whole inside the panel.
+    geom-blank(
+      data: (-0.8, scale-max).map(v => (theme: rows.first().col, score: v)),
+      mapping: aes(x: "theme", y: "score"),
+      inherit-aes: false,
+    ),
     // Each row's median, as a rule across its own swarm, in a neutral that
-    // reads as a mark rather than a category. Sized in data units off the swarm
-    // width, so it tracks the rows.
-    geom-errorbarh(
-      data: rows.enumerate().map(((i, t)) => (slot: slot-of(i), median: t.median)),
-      mapping: aes(x: "slot", xmin: "median", xmax: "median"),
-      inherit-aes: false, height: swarm-width, stroke: 2pt, colour: rgb("#8a8f96"),
+    // reads as a mark rather than a category.
+    geom-errorbar(
+      stat: stat-summary(fun: "median"),
+      width: 2 * swarm-width, stroke: 2.5pt, colour: median-col,
+      inherit-aes: false, mapping: aes(x: "theme", y: "score"),
     ),
     // Both rules are labelled in the empty band above the top row, so the panel
     // needs no legend.
     annotate(
-      "typst", x: n-rows + 0.5, y: threshold - 0.5,
+      "typst", x: 0.5, y: threshold - 0.5,
       label: note(fill: above-col, size: 7.5pt, weight: "bold")[Threshold #threshold],
       anchor: "south-west", clip: false,
     ),
     annotate(
-      "typst", x: n-rows + 0.5, y: overall-median,
+      "typst", x: 0.5, y: overall-median,
       label: note(size: 7.5pt)[row medians, #median-lo to #median-hi],
       anchor: "south-east", clip: false,
     ),
     // One callout in the empty tail, where the scores the scale was built for
     // would sit.
     annotate(
-      "typst", x: n-rows, y: 11,
-      label: box(width: 8.4cm)[
+      "typst", x: 6, y: scale-max,
+      label: box(width: 4cm)[
         #note(fill: above-col, size: 9pt, weight: "bold")[
           #n-above of #n-scored scored accounts (#pct-above) reach #threshold.
         ] \
@@ -156,27 +164,28 @@
           #archive-max.
         ]
       ],
-      anchor: "north-west", clip: false,
+      anchor: "north-east", clip: false,
     ),
   ),
   scales: scales(
-    x: scale-continuous(
-      breaks: range(n-rows).map(slot-of),
+    x: scale-discrete(
+      limits: rows.map(t => t.col),
+      expand: (12%, 6%),
       // Two-line tick label: the column name as it appears in the data, then the
       // gloss, the number of accounts, and how many reach the threshold. Those
       // counts do the work of a legend.
-      labels: rows.map(t => box(inset: (right: 3pt))[
-        #set align(right)
-        #set par(leading: 2pt)
-        #col-name(t.col, 7.5pt) \
-        #note(size: 6pt)[#t.gloss · n #t.n, #t.above at #sym.gt.eq #threshold]
-      ]),
-      limits: (0.4, n-rows + 0.85),
-      expand: (0%, 0%),
+      labels: col => {
+        let t = theme-of(col)
+        box(inset: (right: 3pt))[
+          #set align(right)
+          #set par(leading: 2pt)
+          #col-name(t.col, 7.5pt) \
+          #note(size: 6pt)[#t.gloss · n #t.n, #t.above at #sym.gt.eq #threshold]
+        ]
+      },
     ),
     y: scale-continuous(
       breaks: (0, 5, 10, 15, 20, 25, 30),
-      limits: (-0.8, scale-max),
       expand: (0%, 1%),
     ),
     fill: scale-manual(values: (below-col, above-col), limits: bands),
@@ -217,6 +226,7 @@
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text-y: element-text(font: mono-font, size: 7.5pt),
     panel-grid-major-x: element-blank(),
+    panel-grid-major-y: element-line(),
     panel-grid-minor: element-blank(),
   ),
   width: auto,
