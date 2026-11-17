@@ -124,7 +124,6 @@
   message: "a mainland country is now above 73%",
 )
 
-
 #let ink = theme-minimal().at("ink", default: black)
 #let island-colour = rgb("#d4580f")
 #let near-colour = rgb("#2f74c0")
@@ -154,6 +153,17 @@
 #let kind-scale = scale-manual(values: (island-colour, near-colour, mainland-colour), limits: kinds)
 #let labelled = remote + near + ("BR", "BO")
 
+// Zoom links: from just right of each ringed point to the left edge of its panel.
+// `link-end-x` sits one gutter past the right limit of the scatter, in species.
+#let link-end-x = 2100
+#let links = (
+  (code: "MG", yend: 0.93),
+  (code: "BO", yend: 0.30),
+).map(l => {
+  let c = country(l.code)
+  (x: c.n * 1.12, y: c.share, yend: l.yend)
+})
+
 #let scatter = defer(
   plot,
   data: points,
@@ -162,13 +172,19 @@
     geom-point(),
     geom-point(
       data: d => d.filter(c => c.code in ("MG", "BO")),
-      mapping: aes(colour: none, fill: none, shape: none, size: none),
       size: 7.5pt,
       shape: "circle",
       fill: none,
       colour: highlight,
       stroke: 1pt,
     ),
+    // Connectors from each ringed country to its zoom panel. They run past the
+    // scatter panel (`clip: false`) into the gutter that holds the panels.
+    ..links.map(l => annotate(
+      "segment",
+      x: l.x, y: l.y, xend: link-end-x, yend: l.yend,
+      stroke: 0.7pt + highlight, clip: false,
+    )),
     geom-text(
       data: d => d.filter(c => c.code in labelled),
       mapping: aes(label: "name"),
@@ -190,12 +206,13 @@
     shape: scale-manual(values: ("circle", "diamond", "circle"), limits: kinds),
     size: scale-manual(values: (3.6pt, 3.8pt, 2.2pt), limits: kinds),
   ),
+  guides: guides(default: none),
   labels: labels(x: "Native species in the country, log scale", y: "Found in no other country"),
 )
 
 #let bar-max = 340
 #let bar-panel(title, sub, pairs, label-style: l => l) = {
-  let rows = pairs.map(((k, v)) => (label: k, v: v, pad: 6))
+  let rows = pairs.map(((k, v)) => (label: k, v: v))
   defer(
     plot,
     data: rows,
@@ -204,9 +221,9 @@
       // An invisible bar to the shared maximum: `limits` on a continuous y
       // with coord-flip() makes geom-col draw nothing, so this row trains the
       // scale instead and both panels keep one bar scale.
-      geom-col(data: ((label: pairs.first().first(), v: bar-max, pad: 0),), fill: none, width: 0.8),
+      geom-col(data: ((label: pairs.first().first(), v: bar-max),), fill: none, width: 0.8),
       geom-col(fill: highlight, width: 0.8),
-      geom-text(mapping: aes(label: "v", nudge-y: "pad"), anchor: "west", font: sans, size: 6.5pt, colour: ink),
+      geom-text(mapping: aes(label: "v", nudge-y: 6), anchor: "west", font: sans, size: 6.5pt, colour: ink),
     ),
     scales: scales(
       x: scale-discrete(limits: rows.map(r => r.label), labels: label-style),
@@ -245,11 +262,12 @@
   ),
   columns: 2,
   widths: (2.2, 1),
+  guides: guides(default: none),
   labels: labels(
     title: [Remote Islands Keep Their Frogs to Themselves],
     subtitle: [
       Share of each country's native frog and toad species found in no other country, for the #countries.len() countries with #min-species or more species.
-      Madagascar and Bolivia are ringed in green and opened up on the right, on one bar scale.
+      #text(fill: island-colour, weight: "semibold")[Remote islands] (large circles) and #text(fill: near-colour, weight: "semibold")[islands near a mainland] (diamonds) against #text(fill: mainland-colour, weight: "semibold")[mainland countries] (small circles).
     ],
     caption: [
       Species count in each country, from the ISO codes AmphibiaWeb lists as native. \
