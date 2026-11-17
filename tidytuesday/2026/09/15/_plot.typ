@@ -104,15 +104,15 @@
 // in assets/fonts.
 #let body-font = "Alegreya Sans"
 
-#let ink-of(w) = if w.canonical { ink } else { rubric }
+#let status-ink = (canon: ink, outside: rubric)
+#let status-of(w) = if w.canonical { "canon" } else { "outside" }
+#let ink-of(w) = status-ink.at(status-of(w))
 
-// Rows are numbered from the bottom, so the most copied work sits at the top,
-// and the two rows the title compares are marked once here.
-#let rows = {
-  works
-    .enumerate()
-    .map(((i, w)) => (..w, row: works.len() - i, strong: w.work in ("Jubilees", "Exodus")))
-}
+// The two rows the title compares are marked once here. The first level of a
+// discrete y axis sits at the bottom, so the levels run from the least copied
+// work up and the most copied work sits at the top.
+#let rows = works.map(w => (..w, strong: w.work in ("Jubilees", "Exodus")))
+#let work-levels = works.map(w => w.work).rev()
 
 // One tile per manuscript, laid left to right along the work's row: certain
 // copies first, doubtful ones after them as outlines only. The headline rows
@@ -125,9 +125,9 @@
   rows
     .map(w => range(w.sure + w.doubtful).map(k => (
       x: k + 1,
-      y: w.row,
+      work: w.work,
       doubtful: k >= w.sure,
-      paint: ink-of(w),
+      status: status-of(w),
       strength: if w.strong { 1 } else { 0.7 },
     )))
     .flatten()
@@ -138,7 +138,7 @@
 // last tile of the row.
 #let name-rows = rows.map(w => (
   x: 0.2,
-  y: w.row,
+  work: w.work,
   content: text(
     font: body-font,
     size: 7.5pt,
@@ -150,7 +150,7 @@
 
 #let count-rows = rows.map(w => (
   x: w.sure + w.doubtful + 0.7,
-  y: w.row,
+  work: w.work,
   content: text(
     font: body-font,
     size: 7pt,
@@ -163,17 +163,17 @@
 
 #plot(
   data: tiles,
-  mapping: aes(x: "x", y: "y"),
+  mapping: aes(x: "x", y: "work"),
   layers: (
     geom-tile(
       data: d => d.filter(t => not t.doubtful),
-      mapping: aes(fill: "paint", alpha: "strength"),
+      mapping: aes(fill: "status", alpha: "strength"),
       width: tile-width,
       height: tile-height,
     ),
     geom-tile(
       data: d => d.filter(t => t.doubtful),
-      mapping: aes(colour: "paint", alpha: "strength"),
+      mapping: aes(colour: "status", alpha: "strength"),
       width: tile-width - 0.08,
       height: tile-height - 0.08,
       fill: parchment,
@@ -192,9 +192,9 @@
   ),
   scales: scales(
     x: scale-continuous(limits: (-4.2, calc.max(..works.map(w => w.sure + w.doubtful)) + 3.6), expand: (0%, 0%)),
-    y: scale-continuous(limits: (0.4, works.len() + 0.6), expand: (0%, 0%)),
-    fill: scale-identity(),
-    colour: scale-identity(),
+    y: scale-discrete(limits: work-levels),
+    fill: scale-manual(values: status-ink.values(), limits: status-ink.keys()),
+    colour: scale-manual(values: status-ink.values(), limits: status-ink.keys()),
     alpha: scale-identity(),
   ),
   guides: guides(default: none),
