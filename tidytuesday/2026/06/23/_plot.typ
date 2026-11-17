@@ -48,8 +48,9 @@
 ))
 
 // Inset: raw Typst by design. The funnel below joins the Leo XIII point to this
-// inset, and `compose` panels cannot be joined by a shape. A small column chart of Leo XIII's encyclicals per year of reign, in the
-// empty bottom-right. The box reads `page.fill`, so the inset follows the light
+// inset, and `compose` panels cannot be joined by a shape. It is a small column
+// chart of Leo XIII's encyclicals per year of reign, in the empty bottom-right.
+// The box reads `page.fill`, so the inset follows the light
 // and dark toggle, as the 06/09 inset does.
 #let inset = context {
   let bg = if page.fill in (auto, none) { white } else { page.fill }
