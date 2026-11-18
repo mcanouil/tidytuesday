@@ -93,10 +93,10 @@
 // fallen. Below it, two hues for two different buildings, blue against amber,
 // the pair that survives every form of colour vision.
 #let category-colours = (
-  castle: rgb("#9a6a42"),
   ruin: rgb("#b9987a"),
-  fortress: rgb("#3f7d9c"),
+  castle: rgb("#9a6a42"),
   palace: rgb("#c9962a"),
+  fortress: rgb("#3f7d9c"),
 )
 #let water = rgb("#3f7d9c")
 
@@ -135,13 +135,13 @@
   mapping: aes(x: "x", y: "n", fill: "category"),
   layers: (
     // The moat. A wash under the waterline, so the lower wall reads as the
-    // reflection of the upper one rather than as a second chart. It is drawn as
-    // a geom rather than an annotation, because `annotate` would file a fixed
-    // colour as a fill value and train the discrete fill scale on it.
-    geom-rect(
-      data: ((xmin: first-bin - 20, xmax: last-bin + bin-width + 20, ymin: -215, ymax: 0),),
-      mapping: aes(xmin: "xmin", xmax: "xmax", ymin: "ymin", ymax: "ymax"),
-      inherit-aes: false,
+    // reflection of the upper one rather than as a second chart.
+    annotate(
+      "rect",
+      xmin: first-bin - 20,
+      xmax: last-bin + bin-width + 20,
+      ymin: -215,
+      ymax: 0,
       fill: water,
       alpha: 0.1,
       stroke: none,
@@ -206,16 +206,15 @@
       anchor: "north-east",
       clip: false,
     ),
-    // The tags stand in the order the bars stack, which follows the alphabet of
-    // the levels: castles over ruins above the waterline, palaces over fortresses
-    // below it. One row per tag, so the four stand as a single layer rather than
-    // as four single-row annotations.
+    // The tags stand in the order the bars stack: ruins over castles above the
+    // waterline, fortresses over palaces below it. One row per tag, so the four
+    // stand as a single layer rather than as four single-row annotations.
     geom-typst(
       data: (
-        (category: "castle", y: 130),
-        (category: "ruin", y: 96),
-        (category: "palace", y: -42),
-        (category: "fortress", y: -78),
+        (category: "ruin", y: 130),
+        (category: "castle", y: 96),
+        (category: "fortress", y: -42),
+        (category: "palace", y: -78),
       ).map(row => (
         x: 812,
         y: row.y,
