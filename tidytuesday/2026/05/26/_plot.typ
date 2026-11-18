@@ -68,7 +68,7 @@
   mapping: aes(x: "year", y: "share", fill: "order"),
   layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
-    x: scale-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
+    x: scale-continuous(limits: (1990, 2010), breaks: (1990, 2000, 2010), expand: (0%, 0%)),
     y: scale-continuous(expand: (0%, auto)),
     fill: scale-discrete(
       limits: range(cats.len()).map(str).rev(),
@@ -108,6 +108,38 @@
         ],
         size: 6.5pt,
         anchor: "east",
+      ),
+      // The divergence note and its two arrows sit past the right edge of the
+      // fixed x limits, in the gutter, and stay clear of the Germany panel.
+      annotate(
+        "typst",
+        x: 2015.1,
+        y: 75,
+        label: box(align(center, text(fill: accent, style: "italic")[As incomes rise, \ two roads diverge])),
+        size: 8pt,
+        clip: false,
+      ),
+      annotate(
+        "segment",
+        x: 2015.1,
+        y: 63,
+        xend: 2014.2,
+        yend: 40,
+        colour: cat-colours.at("Traditional biomass"),
+        linewidth: 1.3pt,
+        arrow: arrow(length: 9pt),
+        clip: false,
+      ),
+      annotate(
+        "segment",
+        x: 2015.4,
+        y: 40,
+        xend: 2016.1,
+        yend: 62,
+        colour: cat-colours.at("Wind & solar"),
+        linewidth: 1.3pt,
+        arrow: arrow(length: 9pt),
+        clip: false,
       ),
     )),
     panel("Germany", (
@@ -151,18 +183,4 @@
       ])
     ),
   )
-  // Raw Typst: an annotation in the gutter between compose panels would widen the
-  // scale domain of its panel. The pair is centred on the gutter, which `gutter`
-  // above sizes so that the text clears both panels.
-  #place(top + center, dy: 2cm)[
-    #set align(center)
-    #set text(size: 8pt, style: "italic", fill: accent)
-    As incomes rise, \ two roads diverge
-    #v(2pt)
-    #box(inset: (x: 2pt))[
-      #text(size: 30pt, fill: cat-colours.at("Traditional biomass"))[↓]
-      #h(-5pt)
-      #text(size: 30pt, fill: cat-colours.at("Wind & solar"))[↑]
-    ]
-  ]
 ]
