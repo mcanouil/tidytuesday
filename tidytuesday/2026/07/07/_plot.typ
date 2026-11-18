@@ -57,12 +57,11 @@
   t
 }
 #let finish-names = (ko: "KO/TKO", sub: "Submission", dec: "Decision")
-#let finish-limits = ("KO/TKO", "Submission", "Decision")
+// The stack puts the first limit at the top of the bar, which is the right end,
+// so the knockout comes last to sit at the left edge.
+#let finish-limits = ("Decision", "Submission", "KO/TKO")
 
 // One row per division and finish, straight from the tally of raw fights.
-// `rank` fixes the stacking order: the stack puts the first level of `group` at
-// the top of the bar, which is the right end once the axes flip, so the
-// knockout (rank 3) sits at the left edge.
 #let bars = (
   count(fights, "gender", "division", "finish")
     .filter(t => spec.any(s => key(s.gender, s.class) == key(t.gender, t.division)))
@@ -74,7 +73,6 @@
         cat: finish-names.at(t.finish),
         n: t.n,
         share: t.n / totals.at(k),
-        rank: finish-limits.len() - finish-limits.position(c => c == finish-names.at(t.finish)),
         text: if t.finish == "ko" { "*" + label + "*" } else { label },
       )
     })
@@ -122,7 +120,7 @@
 
 #plot(
   data: bars,
-  mapping: aes(x: "key", y: "share", fill: "cat", group: "rank"),
+  mapping: aes(x: "key", y: "share", fill: "cat"),
   layers: (
     // Thin edge so segments split on light or dark paper.
     geom-col(position: "stack", width: 0.76, colour: rgb("#3333334d"), stroke: 0.4pt),
@@ -184,7 +182,7 @@
       labels: ("0", "25", "50", "75", "100%"),
       expand: (0.5%, 2%),
     ),
-    fill: scale-manual(values: (ko-col, sub-col, dec-col), limits: finish-limits),
+    fill: scale-manual(values: (dec-col, sub-col, ko-col), limits: finish-limits),
   ),
   coord: coord-flip(),
   guides: guides(default: none),
@@ -211,8 +209,7 @@
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text: element-text(font: body-font, size: 7.5pt),
     panel-grid: element-blank(),
-    axis-ticks: element-tick(length: 0.1cm),
-    axis-ticks-y: element-blank(),
+    axis-ticks-x: element-tick(length: 0.1cm),
   ),
   width: auto,
   height: auto,
