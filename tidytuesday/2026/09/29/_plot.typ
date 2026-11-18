@@ -59,13 +59,14 @@
 // The first level of a discrete y axis sits at the bottom, and `cities` runs
 // from the lowest rate up, so the best-mapped city sits at the top.
 #let near-x = national-rate + 5.5
+#let emphasise(c, body) = if c.city in highlighted { strong(body) } else { body }
 #let rows = cities.map(c => (
   ..c,
   zero: 0,
   national: national-rate,
-  value: rate-label(c.rate),
+  value: emphasise(c, rate-label(c.rate)),
   value-x: c.rate + 0.6,
-  near-label: share-label(c.near),
+  near-label: emphasise(c, share-label(c.near)),
   near-x: near-x,
   pill: "💊",
 ))
