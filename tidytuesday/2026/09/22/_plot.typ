@@ -100,13 +100,58 @@
 // One dot per city, one row per region. The rows follow the order of the
 // regions' medians, so the region that lost most sits at the foot and North
 // America and Europe at the top.
-#let points = drawn.map(c => (
-  ..c,
-  outcome: if c.change < 0 { "lost" } else { "gained" },
+//
+// Each swarm is stacked, not density-shaped, so its width counts cities. Cities
+// are binned by change, one percentage point to a bin, and the cities in a bin
+// stack outwards from the row's centre line, alternately above and below, at
+// the bin's centre. One step is shared by every row, so a wider stack means
+// more cities, whichever region it is in.
+#let bin-of(c) = calc.floor(c.change)
+
+#let stacks = {
+  let found = (:)
+  for c in drawn {
+    let key = c.region + "|" + str(bin-of(c))
+    found.insert(key, found.at(key, default: ()) + (c,))
+  }
+  found
+}
+#let step = 0.8 / calc.max(..stacks.values().map(s => s.len()))
+
+#let points = {
+  stacks
+    .values()
+    .map(stack => {
+      stack
+        .sorted(key: c => c.change)
+        .enumerate()
+        .map(((k, c)) => {
+          let side = if calc.even(k) { 1 } else { -1 }
+          (
+            ..c,
+            bin-change: bin-of(c) + 0.5,
+            slot: side * calc.quo(k + 1, 2),
+            outcome: if c.change < 0 { "lost" } else { "gained" },
+          )
+        })
+    })
+    .flatten()
+}
+
+// Gribouille nudges a whole layer by one offset, so each stack slot is a layer
+// of its own, shifted along the row by its slot times the shared step.
+#let slots = points.map(p => p.slot).dedup().sorted()
+#let swarm = slots.map(slot => geom-point(
+  data: points.filter(p => p.slot == slot),
+  mapping: aes(x: "region", y: "bin-change", fill: "outcome"),
+  position: position-nudge(x: slot * step),
+  size: 1.3pt,
+  stroke: 0pt,
 ))
 
 // The y scale pads the right side by more than the left, to make room for the
-// callout on the city that gained most.
+// callout on the city that gained most. Scale limits would do it, but under
+// coord-flip they still drop every layer in this build of Gribouille.
 #let changes = drawn.map(c => c.change)
 #let lo = calc.min(..changes)
 #let hi = calc.max(..changes)
@@ -130,7 +175,7 @@
 }
 
 // The two cities at either end of the range, named where they sit.
-#let by-change = points.sorted(key: c => c.change)
+#let by-change = drawn.sorted(key: c => c.change)
 #let callout(c, dx, dy) = (
   dx: dx,
   dy: dy,
@@ -147,11 +192,7 @@
   mapping: aes(x: "region", y: "change"),
   layers: (
     geom-hline(yintercept: 0, colour: ink, alpha: 0.4, stroke: 0.6pt),
-    geom-beeswarm(
-      mapping: aes(fill: "outcome"),
-      size: 1.3pt,
-      stroke: 0pt,
-    ),
+    ..swarm,
     geom-crossbar(
       stat: stat-summary(fun: "median"),
       width: 0.8,
@@ -190,7 +231,7 @@
     ],
     caption: [
       Green means vegetation that stays green most of the year in Landsat and Sentinel imagery; water is not counted. City boundaries follow the Degree of Urbanisation, not the municipality. \
-      The white bar is each region's median city. Swarm width shows spread, not count. 2025 is published for too few cities. Regions with fewer than #min-cities cities are not drawn. \
+      The white bar is each region's median city. Swarm width shows the number of cities. 2025 is published for too few cities. Regions with fewer than #min-cities cities are not drawn. \
       Source: UN-Habitat Urban Indicators Database (TidyTuesday 2026-09-22). Author: #link("https://mickael.canouil.fr")[Mickaël CANOUIL].
     ],
     x: none,
