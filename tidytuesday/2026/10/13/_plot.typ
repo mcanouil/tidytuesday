@@ -218,16 +218,12 @@
     data: rows,
     mapping: aes(x: "label", y: "v"),
     layers: (
-      // An invisible bar to the shared maximum: `limits` on a continuous y
-      // with coord-flip() makes geom-col draw nothing, so this row trains the
-      // scale instead and both panels keep one bar scale.
-      geom-col(data: ((label: pairs.first().first(), v: bar-max),), fill: none, width: 0.8),
       geom-col(fill: highlight, width: 0.8),
       geom-text(mapping: aes(label: typst("tag"), nudge-y: 6), anchor: "west", font: sans, size: 6.5pt, colour: ink),
     ),
     scales: scales(
       x: scale-discrete(limits: rows.map(r => r.label), labels: label-style),
-      y: scale-continuous(breaks: (), expand: (0%, 0%)),
+      y: scale-continuous(limits: (0, bar-max), breaks: (), expand: (0%, 0%)),
     ),
     coord: coord-flip(),
     labels: labels(title: title, subtitle: sub, x: none, y: none),
