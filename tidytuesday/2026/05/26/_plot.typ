@@ -15,6 +15,15 @@
 )
 #let cats = cat-colours.keys()
 
+// One definition per category. Each names the raw columns summed below, so the
+// legend says what every band holds.
+#let cat-labels = (
+  "Traditional biomass": [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
+  "Modern bioenergy": [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
+  "Hydropower": [#strong[Hydropower] \ electricity from flowing water],
+  "Wind & solar": [#strong[Wind & solar] \ plus geothermal & marine],
+)
+
 #let accent = rgb("#0f8b8d")
 
 // A boxed callout. A translucent paper background and a hairline border lift the
@@ -32,10 +41,9 @@
 }
 
 // One row per year and category, carrying the share. geom-area stacks the
-// categories. The stack follows the alphabetical order of the fill column, with
-// the first level on top, and the fill limits do not change it. The bands are
-// therefore keyed by their rank from the top (`order`), so that traditional
-// biomass sits at the foot, and the limits run from the foot up to keep the legend in the order of `cats`.
+// categories in the order of the fill limits, with the first limit on top. The
+// limits therefore run from wind & solar down to traditional biomass, and the
+// legend lists the bands in the same order, from the top of the stack down.
 //
 // A source that is zero in every year of a country has no band to draw, and a
 // band of zero height would still paint a hairline along the stack.
@@ -56,31 +64,24 @@
           + num(row.geothermal_energy_consumption_tfec_pct)
           + num(row.marine_energy_consumption_tfec_pct),
       )
-      cats.enumerate().map(((i, c)) => (year: y, order: str(cats.len() - 1 - i), share: shares.at(c)))
+      cats.map(c => (year: y, category: c, share: shares.at(c)))
     })
     .flatten()
-  rows.filter(r => rows.any(o => o.order == r.order and o.share > 0))
+  rows.filter(r => rows.any(o => o.category == r.category and o.share > 0))
 }
 
 #let panel(country, annotations) = defer(
   plot,
   data: band-rows(country),
-  mapping: aes(x: "year", y: "share", fill: "order"),
+  mapping: aes(x: "year", y: "share", fill: "category"),
   layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
-    x: scale-continuous(breaks: (1990, 2000, 2010), expand: (0%, 0%)),
+    x: scale-continuous(limits: (1990, 2010), breaks: (1990, 2000, 2010), expand: (0%, 0%)),
     y: scale-continuous(expand: (0%, auto)),
     fill: scale-discrete(
-      limits: range(cats.len()).map(str).rev(),
-      palette: cat-colours.values(),
-      // One definition per category, in the order of `cats`. Each names the raw
-      // columns summed above, so the legend says what every band holds.
-      labels: (
-        [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
-        [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
-        [#strong[Hydropower] \ electricity from flowing water],
-        [#strong[Wind & solar] \ plus geothermal & marine],
-      ),
+      limits: cats.rev(),
+      palette: cat-colours.values().rev(),
+      labels: cats.rev().map(c => cat-labels.at(c)),
     ),
   ),
   labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
@@ -108,6 +109,38 @@
         ],
         size: 6.5pt,
         anchor: "east",
+      ),
+      // The divergence note and its two arrows sit past the right edge of the
+      // fixed x limits, in the gutter, and stay clear of the Germany panel.
+      annotate(
+        "typst",
+        x: 2015.1,
+        y: 75,
+        label: box(align(center, text(fill: accent, style: "italic")[As incomes rise, \ two roads diverge])),
+        size: 8pt,
+        clip: false,
+      ),
+      annotate(
+        "segment",
+        x: 2015.1,
+        y: 63,
+        xend: 2014.2,
+        yend: 40,
+        colour: cat-colours.at("Traditional biomass"),
+        linewidth: 1.3pt,
+        arrow: arrow(length: 9pt),
+        clip: false,
+      ),
+      annotate(
+        "segment",
+        x: 2015.4,
+        y: 40,
+        xend: 2016.1,
+        yend: 62,
+        colour: cat-colours.at("Wind & solar"),
+        linewidth: 1.3pt,
+        arrow: arrow(length: 9pt),
+        clip: false,
       ),
     )),
     panel("Germany", (
@@ -151,18 +184,4 @@
       ])
     ),
   )
-  // Raw Typst: an annotation in the gutter between compose panels would widen the
-  // scale domain of its panel. The pair is centred on the gutter, which `gutter`
-  // above sizes so that the text clears both panels.
-  #place(top + center, dy: 2cm)[
-    #set align(center)
-    #set text(size: 8pt, style: "italic", fill: accent)
-    As incomes rise, \ two roads diverge
-    #v(2pt)
-    #box(inset: (x: 2pt))[
-      #text(size: 30pt, fill: cat-colours.at("Traditional biomass"))[↓]
-      #h(-5pt)
-      #text(size: 30pt, fill: cat-colours.at("Wind & solar"))[↑]
-    ]
-  ]
 ]
