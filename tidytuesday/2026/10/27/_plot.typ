@@ -111,15 +111,7 @@
   data: rows,
   mapping: aes(x: "name", y: "ratio", colour: "side"),
   layers: (
-    // The price axis spans 0.55 to 2.1 as before. A y limit still removes the
-    // stat-summary layers under coord-flip, so a blank layer sets the range.
-    geom-blank(
-      data: (0.55, 2.1).map(v => (name: countries.first().name, ratio: v)),
-      mapping: aes(x: "name", y: "ratio"),
-      inherit-aes: false,
-    ),
-    // An empty data frame stops the line from widening the price axis.
-    geom-hline(yintercept: 1, data: (:), colour: muted, stroke: 0.6pt, linetype: "dashed"),
+    geom-hline(yintercept: 1, colour: muted, stroke: 0.6pt, linetype: "dashed"),
     // The line spans the middle half of the products, and the dot is the median.
     geom-linerange(
       stat: stat-summary(fun: "median-hilow", fun-args: (conf: 0.5)),
@@ -135,7 +127,7 @@
   coord: coord-flip(),
   scales: scales(
     x: scale-discrete(limits: countries.rev().map(c => c.name)),
-    y: scale-log10(breaks: breaks, labels: ratio-label),
+    y: scale-log10(limits: (0.55, 2.1), breaks: breaks, labels: ratio-label),
     colour: scale-manual(values: (dearer-colour, cheaper), limits: ("dearer", "cheaper")),
   ),
   labels: labels(
