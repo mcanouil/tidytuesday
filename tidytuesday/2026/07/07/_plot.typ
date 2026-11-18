@@ -129,14 +129,13 @@
     // A dashed line at the halfway mark, which only the men's heavyweight
     // knockout wedge passes. Dark neutral, so it holds across all three
     // segment colours.
-    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
+    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed"),
     // The knockout share sits in warm off-white on the vermillion wedge, and the
     // decision share closes each bar in dark ink on the quiet grey. Both are
     // Typst markup labels, so the knockout share is bold.
     geom-text(
       data: label-rows("ko"),
       mapping: aes(x: "key", y: "mid", label: typst("text")),
-      inherit-aes: false,
       font: chart-font,
       size: 9.5pt,
       colour: rgb("#faf6f0"),
@@ -144,7 +143,6 @@
     geom-text(
       data: label-rows("dec"),
       mapping: aes(x: "key", y: "mid", label: typst("text")),
-      inherit-aes: false,
       font: chart-font,
       size: 8pt,
       colour: rgb("#3a352f"),
@@ -155,7 +153,7 @@
     annotate(
       "rect",
       xmin: heavy-slot - 0.38, xmax: heavy-slot + 0.38, ymin: 0, ymax: m-heavy-ko,
-      fill: none, stroke: 1.3pt + rgb("#7a3300"), clip: false,
+      fill: none, stroke: 1.3pt, colour: rgb("#7a3300"), clip: false,
     ),
     // One callout, in the gap row under the heavyweight bar, so it never lands on
     // the data. Vermillion reads on both surfaces.
@@ -214,6 +212,7 @@
     axis-text: element-text(font: body-font, size: 7.5pt),
     panel-grid: element-blank(),
     axis-ticks: element-tick(length: 0.1cm),
+    axis-ticks-y: element-blank(),
   ),
   width: auto,
   height: auto,
