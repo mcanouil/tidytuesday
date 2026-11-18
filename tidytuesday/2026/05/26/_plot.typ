@@ -32,10 +32,9 @@
 }
 
 // One row per year and category, carrying the share. geom-area stacks the
-// categories. The stack follows the alphabetical order of the fill column, with
-// the first level on top, and the fill limits do not change it. The bands are
-// therefore keyed by their rank from the top (`order`), so that traditional
-// biomass sits at the foot, and the limits run from the foot up to keep the legend in the order of `cats`.
+// categories in the order of the fill limits, with the first limit on top. The
+// limits therefore run from wind & solar down to traditional biomass, and the
+// legend lists the bands in the same order, from the top of the stack down.
 //
 // A source that is zero in every year of a country has no band to draw, and a
 // band of zero height would still paint a hairline along the stack.
@@ -56,30 +55,30 @@
           + num(row.geothermal_energy_consumption_tfec_pct)
           + num(row.marine_energy_consumption_tfec_pct),
       )
-      cats.enumerate().map(((i, c)) => (year: y, order: str(cats.len() - 1 - i), share: shares.at(c)))
+      cats.map(c => (year: y, category: c, share: shares.at(c)))
     })
     .flatten()
-  rows.filter(r => rows.any(o => o.order == r.order and o.share > 0))
+  rows.filter(r => rows.any(o => o.category == r.category and o.share > 0))
 }
 
 #let panel(country, annotations) = defer(
   plot,
   data: band-rows(country),
-  mapping: aes(x: "year", y: "share", fill: "order"),
+  mapping: aes(x: "year", y: "share", fill: "category"),
   layers: (geom-area(alpha: 1),) + annotations,
   scales: scales(
     x: scale-continuous(limits: (1990, 2010), breaks: (1990, 2000, 2010), expand: (0%, 0%)),
     y: scale-continuous(expand: (0%, auto)),
     fill: scale-discrete(
-      limits: range(cats.len()).map(str).rev(),
-      palette: cat-colours.values(),
-      // One definition per category, in the order of `cats`. Each names the raw
-      // columns summed above, so the legend says what every band holds.
+      limits: cats.rev(),
+      palette: cat-colours.values().rev(),
+      // One definition per limit. Each names the raw columns summed above, so
+      // the legend says what every band holds.
       labels: (
-        [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
-        [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
-        [#strong[Hydropower] \ electricity from flowing water],
         [#strong[Wind & solar] \ plus geothermal & marine],
+        [#strong[Hydropower] \ electricity from flowing water],
+        [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
+        [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
       ),
     ),
   ),
