@@ -57,12 +57,11 @@
   t
 }
 #let finish-names = (ko: "KO/TKO", sub: "Submission", dec: "Decision")
-#let finish-limits = ("KO/TKO", "Submission", "Decision")
+// The stack puts the first limit at the top of the bar, which is the right end,
+// so the knockout comes last to sit at the left edge.
+#let finish-limits = ("Decision", "Submission", "KO/TKO")
 
 // One row per division and finish, straight from the tally of raw fights.
-// `rank` fixes the stacking order: the stack puts the first level of `group` at
-// the top of the bar, which is the right end once the axes flip, so the
-// knockout (rank 3) sits at the left edge.
 #let bars = (
   count(fights, "gender", "division", "finish")
     .filter(t => spec.any(s => key(s.gender, s.class) == key(t.gender, t.division)))
@@ -74,7 +73,6 @@
         cat: finish-names.at(t.finish),
         n: t.n,
         share: t.n / totals.at(k),
-        rank: finish-limits.len() - finish-limits.position(c => c == finish-names.at(t.finish)),
         text: if t.finish == "ko" { "*" + label + "*" } else { label },
       )
     })
@@ -122,21 +120,20 @@
 
 #plot(
   data: bars,
-  mapping: aes(x: "key", y: "share", fill: "cat", group: "rank"),
+  mapping: aes(x: "key", y: "share", fill: "cat"),
   layers: (
     // Thin edge so segments split on light or dark paper.
     geom-col(position: "stack", width: 0.76, colour: rgb("#3333334d"), stroke: 0.4pt),
     // A dashed line at the halfway mark, which only the men's heavyweight
     // knockout wedge passes. Dark neutral, so it holds across all three
     // segment colours.
-    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed", inherit-aes: false),
+    geom-hline(yintercept: 0.5, stroke: 0.8pt, colour: rgb("#2b2b2bcc"), linetype: "dashed"),
     // The knockout share sits in warm off-white on the vermillion wedge, and the
     // decision share closes each bar in dark ink on the quiet grey. Both are
     // Typst markup labels, so the knockout share is bold.
     geom-text(
       data: label-rows("ko"),
       mapping: aes(x: "key", y: "mid", label: typst("text")),
-      inherit-aes: false,
       font: chart-font,
       size: 9.5pt,
       colour: rgb("#faf6f0"),
@@ -144,7 +141,6 @@
     geom-text(
       data: label-rows("dec"),
       mapping: aes(x: "key", y: "mid", label: typst("text")),
-      inherit-aes: false,
       font: chart-font,
       size: 8pt,
       colour: rgb("#3a352f"),
@@ -155,7 +151,7 @@
     annotate(
       "rect",
       xmin: heavy-slot - 0.38, xmax: heavy-slot + 0.38, ymin: 0, ymax: m-heavy-ko,
-      fill: none, stroke: 1.3pt + rgb("#7a3300"), clip: false,
+      fill: none, stroke: 1.3pt, colour: rgb("#7a3300"), clip: false,
     ),
     // One callout, in the gap row under the heavyweight bar, so it never lands on
     // the data. Vermillion reads on both surfaces.
@@ -186,7 +182,7 @@
       labels: ("0", "25", "50", "75", "100%"),
       expand: (0.5%, 2%),
     ),
-    fill: scale-manual(values: (ko-col, sub-col, dec-col), limits: finish-limits),
+    fill: scale-manual(values: (dec-col, sub-col, ko-col), limits: finish-limits),
   ),
   coord: coord-flip(),
   guides: guides(default: none),
@@ -213,7 +209,7 @@
     axis-title: element-text(font: body-font, size: 8.5pt),
     axis-text: element-text(font: body-font, size: 7.5pt),
     panel-grid: element-blank(),
-    axis-ticks: element-tick(length: 0.1cm),
+    axis-ticks-x: element-tick(length: 0.1cm),
   ),
   width: auto,
   height: auto,
