@@ -15,6 +15,15 @@
 )
 #let cats = cat-colours.keys()
 
+// One definition per category. Each names the raw columns summed below, so the
+// legend says what every band holds.
+#let cat-labels = (
+  "Traditional biomass": [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
+  "Modern bioenergy": [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
+  "Hydropower": [#strong[Hydropower] \ electricity from flowing water],
+  "Wind & solar": [#strong[Wind & solar] \ plus geothermal & marine],
+)
+
 #let accent = rgb("#0f8b8d")
 
 // A boxed callout. A translucent paper background and a hairline border lift the
@@ -72,14 +81,7 @@
     fill: scale-discrete(
       limits: cats.rev(),
       palette: cat-colours.values().rev(),
-      // One definition per limit. Each names the raw columns summed above, so
-      // the legend says what every band holds.
-      labels: (
-        [#strong[Wind & solar] \ plus geothermal & marine],
-        [#strong[Hydropower] \ electricity from flowing water],
-        [#strong[Modern bioenergy] \ biogas, biofuels & waste-to-energy],
-        [#strong[Traditional biomass] \ wood, charcoal & dung for cooking],
-      ),
+      labels: cats.rev().map(c => cat-labels.at(c)),
     ),
   ),
   labels: labels(title: country, x: none, y: "% Final Energy", fill: none),
