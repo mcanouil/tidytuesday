@@ -111,26 +111,20 @@
   data: rows,
   mapping: aes(x: "name", y: "ratio", colour: "side"),
   layers: (
-    // The typical price, as a segment across every row. geom-hline and geom-vline
-    // widen the price axis under coord-flip.
-    geom-segment(
-      data: ((x: 0.4, xend: countries.len() + 0.6, y: 1, yend: 1),),
-      mapping: aes(x: "x", xend: "xend", y: "y", yend: "yend"),
-      inherit-aes: false,
-      colour: muted, stroke: 0.6pt, linetype: "dashed",
-    ),
-    // The price axis spans 0.55 to 2.1 as before. A y limit cannot do it: under
-    // coord-flip it removes the layers that summarise the products.
+    // The price axis spans 0.55 to 2.1 as before. A y limit still removes the
+    // stat-summary layers under coord-flip, so a blank layer sets the range.
     geom-blank(
       data: (0.55, 2.1).map(v => (name: countries.first().name, ratio: v)),
       mapping: aes(x: "name", y: "ratio"),
       inherit-aes: false,
     ),
+    // An empty data frame stops the line from widening the price axis.
+    geom-hline(yintercept: 1, data: (:), colour: muted, stroke: 0.6pt, linetype: "dashed"),
     // The line spans the middle half of the products, and the dot is the median.
     geom-linerange(
       stat: stat-summary(fun: "median-hilow", fun-args: (conf: 0.5)),
       stroke: 2.4pt,
-      alpha: 0.7,
+      alpha: 0.5,
     ),
     geom-pointrange(
       stat: stat-summary(fun: "median-hilow", fun-args: (conf: 0.5)),
