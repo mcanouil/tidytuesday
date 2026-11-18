@@ -149,9 +149,8 @@
   stroke: 0pt,
 ))
 
-// The y scale pads the right side by more than the left, to make room for the
-// callout on the city that gained most. Scale limits would do it, but under
-// coord-flip they still drop every layer in this build of Gribouille.
+// The y scale reaches further right than the data, to make room for the
+// callout on the city that gained most.
 #let changes = drawn.map(c => c.change)
 #let lo = calc.min(..changes)
 #let hi = calc.max(..changes)
@@ -180,7 +179,7 @@
   dx: dx,
   dy: dy,
   region: c.region,
-  change: c.change,
+  change: bin-of(c) + 0.5,
   label: text(font: body-font, size: 6pt, fill: ink.transparentize(15%))[
     #text(weight: "semibold")[#c.city.split(" (").first()]
     #share-label(c.at("y" + first-year)) to #share-label(c.at("y" + last-year))
@@ -215,7 +214,7 @@
   scales: scales(
     x: scale-discrete(limits: kept.rev(), labels: row-label),
     y: scale-continuous(
-      expand: (auto, 27%),
+      limits: (lo - 0.04 * (hi - lo), hi + 0.27 * (hi - lo)),
       breaks: breaks,
       labels: signed,
     ),
