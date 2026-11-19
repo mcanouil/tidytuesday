@@ -141,6 +141,8 @@
 #let strip-width = 9.2cm
 #let cell-inset = 3pt
 
+#let swarm-width = 2.3
+
 #let strip-renderer = nanoplot(
   mapping: aes(x: "salary", y: "lane", fill: "pct"),
   layers: (
@@ -151,11 +153,11 @@
       stroke: 0.4pt,
     ),
     geom-vline(xintercept: all-median, colour: muted, stroke: 0.6pt, linetype: "dashed"),
-    geom-point(size: 2.6pt, colour: page-colour, stroke: 0.4pt, position: position-beeswarm(orientation: "y", width: 3)),
+    geom-point(size: 2.6pt, colour: page-colour, stroke: 0.4pt, position: position-beeswarm(orientation: "y", width: swarm-width)),
   ),
   scales: scales(
     x: scale-continuous(breaks: guides-at, labels: v => text(font: mono, size: 5.5pt, fill: muted)[\$#(v / 1000)k], expand: (0%, 0%)),
-    y: scale-continuous(limits: (-3.5, 3.5), expand: (0%, 0%)),
+    y: scale-continuous(limits: (-swarm-width - 1.2, swarm-width + 1.2), expand: (0%, 0%)),
     fill: scale-gradientn(colours: ramp, limits: (0, 100)),
   ),
   domain-field: "salary",
