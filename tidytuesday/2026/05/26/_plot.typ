@@ -42,8 +42,8 @@
 
 // One row per year and category, carrying the share. geom-area stacks the
 // categories in the order of the fill limits, with the first limit on top. The
-// limits therefore run from wind & solar down to traditional biomass, and the
-// legend lists the bands in the same order, from the top of the stack down.
+// limits therefore run from wind & solar down to traditional biomass. The legend
+// reverses them, so it lists the bands from the bottom of the stack up.
 //
 // A source that is zero in every year of a country has no band to draw, and a
 // band of zero height would still paint a hairline along the stack.
@@ -171,7 +171,7 @@
     collect: ("fill",),
     // Each key carries a two-line definition, so four in one row stand wider than
     // the panels. Two columns keep the legend inside the figure.
-    guides: guides(default: guide-legend(position: "bottom", ncolumn: 2)),
+    guides: guides(default: guide-legend(position: "bottom", ncolumn: 2, reverse: true)),
     gutter: 2.2cm,
     width: auto,
     height: auto,
