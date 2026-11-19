@@ -171,7 +171,7 @@
     collect: ("fill",),
     // Each key carries a two-line definition, so four in one row stand wider than
     // the panels. Two columns keep the legend inside the figure.
-    guides: guides(default: guide-legend(position: "bottom", ncolumn: 2, reverse: true)),
+    guides: guides(default: guide-legend(position: "bottom", ncolumn: 2, reverse: true, align: left)),
     gutter: 2.2cm,
     width: auto,
     height: auto,
